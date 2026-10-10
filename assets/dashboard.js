@@ -148,6 +148,67 @@
     }
   });
 
+  Z.extend({
+    en: {
+      'd.t.audit.p': 'Pending: website speed and booking-app review', 'd.t.audit.d': 'Done: market study — 5 competing cafés compared',
+      'd.t.content.p': 'Pending: 2 reels + 1 story in edit from your latest shoot', 'd.t.content.d': 'Done: 6 posts, 3 reels, 4 stories, 1 location-reveal video',
+      'd.t.inbox.p.n': 'Needs you: {n} suggested replies to review', 'd.t.inbox.p.0': 'Pending: inbox is clear', 'd.t.inbox.d': 'Done: 214 comments and DMs answered this week',
+      'd.t.wa.p': 'Pending: add 3 new autumn drinks to the catalogue', 'd.t.wa.d': 'Done: 128 chats answered, 14 pickup orders taken',
+      'd.t.smm.p': 'Pending: fresh creative for the Meta campaign', 'd.t.smm.d': 'Done: Meta + TikTok campaigns live — see Ads',
+      'd.t.yt.p': 'Not started — e.g. weekly Shorts from your bar footage', 'd.t.yt.d': 'Ask KJ to add it to your plan',
+      'd.t.google.p': 'Pending: new photos for your Google Business Profile', 'd.t.google.d': 'Done: Search campaign live — 41 direction requests',
+      'd.tool.go.inbox': 'Open inbox', 'd.tool.go.ads': 'View ads',
+      'd.inbox.title': 'Inbox', 'd.inbox.sub': 'Comments, DMs and WhatsApp — with AI-suggested replies in your brand voice.',
+      'd.inbox.note': 'Replies go out through each platform’s official API (WhatsApp via the WhatsApp Business Platform). Demo: nothing is sent.',
+      'd.inbox.k.comment': 'comment', 'd.inbox.k.dm': 'DM', 'd.inbox.k.msg': 'message',
+      'd.inbox.suggested': 'Suggested reply', 'd.inbox.sensitive': 'Sensitive — suggested: escalate to you',
+      'd.inbox.send': 'Send', 'd.inbox.edit': 'Edit', 'd.inbox.escalate': 'Escalate', 'd.inbox.undo': 'Undo',
+      'd.inbox.sent': 'Reply sent', 'd.inbox.escalated': 'Escalated to your team — the AI won’t reply',
+      'd.inbox.toast.sent': 'Reply sent on {p} (demo).', 'd.inbox.toast.esc': 'Escalated: {who} is waiting for a reply from your team.', 'd.inbox.toast.undo': 'Message moved back to your inbox.',
+      'd.inbox.edit.title': 'Edit reply', 'd.inbox.edit.label': 'Reply to {who}', 'd.inbox.edit.send': 'Save & send', 'd.inbox.edit.need': 'The reply can’t be empty.',
+      'd.inbox.empty': 'Inbox zero — every message is handled.',
+      'd.ads.title': 'Ads', 'd.ads.sub': 'Campaigns from Social Media Marketing and Google Ads & Marketing.', 'd.ads.demo': 'Demo numbers',
+      'd.ads.note': 'Ad budget is paid by you directly to each platform.',
+      'd.ads.spend': 'Spent {s} of {b}', 'd.ads.total': 'This month: {s} spent of {b} budget',
+      'd.ads.st.active': 'Active', 'd.ads.st.learning': 'Learning', 'd.ads.st.paused': 'Paused',
+      'd.ads.pause': 'Pause', 'd.ads.resume': 'Resume', 'd.ads.details': 'Details',
+      'd.ads.toast.pause': '“{name}” paused (demo).', 'd.ads.toast.resume': '“{name}” resumed (demo).',
+      'd.ads.k.platform': 'Platform', 'd.ads.k.results': 'Results', 'd.ads.k.budget': 'Budget', 'd.ads.k.status': 'Status',
+      'd.n.6': '4 new comments and messages — AI replies ready for review.', 'd.n.6t': '5 min ago',
+      'd.n.7': 'TikTok campaign is still learning — expect stable results in 2–3 days.', 'd.n.7t': '2 h ago',
+      'd.n.inbox': 'Reply sent to {who}.', 'd.n.esc': '{who} was escalated to your team.'
+    },
+    ar: {
+      'd.t.audit.p': 'قيد التنفيذ: مراجعة سرعة الموقع وتطبيق الحجز', 'd.t.audit.d': 'تم: دراسة السوق — مقارنة 5 مقاهٍ منافسة',
+      'd.t.content.p': 'قيد التنفيذ: ريلزان وستوري من آخر تصوير', 'd.t.content.d': 'تم: 6 منشورات و3 ريلز و4 ستوري وفيديو كشف موقع',
+      'd.t.inbox.p.n': 'يحتاجك: {n} ردود مقترحة للمراجعة', 'd.t.inbox.p.0': 'قيد التنفيذ: لا رسائل بالانتظار', 'd.t.inbox.d': 'تم: الرد على 214 تعليقًا ورسالة هذا الأسبوع',
+      'd.t.wa.p': 'قيد التنفيذ: إضافة 3 مشروبات خريفية للكتالوج', 'd.t.wa.d': 'تم: الرد على 128 محادثة واستلام 14 طلب استلام',
+      'd.t.smm.p': 'قيد التنفيذ: تصاميم جديدة لحملة ميتا', 'd.t.smm.d': 'تم: حملات ميتا وتيك توك تعمل — شوف الإعلانات',
+      'd.t.yt.p': 'لم يبدأ — مثال: شورتس أسبوعية من تصوير البار', 'd.t.yt.d': 'اطلب من KJ إضافتها لخطتك',
+      'd.t.google.p': 'قيد التنفيذ: صور جديدة لملفك التجاري على جوجل', 'd.t.google.d': 'تم: حملة البحث تعمل — 41 طلب اتجاهات',
+      'd.tool.go.inbox': 'افتح الرسائل', 'd.tool.go.ads': 'اعرض الإعلانات',
+      'd.inbox.title': 'الرسائل', 'd.inbox.sub': 'التعليقات والرسائل الخاصة وواتساب — مع ردود مقترحة بنبرة علامتك.',
+      'd.inbox.note': 'الردود تُرسل عبر الواجهة الرسمية لكل منصة (وواتساب عبر منصة واتساب للأعمال). عرض تجريبي: لا يُرسل شيء.',
+      'd.inbox.k.comment': 'تعليق', 'd.inbox.k.dm': 'رسالة خاصة', 'd.inbox.k.msg': 'رسالة',
+      'd.inbox.suggested': 'الرد المقترح', 'd.inbox.sensitive': 'حساسة — المقترح: تحويلها إليك',
+      'd.inbox.send': 'إرسال', 'd.inbox.edit': 'تعديل', 'd.inbox.escalate': 'تحويل', 'd.inbox.undo': 'تراجع',
+      'd.inbox.sent': 'تم إرسال الرد', 'd.inbox.escalated': 'حُوّلت لفريقك — الذكاء الاصطناعي لن يرد',
+      'd.inbox.toast.sent': 'تم إرسال الرد على {p} (عرض تجريبي).', 'd.inbox.toast.esc': 'تم التحويل: {who} بانتظار رد من فريقك.', 'd.inbox.toast.undo': 'رجعت الرسالة إلى صندوقك.',
+      'd.inbox.edit.title': 'تعديل الرد', 'd.inbox.edit.label': 'الرد على {who}', 'd.inbox.edit.send': 'حفظ وإرسال', 'd.inbox.edit.need': 'لا يمكن أن يكون الرد فارغًا.',
+      'd.inbox.empty': 'الصندوق فاضي — كل الرسائل تمت معالجتها.',
+      'd.ads.title': 'الإعلانات', 'd.ads.sub': 'حملات التسويق عبر السوشال ميديا وإعلانات جوجل.', 'd.ads.demo': 'أرقام تجريبية',
+      'd.ads.note': 'ميزانية الإعلانات تدفعها أنت مباشرة لكل منصة.',
+      'd.ads.spend': 'صُرف {s} من {b}', 'd.ads.total': 'هذا الشهر: صُرف {s} من ميزانية {b}',
+      'd.ads.st.active': 'نشطة', 'd.ads.st.learning': 'مرحلة التعلّم', 'd.ads.st.paused': 'متوقفة',
+      'd.ads.pause': 'إيقاف', 'd.ads.resume': 'استئناف', 'd.ads.details': 'التفاصيل',
+      'd.ads.toast.pause': 'تم إيقاف «{name}» (عرض تجريبي).', 'd.ads.toast.resume': 'تم استئناف «{name}» (عرض تجريبي).',
+      'd.ads.k.platform': 'المنصة', 'd.ads.k.results': 'النتائج', 'd.ads.k.budget': 'الميزانية', 'd.ads.k.status': 'الحالة',
+      'd.n.6': '4 تعليقات ورسائل جديدة — الردود المقترحة جاهزة للمراجعة.', 'd.n.6t': 'قبل 5 دقائق',
+      'd.n.7': 'حملة تيك توك ما زالت في مرحلة التعلّم — النتائج تستقر خلال 2–3 أيام.', 'd.n.7t': 'قبل ساعتين',
+      'd.n.inbox': 'تم إرسال الرد إلى {who}.', 'd.n.esc': 'تم تحويل {who} إلى فريقك.'
+    }
+  });
+
   /* ---------- Seed data ---------- */
   function seed() {
     return {
@@ -194,14 +255,45 @@
         { id: 'c19', w: 1, d: 2, time: '12:00', p: 'facebook', type: 'post', s: 'scheduled', src: 'gen', title: { en: 'Loyalty card reminder', ar: 'تذكير بطاقة الولاء' } },
         { id: 'c20', w: 1, d: 3, time: '18:30', p: 'instagram', type: 'reel', s: 'scheduled', src: 'footage', title: { en: 'Cold brew, 18 hours', ar: 'كولد برو، 18 ساعة' } },
         { id: 'c21', w: 1, d: 4, time: '11:00', p: 'pinterest', type: 'post', s: 'scheduled', src: 'photos', title: { en: 'Autumn menu board', ar: 'لوحة قائمة الخريف' } },
-        { id: 'c22', w: 1, d: 5, time: '9:00', p: 'linkedin', type: 'post', s: 'scheduled', src: 'gen', title: { en: 'Why we roast in small batches', ar: 'ليش نحمّص بكميات صغيرة' } }
+        { id: 'c22', w: 1, d: 5, time: '9:00', p: 'linkedin', type: 'post', s: 'scheduled', src: 'gen', title: { en: 'Why we roast in small batches', ar: 'ليش نحمّص بكميات صغيرة' } },
+        { id: 'c23', w: 0, d: 4, time: '8:00', p: 'instagram', type: 'story', s: 'scheduled', src: 'footage', title: { en: 'Thursday special at the bar', ar: 'عرض الخميس عند البار' } },
+        { id: 'c24', w: 0, d: 6, time: '16:00', p: 'facebook', type: 'story', s: 'scheduled', src: 'photos', title: { en: 'Weekend pastry box', ar: 'بوكس معجنات الويكند' } },
+        { id: 'c25', w: 1, d: 2, time: '8:30', p: 'instagram', type: 'story', s: 'scheduled', src: 'footage', title: { en: 'Poll: hot or iced saffron latte?', ar: 'تصويت: لاتيه الزعفران حار ولا بارد؟' } },
+        { id: 'c26', w: 1, d: 6, time: '17:00', p: 'youtube', type: 'reel', s: 'scheduled', src: 'footage', title: { en: 'Location reveal: Qahwa House rising from the map', ar: 'كشف الموقع: بيت القهوة يرتفع من الخريطة' } }
       ],
       notifs: [
+        { id: 'n6', kind: 'bad', key: 'd.n.6', tkey: 'd.n.6t', target: 'inbox', read: false },
         { id: 'n1', kind: 'bad', key: 'd.n.1', tkey: 'd.n.1t', target: 'approvals', read: false },
         { id: 'n2', kind: 'warn', key: 'd.n.2', tkey: 'd.n.2t', target: 'upload', read: false },
         { id: 'n3', kind: 'warn', key: 'd.n.3', tkey: 'd.n.3t', target: 'tools', read: false },
         { id: 'n4', kind: 'ok', key: 'd.n.4', tkey: 'd.n.4t', target: 'insights', read: false },
+        { id: 'n7', kind: 'warn', key: 'd.n.7', tkey: 'd.n.7t', target: 'ads', read: true },
         { id: 'n5', kind: 'ok', key: 'd.n.5', tkey: 'd.n.5t', target: 'calendar', read: true }
+      ],
+      inbox: [
+        { id: 'i1', p: 'instagram', k: 'comment', who: '@layla.k', state: 'pending',
+          msg: { en: 'Do you have the saffron latte iced too?', ar: 'عندكم لاتيه الزعفران بارد؟' },
+          reply: { en: 'Yes! The iced Saffron Cardamom Latte is on the autumn menu all day. See you soon.', ar: 'إيه أكيد! لاتيه الزعفران والهيل البارد موجود في قائمة الخريف طول اليوم. ننتظرك!' } },
+        { id: 'i2', p: 'instagram', k: 'dm', who: '@omar.events', state: 'pending',
+          msg: { en: 'Hi, can we book a table for 8 on Friday evening?', ar: 'مرحبا، نقدر نحجز طاولة لـ8 أشخاص الجمعة المسا؟' },
+          reply: { en: 'Hi Omar, happy to host you! We have space for 8 on Friday from 7 PM. Shall I reserve it under your name?', ar: 'هلا عمر، يسعدنا! عندنا مكان لـ8 أشخاص يوم الجمعة من الساعة 7 المسا. أحجزها باسمك؟' } },
+        { id: 'i3', p: 'tiktok', k: 'comment', who: '@coffee.nerd', state: 'pending',
+          msg: { en: 'Which beans are you using for the V60?', ar: 'أي بن تستخدمون للـV60؟' },
+          reply: { en: 'This week it’s Ethiopia Guji — floral and light roast. Ask the bar for a free tasting!', ar: 'هالأسبوع إثيوبيا قوجي — زهري وتحميص فاتح. اطلب تذوّق مجاني من البار!' } },
+        { id: 'i4', p: 'whatsapp', k: 'msg', who: '+971 5• ••• 2231', state: 'pending', sensitive: true,
+          msg: { en: 'My order yesterday was missing a croissant.', ar: 'طلبي أمس كان ناقص كرواسون.' },
+          reply: { en: 'We’re sorry about that! I’m passing this to the team now so they can make it right.', ar: 'نعتذر منك! بحوّل الموضوع للفريق الحين عشان يعوضونك.' } }
+      ],
+      ads: [
+        { id: 'ad1', p: 'meta', state: 'active', spend: 1240, budget: 2000,
+          name: { en: 'Autumn menu — local reach', ar: 'قائمة الخريف — وصول محلي' },
+          results: { en: '18.4K reached · 312 link clicks', ar: '18.4 ألف وصول · 312 نقرة' } },
+        { id: 'ad2', p: 'google', state: 'active', spend: 860, budget: 1200,
+          name: { en: 'Search — “coffee near me”', ar: 'بحث — «قهوة قريبة مني»' },
+          results: { en: '96 calls · 41 direction requests', ar: '96 اتصال · 41 طلب اتجاهات' } },
+        { id: 'ad3', p: 'tiktok', state: 'learning', spend: 450, budget: 1500,
+          name: { en: 'Saffron latte launch', ar: 'إطلاق لاتيه الزعفران' },
+          results: { en: '62K views · 3.1% click rate', ar: '62 ألف مشاهدة · 3.1% نسبة نقر' } }
       ],
       files: []
     };
@@ -209,12 +301,16 @@
 
   var S = seed();
   var notifSeq = 100;
+  var AD_PLATFORMS = { meta: { en: 'Meta (Instagram + Facebook)', ar: 'ميتا (إنستغرام + فيسبوك)', color: '#1877F2' }, google: { en: 'Google Ads', ar: 'إعلانات جوجل', color: '#34A853' }, tiktok: { en: 'TikTok Ads', ar: 'إعلانات تيك توك', color: '#25C2C9' } };
+  var WA_PLAT = { id: 'whatsapp', en: 'WhatsApp', ar: 'واتساب', color: '#25D366' };
+  function money(n) { return (L() === 'ar' ? n.toLocaleString('en-US') + ' د.إ' : 'AED ' + n.toLocaleString('en-US')); }
+  function inboxPending() { return S.inbox.filter(function (m) { return m.state === 'pending'; }).length; }
   var BARS = [['instagram', 21.4], ['tiktok', 14.1], ['facebook', 6.3], ['youtube', 3.2], ['x', 1.8], ['linkedin', 0.9], ['pinterest', 0.5]];
 
   /* ---------- Helpers ---------- */
   function L() { return Z.getLang(); }
   function $(id) { return document.getElementById(id); }
-  function plat(id) { for (var i = 0; i < Z.PLATFORMS.length; i++) if (Z.PLATFORMS[i].id === id) return Z.PLATFORMS[i]; return { id: id, en: id, ar: id, color: '#999' }; }
+  function plat(id) { if (id === 'whatsapp') return WA_PLAT; for (var i = 0; i < Z.PLATFORMS.length; i++) if (Z.PLATFORMS[i].id === id) return Z.PLATFORMS[i]; return { id: id, en: id, ar: id, color: '#999' }; }
   function appr(id) { for (var i = 0; i < S.approvals.length; i++) if (S.approvals[i].id === id) return S.approvals[i]; return null; }
   function tool(id) { for (var i = 0; i < Z.TOOLS.length; i++) if (Z.TOOLS[i].id === id) return Z.TOOLS[i]; return null; }
   function pendingCount() { return S.approvals.filter(function (a) { return a.state === 'pending'; }).length; }
@@ -269,6 +365,12 @@
       case 'brand': return { s: 'ok', p: t('d.t.brand.p'), d: t('d.t.brand.d'), go: null };
       case 'content': return { s: 'warn', p: t('d.t.content.p'), d: t('d.t.content.d'), go: 'upload' };
       case 'publisher': return { s: n ? 'bad' : 'ok', p: n ? t('d.t.pub.p.n', { n: n }) : t('d.t.pub.p.0'), d: t('d.t.pub.d', { n: pub.length, p: Object.keys(plats).length }), go: n ? 'approvals' : 'calendar' };
+      case 'audit': return { s: 'ok', p: t('d.t.audit.p'), d: t('d.t.audit.d'), go: null };
+      case 'inbox': var ni = inboxPending(); return { s: ni ? 'bad' : 'ok', p: ni ? t('d.t.inbox.p.n', { n: ni }) : t('d.t.inbox.p.0'), d: t('d.t.inbox.d'), go: 'inbox' };
+      case 'whatsapp': return { s: 'ok', p: t('d.t.wa.p'), d: t('d.t.wa.d'), go: 'inbox' };
+      case 'smm': return { s: 'warn', p: t('d.t.smm.p'), d: t('d.t.smm.d'), go: 'ads' };
+      case 'youtube': return { s: 'off', p: t('d.t.yt.p'), d: t('d.t.yt.d'), go: null };
+      case 'google': return { s: 'ok', p: t('d.t.google.p'), d: t('d.t.google.d'), go: 'ads' };
       case 'builder3d': return { s: 'off', p: t('d.t.3d.p'), d: t('d.t.3d.d'), go: null };
       case 'drawings': return { s: 'off', p: t('d.t.2d.p'), d: t('d.t.2d.d'), go: null };
       case 'security': return { s: 'warn', p: t('d.t.sec.p'), d: t('d.t.sec.d'), go: null };
@@ -277,19 +379,66 @@
     return { s: 'off', p: '', d: '' };
   }
 
+  function dtoolCard(tl) {
+    var st = toolState(tl.id);
+    return '<li><article class="plate dtool state-' + st.s + '" id="dtool-' + tl.id + '">' +
+      '<div class="dtool-head"><span class="tool-icon">' + tl.icon + '</span><div><h4>' + esc(tl[L()].name) + '</h4>' +
+      '<span class="status-label status-' + st.s + '"><span class="dot ' + st.s + '"></span>' + esc(t('d.st.' + st.s)) + '</span></div></div>' +
+      '<div class="lines">' +
+      '<div class="line pending"><span class="dot ' + (st.s === 'off' ? 'off' : (st.s === 'bad' ? 'bad' : 'warn')) + '"></span><span>' + esc(st.p) + '</span></div>' +
+      '<div class="line done"><span class="dot ' + (st.s === 'off' ? 'off' : 'ok') + '"></span><span>' + esc(st.d) + '</span></div>' +
+      '</div>' +
+      '<button class="btn btn-ghost btn-sm" type="button" data-action="tool-detail" data-id="' + tl.id + '">' + esc(t('d.details')) + '<span class="sr-only"> — ' + esc(tl[L()].name) + '</span></button>' +
+      '</article></li>';
+  }
   function renderTools() {
-    $('dtools').innerHTML = Z.TOOLS.map(function (tl) {
-      var st = toolState(tl.id);
-      return '<li><article class="plate dtool state-' + st.s + '">' +
-        '<div class="dtool-head"><span class="tool-icon">' + tl.icon + '</span><div><h3>' + esc(tl[L()].name) + '</h3>' +
-        '<span class="status-label status-' + st.s + '"><span class="dot ' + st.s + '"></span>' + esc(t('d.st.' + st.s)) + '</span></div></div>' +
-        '<div class="lines">' +
-        '<div class="line pending"><span class="dot ' + (st.s === 'off' ? 'off' : (st.s === 'bad' ? 'bad' : 'warn')) + '"></span><span>' + esc(st.p) + '</span></div>' +
-        '<div class="line done"><span class="dot ' + (st.s === 'off' ? 'off' : 'ok') + '"></span><span>' + esc(st.d) + '</span></div>' +
-        '</div>' +
-        '<button class="btn btn-ghost btn-sm" type="button" data-action="tool-detail" data-id="' + tl.id + '">' + esc(t('d.details')) + '<span class="sr-only"> — ' + esc(tl[L()].name) + '</span></button>' +
+    $('dtools').innerHTML = Z.GROUPS.map(function (g) {
+      var list = Z.TOOLS.filter(function (tl) { return tl.group === g.id; });
+      return '<div class="dtool-group"><h3 class="dgroup-title"><span class="tag">' + g.code + '</span> ' + esc(g[L()].name) + '</h3>' +
+        '<ul class="dtools">' + list.map(dtoolCard).join('') + '</ul></div>';
+    }).join('');
+  }
+
+  function renderInbox() {
+    var list = $('inbox-list');
+    list.innerHTML = S.inbox.map(function (m) {
+      var p = plat(m.p);
+      var head = '<div class="inbox-meta"><span class="chip" style="min-height:24px;padding:0 8px;cursor:default"><span class="pdot" style="background:' + p.color + '"></span>' + esc(p[L()]) + ' · ' + esc(t('d.inbox.k.' + m.k)) + '</span><strong dir="ltr">' + esc(m.who) + '</strong></div>';
+      var body = '<p class="inbox-msg">' + esc(m.msg[L()]) + '</p>';
+      var actions, reply;
+      if (m.state === 'pending') {
+        reply = '<div class="inbox-reply"><span>' + esc(t('d.inbox.suggested')) + '</span>' + (m.sensitive ? '<span class="sens status-bad"><span class="dot bad"></span>' + esc(t('d.inbox.sensitive')) + '</span>' : '') + '<p>' + esc(m.reply[L()]) + '</p></div>';
+        actions = '<button class="btn btn-approve btn-sm" type="button" data-action="inbox-send" data-id="' + m.id + '">' + esc(t('d.inbox.send')) + '</button>' +
+          '<button class="btn btn-ghost btn-sm" type="button" data-action="inbox-edit" data-id="' + m.id + '">' + esc(t('d.inbox.edit')) + '</button>' +
+          '<button class="btn btn-ghost btn-sm" type="button" data-action="inbox-escalate" data-id="' + m.id + '">' + esc(t('d.inbox.escalate')) + '</button>';
+      } else {
+        var sent = m.state === 'sent';
+        reply = sent ? '<div class="inbox-reply is-sent"><p>' + esc(m.edited ? m.edited : m.reply[L()]) + '</p></div>' : '';
+        actions = '<span class="appr-state status-' + (sent ? 'ok' : 'warn') + '"><span class="dot ' + (sent ? 'ok' : 'warn') + '"></span>' + esc(t(sent ? 'd.inbox.sent' : 'd.inbox.escalated')) + '</span>' +
+          '<button class="link-btn" type="button" data-action="inbox-undo" data-id="' + m.id + '">' + esc(t('d.inbox.undo')) + '</button>';
+      }
+      return '<li><article class="plate inbox-item' + (m.state !== 'pending' ? ' is-done' : '') + '" id="inbox-' + m.id + '">' + head + body + reply + '<div class="appr-actions">' + actions + '</div></article></li>';
+    }).join('');
+  }
+
+  function renderAds() {
+    var ts = 0, tb = 0;
+    $('ads-list').innerHTML = S.ads.map(function (a) {
+      ts += a.spend; tb += a.budget;
+      var ap = AD_PLATFORMS[a.p];
+      var stc = a.state === 'active' ? 'ok' : a.state === 'learning' ? 'warn' : 'off';
+      var pct = Math.min(100, a.spend / a.budget * 100);
+      return '<li><article class="plate ad-item" id="ad-' + a.id + '">' +
+        '<div class="ad-top"><span class="chip" style="min-height:24px;padding:0 8px;cursor:default"><span class="pdot" style="background:' + ap.color + '"></span>' + esc(ap[L()]) + '</span>' +
+        '<span class="status-label status-' + stc + '" style="font-weight:700;font-size:12px;display:inline-flex;gap:6px;align-items:center"><span class="dot ' + stc + '"></span>' + esc(t('d.ads.st.' + a.state)) + '</span></div>' +
+        '<h4>' + esc(a.name[L()]) + '</h4>' +
+        '<div class="ad-bar" role="img" aria-label="' + esc(t('d.ads.spend', { s: money(a.spend), b: money(a.budget) })) + '"><span style="width:' + pct.toFixed(0) + '%"></span></div>' +
+        '<div class="ad-nums"><span>' + esc(t('d.ads.spend', { s: money(a.spend), b: money(a.budget) })) + '</span><span>' + esc(a.results[L()]) + '</span></div>' +
+        '<div class="appr-actions"><button class="btn btn-ghost btn-sm" type="button" data-action="ad-toggle" data-id="' + a.id + '">' + esc(t(a.state === 'paused' ? 'd.ads.resume' : 'd.ads.pause')) + '</button>' +
+        '<button class="link-btn" type="button" data-action="ad-details" data-id="' + a.id + '">' + esc(t('d.ads.details')) + '</button></div>' +
         '</article></li>';
     }).join('');
+    $('ads-total').textContent = t('d.ads.total', { s: money(ts), b: money(tb) });
   }
 
   function renderFilters() {
@@ -392,7 +541,7 @@
   }
 
   function renderAll() {
-    renderTheme(); renderKpis(); renderTools(); renderFilters(); renderCalendar(); renderApprovals(); renderNotifs(); renderBars(); renderFiles();
+    renderTheme(); renderKpis(); renderTools(); renderFilters(); renderCalendar(); renderApprovals(); renderNotifs(); renderBars(); renderFiles(); renderInbox(); renderAds();
   }
 
   /* ---------- Modal ---------- */
@@ -497,6 +646,8 @@
       if (st.go === 'approvals') acts.push({ action: 'modal-go', target: 'approvals', label: t('d.tool.go.appr'), cls: 'btn-primary' });
       if (st.go === 'upload') acts.push({ action: 'modal-go', target: 'upload', label: t('d.tool.go.up'), cls: 'btn-primary' });
       if (st.go === 'insights') acts.push({ action: 'modal-go', target: 'insights', label: t('d.tool.go.ins'), cls: 'btn-primary' });
+      if (st.go === 'inbox') acts.push({ action: 'modal-go', target: 'inbox', label: t('d.tool.go.inbox'), cls: 'btn-primary' });
+      if (st.go === 'ads') acts.push({ action: 'modal-go', target: 'ads', label: t('d.tool.go.ads'), cls: 'btn-primary' });
       if (st.go === 'calendar') acts.push({ action: 'modal-go', target: 'calendar', label: t('d.tool.go.cal'), cls: 'btn-primary' });
       if (st.s === 'off') {
         acts.push({ href: 'index.html?tool=' + id + '#enquire', label: t('d.tool.enq'), cls: 'btn-primary' });
@@ -624,6 +775,80 @@
         ]
       });
     },
+    'inbox-send': function (el) {
+      var m = inboxItem(el.getAttribute('data-id'));
+      if (!m || m.state !== 'pending') return;
+      m.state = 'sent';
+      Z.toast(t('d.inbox.toast.sent', { p: plat(m.p)[L()] }), 'ok');
+      addNotif('ok', { en: tIn('en', 'd.n.inbox', { who: m.who }), ar: tIn('ar', 'd.n.inbox', { who: m.who }) }, 'inbox');
+      refreshInbox();
+    },
+    'inbox-edit': function (el) {
+      var m = inboxItem(el.getAttribute('data-id'));
+      if (!m) return;
+      openModal({
+        title: t('d.inbox.edit.title'),
+        body: '<p class="inbox-msg" style="margin:0">' + esc(m.msg[L()]) + '</p><label for="ib-note"><strong>' + esc(t('d.inbox.edit.label', { who: m.who })) + '</strong></label>' +
+          '<textarea id="ib-note">' + esc(m.edited || m.reply[L()]) + '</textarea><p class="err" id="ib-err" style="color:var(--bad);font-size:13px"></p>',
+        actions: [
+          { action: 'inbox-edit-send', id: m.id, label: t('d.inbox.edit.send'), cls: 'btn-primary' },
+          { action: 'modal-close', label: t('d.close') }
+        ]
+      });
+    },
+    'inbox-edit-send': function (el) {
+      var m = inboxItem(el.getAttribute('data-id'));
+      var ta = $('ib-note');
+      if (!m || !ta) return;
+      if (!ta.value.trim()) { $('ib-err').textContent = t('d.inbox.edit.need'); ta.focus(); return; }
+      m.edited = ta.value.trim();
+      m.state = 'sent';
+      closeModal();
+      Z.toast(t('d.inbox.toast.sent', { p: plat(m.p)[L()] }), 'ok');
+      addNotif('ok', { en: tIn('en', 'd.n.inbox', { who: m.who }), ar: tIn('ar', 'd.n.inbox', { who: m.who }) }, 'inbox');
+      refreshInbox();
+    },
+    'inbox-escalate': function (el) {
+      var m = inboxItem(el.getAttribute('data-id'));
+      if (!m || m.state !== 'pending') return;
+      m.state = 'escalated';
+      Z.toast(t('d.inbox.toast.esc', { who: m.who }), 'warn');
+      addNotif('warn', { en: tIn('en', 'd.n.esc', { who: m.who }), ar: tIn('ar', 'd.n.esc', { who: m.who }) }, 'inbox');
+      refreshInbox();
+    },
+    'inbox-undo': function (el) {
+      var m = inboxItem(el.getAttribute('data-id'));
+      if (!m) return;
+      m.state = 'pending'; m.edited = null;
+      Z.toast(t('d.inbox.toast.undo'));
+      refreshInbox();
+    },
+    'ad-toggle': function (el) {
+      var a = adItem(el.getAttribute('data-id'));
+      if (!a) return;
+      if (modal.open) closeModal();
+      if (a.state === 'paused') { a.state = a.prev || 'active'; Z.toast(t('d.ads.toast.resume', { name: a.name[L()] }), 'ok'); }
+      else { a.prev = a.state; a.state = 'paused'; Z.toast(t('d.ads.toast.pause', { name: a.name[L()] }), 'warn'); }
+      renderAds();
+      var b = document.querySelector('#ad-' + a.id + ' [data-action="ad-toggle"]'); if (b) b.focus();
+    },
+    'ad-details': function (el) {
+      var a = adItem(el.getAttribute('data-id'));
+      if (!a) return;
+      var ap = AD_PLATFORMS[a.p];
+      openModal({
+        title: a.name[L()],
+        body: '<dl class="kv"><dt>' + esc(t('d.ads.k.platform')) + '</dt><dd>' + esc(ap[L()]) + '</dd>' +
+          '<dt>' + esc(t('d.ads.k.status')) + '</dt><dd>' + esc(t('d.ads.st.' + a.state)) + '</dd>' +
+          '<dt>' + esc(t('d.ads.k.budget')) + '</dt><dd>' + esc(t('d.ads.spend', { s: money(a.spend), b: money(a.budget) })) + '</dd>' +
+          '<dt>' + esc(t('d.ads.k.results')) + '</dt><dd>' + esc(a.results[L()]) + '</dd></dl>' +
+          '<p style="color:var(--muted);font-size:14px">' + esc(t('d.ads.demo')) + ' · ' + esc(t('d.ads.note')) + '</p>',
+        actions: [
+          { action: 'ad-toggle', id: a.id, label: t(a.state === 'paused' ? 'd.ads.resume' : 'd.ads.pause') },
+          { action: 'modal-close', label: t('d.close'), cls: 'btn-primary' }
+        ]
+      });
+    },
     'upload-send': function () {
       if (!S.files.length) { Z.toast(t('d.up.none'), 'warn'); $('file-input').focus(); return; }
       var n = S.files.length;
@@ -647,6 +872,9 @@
     }
   };
 
+  function inboxItem(id) { return S.inbox.filter(function (m) { return m.id === id; })[0]; }
+  function adItem(id) { return S.ads.filter(function (a) { return a.id === id; })[0]; }
+  function refreshInbox() { renderInbox(); renderTools(); renderKpis(); }
   function refreshAfterApproval() { renderKpis(); renderTools(); renderCalendar(); renderApprovals(); }
 
   function closeNotif() {

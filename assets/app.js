@@ -16,6 +16,12 @@
     drawings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3z"/><path d="M3 9h7v12M10 9V3M14 14h7M6 6h.01"/><path d="M14 17l2-2 2 2"/></svg>',
     security: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.2-8 11-4.6-1.8-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg>',
     insights: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M6 17v-5M11 17V7M16 17v-8M21 17V4"/></svg>',
+    audit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 12v-2M10.5 12V8M13 12v-3"/></svg>',
+    inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h12v8H9l-4 3v-3H4z"/><path d="M16 9h4v8h-1v3l-4-3h-4v-2"/></svg>',
+    whatsappTool: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1112 20a8 8 0 01-4.1-1.1z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a3.5 3.5 0 01-1.8-1.8l.8-1-1-2z"/></svg>',
+    smm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h3l7 5V5L6 10z"/><path d="M17 9a4 4 0 010 6M19.5 6.5a7.5 7.5 0 010 11"/></svg>',
+    youtube: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="3.5"/><path d="M10 9l5 3-5 3z"/></svg>',
+    google: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0112 3.5 6.5 6.5 0 0118.5 10c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
     wa: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.56 2 2.1 6.45 2.1 11.93c0 1.75.46 3.46 1.33 4.97L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.47 0 9.93-4.45 9.93-9.93A9.86 9.86 0 0012.04 2zm0 18.15h-.01a8.25 8.25 0 01-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.36c0-4.55 3.71-8.25 8.27-8.25 2.2 0 4.28.86 5.84 2.42a8.2 8.2 0 012.42 5.84c0 4.55-3.71 8.21-8.27 8.21zm4.53-6.16c-.25-.12-1.47-.72-1.7-.8-.23-.09-.39-.13-.56.12-.17.25-.64.8-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.12-.15.17-.25.25-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.42h-.48c-.17 0-.44.06-.66.31-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.57.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.08.15-1.18-.06-.11-.23-.17-.48-.29z"/></svg>',
@@ -24,58 +30,109 @@
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
   };
 
-  /* ---------- Tool catalogue ---------- */
+  /* ---------- Tool catalogue (12 tools in 5 groups) ---------- */
+  var GROUPS = [
+    { id: 'brand', code: 'G-01', en: { name: 'Brand', d: 'Know where you stand, then look the part everywhere.' }, ar: { name: 'الهوية', d: 'اعرف موقعك في السوق، ثم اظهر بهوية واحدة في كل مكان.' } },
+    { id: 'content', code: 'G-02', en: { name: 'Content', d: 'Your own footage, edited into content that performs.' }, ar: { name: 'المحتوى', d: 'موادك الحقيقية، محرَّرة إلى محتوى يحقق نتائج.' } },
+    { id: 'engage', code: 'G-03', en: { name: 'Engage & Sell', d: 'Publish, reply and take orders — through official platform APIs.' }, ar: { name: 'التفاعل والمبيعات', d: 'انشر، ورُد، واستقبل الطلبات — عبر الواجهات الرسمية للمنصات.' } },
+    { id: 'grow', code: 'G-04', en: { name: 'Grow', d: 'Campaigns, channels and reports that bring new customers.' }, ar: { name: 'النمو', d: 'حملات وقنوات وتقارير تجلب لك عملاء جدد.' } },
+    { id: 'build', code: 'G-05', en: { name: 'Build & Protect', d: 'Engineering-grade visuals, drawings and security.' }, ar: { name: 'البناء والحماية', d: 'تصورات ورسومات بمعايير هندسية، وأمان لحساباتك.' } }
+  ];
+
   var TOOLS = [
-    { id: 'brand', code: 'T-01', icon: ICONS.brand,
+    { id: 'brand', group: 'brand', code: 'T-01', icon: ICONS.brand,
       en: { name: 'Brand Kit Builder', tag: 'A complete, consistent identity before the first post goes out.',
         desc: 'Everything your brand needs to look and sound like itself on every channel — documented so your team can follow it.',
         points: ['Logo direction and colour palette', 'Typography and brand voice', 'Bilingual Arabic / English taglines', 'Social templates + brand guideline document'] },
       ar: { name: 'باني هوية العلامة', tag: 'هوية متكاملة ومتّسقة قبل أن يُنشر أول منشور.',
         desc: 'كل ما تحتاجه علامتك لتظهر بشكلها وصوتها الحقيقي على كل منصة — موثّق ليلتزم به فريقك بسهولة.',
         points: ['اتجاه الشعار ولوحة الألوان', 'الخطوط ونبرة العلامة', 'شعارات نصية بالعربية والإنجليزية', 'قوالب سوشال ميديا ودليل هوية متكامل'] } },
-    { id: 'content', code: 'T-02', icon: ICONS.content,
+    { id: 'audit', group: 'brand', code: 'T-02', icon: ICONS.audit,
+      en: { name: 'Brand & Market Audit', tag: 'An honest digital study of your business — next to your competitors.',
+        desc: 'A clear look at how you show up online today compared with the businesses you compete with, and where the quickest wins are.',
+        points: ['Social accounts, website and app reviewed', 'Colours, voice and visuals vs competitors', 'Gaps in content, channels and offers', 'Prioritised list of opportunities'] },
+      ar: { name: 'تدقيق العلامة والسوق', tag: 'دراسة رقمية صريحة لنشاطك — بجانب منافسيك.',
+        desc: 'نظرة واضحة على ظهورك الرقمي اليوم مقارنة بمنافسيك، وأين توجد أسرع المكاسب.',
+        points: ['مراجعة حسابات السوشال والموقع والتطبيق', 'الألوان والنبرة والصور مقارنة بالمنافسين', 'الفجوات في المحتوى والقنوات والعروض', 'قائمة فرص مرتبة حسب الأولوية'] } },
+    { id: 'content', group: 'content', code: 'T-03', icon: ICONS.content,
       en: { name: 'Content Studio', tag: 'Your real photos and videos, edited into content that looks like you.',
         desc: 'It always starts by asking for your own product photos and videos, then edits them professionally. Visuals are generated only where footage is missing.',
-        points: ['Posts, carousels and reels in your brand', 'Cuts, captions, motion text and music', 'Colour grade and brand overlays', 'Captions in Arabic and English'] },
+        points: ['Posts, carousels, reels and stories', 'Animated video covers', '3D “location reveal” videos — your building rising from the map', 'Cuts, captions, motion text, music, colour grade, brand overlays', 'Captions in Arabic and English'] },
       ar: { name: 'استوديو المحتوى', tag: 'صورك وفيديوهاتك الحقيقية، تتحوّل إلى محتوى يشبهك.',
         desc: 'يبدأ دائمًا بطلب صور وفيديوهات منتجاتك، ثم يحرّرها باحتراف. ولا يُولّد صورًا إلا عندما لا تتوفّر مواد مصوّرة.',
-        points: ['منشورات وكاروسيل وريلز بهوية علامتك', 'قصّ وتعليقات ونصوص متحركة وموسيقى', 'معالجة ألوان وإضافات بهوية العلامة', 'تعليقات بالعربية والإنجليزية'] } },
-    { id: 'publisher', code: 'T-03', icon: ICONS.publisher,
+        points: ['منشورات وكاروسيل وريلز وستوري', 'أغلفة فيديو متحركة', 'فيديوهات «كشف الموقع» ثلاثية الأبعاد — مبناك يرتفع من الخريطة', 'قصّ وتعليقات ونصوص متحركة وموسيقى ومعالجة ألوان بهوية علامتك', 'تعليقات بالعربية والإنجليزية'] } },
+    { id: 'publisher', group: 'engage', code: 'T-04', icon: ICONS.publisher,
       en: { name: 'Social Media Publisher', tag: 'Seven platforms, one calendar — and nothing posts without your approval.',
-        desc: 'Approved content is scheduled and published at the right time on every channel you use, from one shared content calendar.',
-        points: ['Instagram, Facebook, TikTok, YouTube', 'Pinterest, X and LinkedIn', 'One content calendar for every channel', 'Approve or request changes before anything goes live'] },
+        desc: 'Approved content is scheduled and published through each platform’s official API, from one shared content calendar — safe for your accounts.',
+        points: ['Instagram, Facebook, TikTok, YouTube', 'Pinterest, X and LinkedIn', 'Official platform APIs only', 'Approve or request changes before anything goes live'] },
       ar: { name: 'ناشر السوشال ميديا', tag: 'سبع منصات في تقويم واحد — ولا شيء يُنشر بدون موافقتك.',
-        desc: 'يُجدول المحتوى المعتمد ويُنشر في الوقت المناسب على كل منصة تستخدمها، من تقويم محتوى واحد.',
-        points: ['إنستغرام، فيسبوك، تيك توك، يوتيوب', 'بنترست، إكس ولينكدإن', 'تقويم محتوى واحد لكل المنصات', 'وافق أو اطلب تعديل قبل أي نشر'] } },
-    { id: 'builder3d', code: 'T-04', icon: ICONS.builder3d,
+        desc: 'يُجدول المحتوى المعتمد ويُنشر عبر الواجهة الرسمية (API) لكل منصة، من تقويم محتوى واحد — بأمان تام لحساباتك.',
+        points: ['إنستغرام، فيسبوك، تيك توك، يوتيوب', 'بنترست، إكس ولينكدإن', 'عبر الواجهات الرسمية للمنصات فقط', 'وافق أو اطلب تعديل قبل أي نشر'] } },
+    { id: 'inbox', group: 'engage', code: 'T-05', icon: ICONS.inbox,
+      en: { name: 'Inbox & Comments AI', tag: 'Every comment and DM answered in your brand voice.',
+        desc: 'Replies to comments and direct messages on Instagram, Facebook, TikTok and YouTube through their official APIs. Questions you’ve approved answers for are handled automatically; anything sensitive comes straight to you.',
+        points: ['Comments and DMs on Instagram, Facebook, TikTok, YouTube', 'Replies in your brand voice, Arabic or English', 'Approved FAQs answered automatically', 'Complaints and sensitive messages escalated to you'] },
+      ar: { name: 'الرد الذكي على التعليقات والرسائل', tag: 'كل تعليق ورسالة يُرد عليها بنبرة علامتك.',
+        desc: 'يرد على التعليقات والرسائل الخاصة في إنستغرام وفيسبوك وتيك توك ويوتيوب عبر واجهاتها الرسمية. الأسئلة التي اعتمدت إجاباتها يُرد عليها تلقائيًا، وأي رسالة حساسة تصلك مباشرة.',
+        points: ['تعليقات ورسائل إنستغرام وفيسبوك وتيك توك ويوتيوب', 'ردود بنبرة علامتك بالعربية أو الإنجليزية', 'الأسئلة المتكررة المعتمدة يُرد عليها تلقائيًا', 'الشكاوى والرسائل الحساسة تُحوَّل إليك'] } },
+    { id: 'whatsapp', group: 'engage', code: 'T-06', icon: ICONS.whatsappTool,
+      en: { name: 'WhatsApp AI Assistant', tag: 'Instant answers on WhatsApp, 24/7 — with a human one tap away.',
+        desc: 'Runs on the official WhatsApp Business Platform: answers questions, shares your catalogue and takes orders or bookings, then hands over to your team whenever needed.',
+        points: ['Instant replies, day and night', 'Product catalogue, orders and bookings', 'Broadcasts only to customers who opted in', 'Handover to a human at any point'] },
+      ar: { name: 'مساعد واتساب الذكي', tag: 'ردود فورية على واتساب على مدار الساعة — وموظفك على بُعد ضغطة.',
+        desc: 'يعمل عبر منصة واتساب للأعمال الرسمية (WhatsApp Business Platform): يجاوب الأسئلة، ويعرض الكتالوج، ويستقبل الطلبات والحجوزات، ويحوّل المحادثة لفريقك متى ما احتجت.',
+        points: ['ردود فورية ليلًا ونهارًا', 'كتالوج المنتجات والطلبات والحجوزات', 'رسائل جماعية فقط لمن وافق على استقبالها', 'تحويل المحادثة لموظف في أي لحظة'] } },
+    { id: 'smm', group: 'grow', code: 'T-07', icon: ICONS.smm,
+      en: { name: 'Social Media Marketing', tag: 'Strategy, campaigns and paid ads that reach the right people.',
+        desc: 'Plans your campaigns and runs paid ads on Meta (Instagram and Facebook), TikTok and Snapchat, with clear targets and weekly results. Your ad budget is paid by you directly to the platform.',
+        points: ['Channel strategy and campaign plan', 'Paid ads on Meta, TikTok and Snapchat', 'Audiences, creatives and A/B tests', 'Spend vs budget visible in your dashboard'] },
+      ar: { name: 'التسويق عبر السوشال ميديا', tag: 'استراتيجية وحملات وإعلانات مدفوعة تصل للناس الصح.',
+        desc: 'يخطط حملاتك ويدير إعلاناتك المدفوعة على ميتا (إنستغرام وفيسبوك) وتيك توك وسناب شات، بأهداف واضحة ونتائج أسبوعية. ميزانية الإعلانات تدفعها أنت مباشرة للمنصة.',
+        points: ['استراتيجية القنوات وخطة الحملات', 'إعلانات مدفوعة على ميتا وتيك توك وسناب شات', 'الجمهور والتصاميم واختبارات A/B', 'الصرف مقابل الميزانية واضح في لوحتك'] } },
+    { id: 'youtube', group: 'grow', code: 'T-08', icon: ICONS.youtube,
+      en: { name: 'YouTube Growth', tag: 'A channel that works for you — Shorts, long videos and ads.',
+        desc: 'Sets up and grows your YouTube channel: Shorts and long videos from your footage, titles and SEO, thumbnails, and YouTube ads.',
+        points: ['Channel setup and branding', 'Shorts + long-form videos', 'Titles, descriptions, SEO and thumbnails', 'YouTube ads'] },
+      ar: { name: 'نمو يوتيوب', tag: 'قناة تشتغل لصالحك — شورتس وفيديوهات طويلة وإعلانات.',
+        desc: 'يجهّز قناتك على يوتيوب وينمّيها: شورتس وفيديوهات طويلة من موادك، عناوين وتحسين بحث، صور مصغّرة، وإعلانات يوتيوب.',
+        points: ['إعداد القناة وهويتها', 'شورتس وفيديوهات طويلة', 'العناوين والأوصاف والـSEO والصور المصغّرة', 'إعلانات يوتيوب'] } },
+    { id: 'google', group: 'grow', code: 'T-09', icon: ICONS.google,
+      en: { name: 'Google Ads & Marketing', tag: 'Be found the moment someone searches for what you sell.',
+        desc: 'Search and Performance Max campaigns, YouTube ads, your Google Business Profile and local SEO — so nearby customers find you, call you and visit.',
+        points: ['Google Search and Performance Max', 'YouTube ads', 'Google Business Profile management', 'Local SEO and map visibility'] },
+      ar: { name: 'إعلانات وتسويق جوجل', tag: 'خلّ العميل يلقاك لحظة ما يبحث عن اللي تبيعه.',
+        desc: 'حملات البحث وPerformance Max، إعلانات يوتيوب، ملفك التجاري على جوجل (Google Business Profile) والـSEO المحلي — حتى يلقاك العملاء القريبون ويتصلون ويزورونك.',
+        points: ['حملات بحث جوجل وPerformance Max', 'إعلانات يوتيوب', 'إدارة ملفك التجاري على جوجل', 'SEO محلي وظهور على الخرائط'] } },
+    { id: 'insights', group: 'grow', code: 'T-10', icon: ICONS.insights,
+      en: { name: 'Insights & Reports', tag: 'Every week: what worked, and what to post next.',
+        desc: 'A weekly report across all your channels and campaigns that turns numbers into decisions — with clear recommendations for next week.',
+        points: ['Reach and engagement by platform', 'Best and weakest posts of the week', 'Ad results vs budget', 'What to post next, and when'] },
+      ar: { name: 'التحليلات والتقارير', tag: 'كل أسبوع: ما الذي نجح، وماذا تنشر بعده.',
+        desc: 'تقرير أسبوعي لكل منصاتك وحملاتك يحوّل الأرقام إلى قرارات — مع توصيات واضحة للأسبوع القادم.',
+        points: ['الوصول والتفاعل لكل منصة', 'أفضل وأضعف منشورات الأسبوع', 'نتائج الإعلانات مقابل الميزانية', 'ماذا تنشر بعد ذلك ومتى'] } },
+    { id: 'builder3d', group: 'build', code: 'T-11', icon: ICONS.builder3d,
       en: { name: '3D Builder', tag: 'See the space or product in 3D before it exists.',
         desc: 'Clear 3D visualisation of interiors, shopfronts, displays and products — built on a tool ZKJ VERSE has tested on its own projects.',
         points: ['Spaces, fit-outs and shopfronts', 'Products and displays', 'Stills ready for social and proposals', 'Iterate on layout and materials'] },
       ar: { name: 'مُنشئ الثلاثي الأبعاد', tag: 'شاهد المكان أو المنتج بالأبعاد الثلاثية قبل تنفيذه.',
         desc: 'تصوّر ثلاثي الأبعاد واضح للمساحات الداخلية والواجهات وأماكن العرض والمنتجات — مبني على أداة جرّبتها ZKJ VERSE في مشاريعها.',
         points: ['مساحات وتشطيبات وواجهات محلات', 'منتجات وأماكن عرض', 'صور جاهزة للسوشال والعروض', 'تعديلات على التوزيع والخامات'] } },
-    { id: 'drawings', code: 'T-05', icon: ICONS.drawings,
+    { id: 'drawings', group: 'build', code: 'T-12', icon: ICONS.drawings,
       en: { name: '2D Engineering Drawings Agent', tag: 'Technical drawings in Arabic and English, with dimensions that read right.',
-        desc: 'Plans, sections and schedules prepared bilingually, with correct right-to-left dimensions and labels — made by an engineer’s standards.',
+        desc: 'Plans, sections and schedules prepared bilingually, with correct right-to-left dimensions and labels — made to an engineer’s standards.',
         points: ['Plans, sections and elevations', 'Door, finish and equipment schedules', 'Correct RTL dimensions and labels', 'Arabic / English title blocks'] },
       ar: { name: 'وكيل الرسومات الهندسية ثنائية الأبعاد', tag: 'رسومات فنية بالعربية والإنجليزية، بأبعاد تُقرأ صح.',
         desc: 'مخططات ومقاطع وجداول ثنائية اللغة، مع أبعاد وتسميات صحيحة من اليمين إلى اليسار — بمعايير هندسية.',
         points: ['مخططات ومقاطع وواجهات', 'جداول الأبواب والتشطيبات والمعدات', 'أبعاد وتسميات صحيحة من اليمين لليسار', 'إطارات عنوان بالعربية والإنجليزية'] } },
-    { id: 'security', code: 'T-06', icon: ICONS.security,
+    { id: 'security', group: 'build', code: 'T-13', icon: ICONS.security,
       en: { name: 'Security Agent', tag: 'Find the weak spots before someone else does.',
         desc: 'Reviews your website, social accounts and code for security issues, then gives you a plain-language fix list, ordered by risk.',
         points: ['Website and booking-page checks', 'Account access and two-step login review', 'Code review for common issues', 'Plain-language fix list by priority'] },
       ar: { name: 'وكيل الأمان', tag: 'اكتشف نقاط الضعف قبل أن يكتشفها غيرك.',
         desc: 'يراجع موقعك وحساباتك على السوشال والكود بحثًا عن مشاكل أمنية، ثم يعطيك قائمة إصلاحات بلغة واضحة مرتبة حسب الخطورة.',
-        points: ['فحص الموقع وصفحات الحجز', 'مراجعة صلاحيات الحسابات والتحقق بخطوتين', 'مراجعة الكود للمشاكل الشائعة', 'قائمة إصلاحات واضحة حسب الأولوية'] } },
-    { id: 'insights', code: 'T-07', icon: ICONS.insights,
-      en: { name: 'Insights & Reports', tag: 'Every week: what worked, and what to post next.',
-        desc: 'A weekly report across all your channels that turns numbers into decisions — with clear recommendations for the next week’s content.',
-        points: ['Reach and engagement by platform', 'Best and weakest posts of the week', 'What to post next, and when', 'Bilingual report in your dashboard'] },
-      ar: { name: 'التحليلات والتقارير', tag: 'كل أسبوع: ما الذي نجح، وماذا تنشر بعده.',
-        desc: 'تقرير أسبوعي لكل منصاتك يحوّل الأرقام إلى قرارات — مع توصيات واضحة لمحتوى الأسبوع القادم.',
-        points: ['الوصول والتفاعل لكل منصة', 'أفضل وأضعف منشورات الأسبوع', 'ماذا تنشر بعد ذلك ومتى', 'تقرير بلغتين داخل لوحتك'] } }
+        points: ['فحص الموقع وصفحات الحجز', 'مراجعة صلاحيات الحسابات والتحقق بخطوتين', 'مراجعة الكود للمشاكل الشائعة', 'قائمة إصلاحات واضحة حسب الأولوية'] } }
   ];
+  TOOLS.forEach(function (tl, i) { tl.code = 'T-' + (i < 9 ? '0' : '') + (i + 1); });
 
   var PLATFORMS = [
     { id: 'instagram', en: 'Instagram', ar: 'إنستغرام', color: '#E1306C' },
@@ -88,24 +145,29 @@
   ];
 
   var PACKAGES = ['starter', 'growth', 'full'];
+  var FORM_EXTRA_PLATFORMS = [
+    { id: 'snapchat', en: 'Snapchat', ar: 'سناب شات' },
+    { id: 'whatsapp', en: 'WhatsApp', ar: 'واتساب' },
+    { id: 'google', en: 'Google Business Profile', ar: 'ملف جوجل التجاري' }
+  ];
 
   /* ---------- Strings ---------- */
   var STR = {
     en: {
       'meta.title': 'ZKJ SYSTEM — AI tools for your brand, by ZKJ VERSE',
       'skip': 'Skip to content',
-      'nav.how': 'How it works', 'nav.tools': 'Tools', 'nav.packages': 'Packages', 'nav.demo': 'Live demo', 'nav.faq': 'FAQ', 'nav.enquire': 'Enquire',
+      'nav.safe': 'Safety', 'nav.how': 'How it works', 'nav.tools': 'Tools', 'nav.packages': 'Packages', 'nav.demo': 'Live demo', 'nav.faq': 'FAQ', 'nav.enquire': 'Enquire',
       'nav.menu': 'Open menu', 'lang.switch': 'Switch language to Arabic',
       'hero.eyebrow': 'ZKJ VERSE · Where Engineering Meets Light',
       'hero.title': 'AI tools that run your brand’s content — <span class="hl">and show you every step.</span>',
-      'hero.lead': 'ZKJ SYSTEM is a set of seven AI tools built by ZKJ VERSE. Send a short brief and your own photos and videos — the tools build your brand kit, edit your content, publish it with your approval and tell you what worked. All inside a live dashboard in your logo and colours.',
+      'hero.lead': 'ZKJ SYSTEM is a set of 13 AI tools built by ZKJ VERSE. Send a short brief and your own photos and videos — the tools build your brand, edit your content, publish and reply through official platform APIs with your approval, run your campaigns and tell you what worked. All inside a live dashboard in your logo and colours.',
       'hero.cta.wa': 'Enquire on WhatsApp', 'hero.cta.demo': 'Open the live demo',
       'hero.f1': 'AI tools', 'hero.f2': 'platforms published', 'hero.f3': 'languages — Arabic & English', 'hero.f4': 'posts go live without your approval',
       'mock.client': 'Your brand here', 'mock.demo': 'Live demo',
-      'mock.r1': 'Content Studio', 'mock.r1s': '2 reels in edit from your footage',
+      'mock.r1': 'Content Studio', 'mock.r1s': '2 reels and 1 story in edit from your footage',
       'mock.r2': 'Social Media Publisher', 'mock.r2s': '3 posts waiting for your approval',
       'mock.r3': 'Insights & Reports', 'mock.r3s': 'Weekly report ready',
-      'mock.r4': '3D Builder', 'mock.r4s': 'Not started',
+      'mock.r4': 'Inbox & Comments AI', 'mock.r4s': '4 suggested replies to review',
       'mock.foot1': 'Your logo · your colours', 'mock.foot2': 'EN / AR',
       'aud.label': 'Built for businesses across the Arab world:',
       'aud.1': 'Restaurants', 'aud.2': 'Cafés', 'aud.3': 'Gyms', 'aud.4': 'Retail', 'aud.5': 'Real estate', 'aud.6': 'E-commerce', 'aud.7': 'Brands',
@@ -114,24 +176,32 @@
       'how.2.t': 'Brief + your photos & videos', 'how.2.d': 'A short brief on your brand, audience and goals — plus your own product photos and videos, if you have them.',
       'how.3.t': 'Tools start', 'how.3.d': 'KJ sets up the tools you chose. Content is edited from your real footage first; anything missing is generated in your style.',
       'how.4.t': 'Your live branded dashboard', 'how.4.d': 'Notifications, content, approvals and publishing in one place — in your logo and colours, in Arabic or English.',
-      'tools.eyebrow': 'The catalogue', 'tools.title': 'Seven tools. One system.', 'tools.sub': 'Start with one tool or run all seven. Every tool reports into the same dashboard, so you always know what’s done and what needs you.',
+      'tools.eyebrow': 'The catalogue', 'tools.title': '13 tools. Five groups. One system.', 'tools.sub': 'Brand, Content, Engage & Sell, Grow, Build & Protect. Start with one tool or run them all — every tool reports into the same dashboard, so you always know what’s done and what needs you.',
       'tools.cta': 'Enquire about this tool',
       'pk.eyebrow': 'Packages', 'pk.title': 'Packages by channel', 'pk.sub': 'Every package includes Content Studio, Social Media Publisher, Insights & Reports and your live branded dashboard. Pricing is shared with you personally after your brief.',
       'pk.starter.name': 'Starter', 'pk.starter.reach': '1–2 platforms', 'pk.starter.d': 'For a focused start on the channels where your customers already are.',
-      'pk.growth.name': 'Growth', 'pk.growth.reach': '3–4 platforms', 'pk.growth.d': 'For businesses ready to show up consistently across more channels.',
-      'pk.full.name': 'Full', 'pk.full.reach': 'All 7 platforms + Brand Kit', 'pk.full.d': 'The complete system, starting with a full brand kit and covering every channel.',
+      'pk.growth.name': 'Growth', 'pk.growth.reach': '3–4 platforms', 'pk.growth.d': 'For businesses ready to show up consistently on more channels — and answer every comment and DM.',
+      'pk.full.name': 'Full', 'pk.full.reach': 'All 7 platforms + Brand Kit, ads & WhatsApp AI', 'pk.full.d': 'The complete system: a full brand kit, every channel, paid campaigns and a WhatsApp assistant that takes orders around the clock.',
       'pk.i1': 'Content edited from your own photos & videos', 'pk.i2': 'Approval before anything is published', 'pk.i3': 'Weekly insights report', 'pk.i4': 'Live branded dashboard (EN / AR)',
       'pk.i5': 'Brand Kit Builder included', 'pk.i6': 'Content calendar across all channels',
       'pk.cta': 'Enquire about {name}',
-      'pk.note': 'Add 3D Builder, 2D Engineering Drawings or the Security Agent to any package — or use them on their own.',
+      'pk.note': 'Add Brand & Market Audit, YouTube Growth, Google Ads & Marketing, 3D Builder, 2D Engineering Drawings or the Security Agent to any package — or use them on their own. Ad budgets are paid by you directly to each platform.',
       'demo.eyebrow': 'Live demo', 'demo.title': 'See your dashboard before you start', 'demo.sub': 'Click through a working demo with a sample café brand: approve posts, check the calendar, upload media and switch themes. No login needed.', 'demo.cta': 'Open the live demo',
       'faq.eyebrow': 'FAQ', 'faq.title': 'Questions, answered',
       'faq.1.q': 'Is ZKJ SYSTEM a service or a product?', 'faq.1.a': 'A product. ZKJ SYSTEM is a set of AI tools sold by ZKJ VERSE. KJ sets up your tools from your brief and your media, and you follow everything in your own branded dashboard.',
       'faq.2.q': 'Do I have to send my own photos and videos?', 'faq.2.a': 'It’s the first thing we ask for — your real products, space and people perform best. If you don’t have footage yet, Content Studio generates visuals in your brand style, and those posts are clearly marked in your dashboard.',
-      'faq.3.q': 'Will anything be posted without my approval?', 'faq.3.a': 'No. Every post, carousel and reel waits in your approvals queue. You approve it or request changes; only approved content is scheduled and published.',
-      'faq.4.q': 'Which platforms do you publish to?', 'faq.4.a': 'Instagram, Facebook, TikTok, YouTube, Pinterest, X and LinkedIn. Your package decides how many you start with.',
+      'faq.3.q': 'Will anything be posted or sent without my approval?', 'faq.3.a': 'No. Every post, carousel, reel and story waits in your approvals queue. Comment, DM and WhatsApp replies follow answers and rules you have approved; anything new or sensitive waits for you or is escalated to you.',
+      'faq.4.q': 'Which platforms do you publish to?', 'faq.4.a': 'We publish to Instagram, Facebook, TikTok, YouTube, Pinterest, X and LinkedIn; run ads on Meta, TikTok, Snapchat and Google; and answer customers on WhatsApp. Your package decides where you start.',
       'faq.5.q': 'Does it work in Arabic and English?', 'faq.5.a': 'Yes. Captions, your dashboard and your reports are available in Arabic and English, with a proper right-to-left layout in Arabic.',
       'faq.6.q': 'How do pricing and payment work?', 'faq.6.a': 'There is no checkout on this site. Send an enquiry and KJ replies personally with a proposal for the tools you chose, and arranges payment with you directly.',
+      'faq.8.q': 'Is it safe for my accounts?', 'faq.8.a': 'Yes. Publishing, comment and DM replies and WhatsApp run only through the platforms’ official APIs and business tools — Meta, TikTok, YouTube, Google and the WhatsApp Business Platform. No unofficial bots or workarounds, and you can remove access at any time.',
+      'faq.9.q': 'Is the ad budget included?', 'faq.9.a': 'No — the ad budget is paid by you directly to the platform (Meta, TikTok, Snapchat or Google). ZKJ SYSTEM plans and manages the campaigns, and you see spend against budget in your dashboard.',
+      'safe.eyebrow': 'Safe by design', 'safe.title': 'Official channels only. Your approval first.', 'safe.sub': 'Your accounts are your business. ZKJ SYSTEM works with them the way the platforms intend.',
+      'safe.1.t': 'Official platform APIs', 'safe.1.d': 'Publishing, comment and DM replies and WhatsApp run through the official APIs and business tools of Meta, TikTok, YouTube, Google and the WhatsApp Business Platform — safe for your accounts.',
+      'safe.2.t': 'Nothing goes out without approval', 'safe.2.d': 'Posts wait in your approvals queue. Replies follow answers and rules you’ve approved, and anything sensitive is escalated to you.',
+      'safe.3.t': 'You stay the owner', 'safe.3.d': 'Pages, channels and ad accounts stay in your name. Access is granted through each platform’s official permissions and you can remove it at any time.',
+      'safe.4.t': 'Ad budget goes to the platform', 'safe.4.d': 'Your ad budget is paid by you directly to Meta, TikTok, Snapchat or Google. You see every campaign’s spend against budget.',
+      'pk.i7': 'Inbox & Comments AI replies', 'pk.i8': 'Social Media Marketing — paid ads on Meta, TikTok & Snapchat', 'pk.i9': 'WhatsApp AI Assistant',
       'faq.7.q': 'Can I start small and add tools later?', 'faq.7.a': 'Yes. Start with one tool or the Starter package and add tools whenever you’re ready — they join the same dashboard.',
       'enq.eyebrow': 'Enquire', 'enq.title': 'Start with a conversation', 'enq.sub': 'Choose the channel that suits you. KJ reads every enquiry and replies personally.',
       'enq.ctx': 'Enquiring about:', 'enq.ctx.clear': 'Clear selection',
@@ -160,18 +230,18 @@
     ar: {
       'meta.title': 'ZKJ SYSTEM — أدوات ذكاء اصطناعي لعلامتك من ZKJ VERSE',
       'skip': 'انتقل إلى المحتوى',
-      'nav.how': 'كيف يعمل', 'nav.tools': 'الأدوات', 'nav.packages': 'الباقات', 'nav.demo': 'العرض المباشر', 'nav.faq': 'الأسئلة الشائعة', 'nav.enquire': 'استفسر',
+      'nav.safe': 'الأمان', 'nav.how': 'كيف يعمل', 'nav.tools': 'الأدوات', 'nav.packages': 'الباقات', 'nav.demo': 'العرض المباشر', 'nav.faq': 'الأسئلة الشائعة', 'nav.enquire': 'استفسر',
       'nav.menu': 'فتح القائمة', 'lang.switch': 'تغيير اللغة إلى الإنجليزية',
       'hero.eyebrow': 'ZKJ VERSE · حيث تلتقي الهندسة بالضوء',
       'hero.title': 'أدوات ذكاء اصطناعي تدير محتوى علامتك — <span class="hl">وتريك كل خطوة.</span>',
-      'hero.lead': 'ZKJ SYSTEM مجموعة من سبع أدوات ذكاء اصطناعي من تطوير ZKJ VERSE. أرسل موجزًا قصيرًا مع صورك وفيديوهاتك — والأدوات تبني هويتك، وتحرّر محتواك، وتنشره بعد موافقتك، وتخبرك بما نجح. وكل ذلك داخل لوحة تحكم مباشرة بشعارك وألوانك.',
+      'hero.lead': 'ZKJ SYSTEM مجموعة من 13 أداة ذكاء اصطناعي من تطوير ZKJ VERSE. أرسل موجزًا قصيرًا مع صورك وفيديوهاتك — والأدوات تبني هويتك، وتحرّر محتواك، وتنشر وترد عبر الواجهات الرسمية للمنصات بعد موافقتك، وتدير حملاتك، وتخبرك بما نجح. وكل ذلك داخل لوحة تحكم مباشرة بشعارك وألوانك.',
       'hero.cta.wa': 'تواصل معنا على واتساب', 'hero.cta.demo': 'افتح العرض المباشر',
       'hero.f1': 'أدوات ذكاء اصطناعي', 'hero.f2': 'منصات للنشر', 'hero.f3': 'لغتان — العربية والإنجليزية', 'hero.f4': 'منشورات تُنشر بدون موافقتك',
       'mock.client': 'علامتك هنا', 'mock.demo': 'عرض مباشر',
-      'mock.r1': 'استوديو المحتوى', 'mock.r1s': 'ريلزان قيد التحرير من موادك',
+      'mock.r1': 'استوديو المحتوى', 'mock.r1s': 'ريلزان وستوري قيد التحرير من موادك',
       'mock.r2': 'ناشر السوشال ميديا', 'mock.r2s': '3 منشورات بانتظار موافقتك',
       'mock.r3': 'التحليلات والتقارير', 'mock.r3s': 'التقرير الأسبوعي جاهز',
-      'mock.r4': 'مُنشئ الثلاثي الأبعاد', 'mock.r4s': 'لم يبدأ بعد',
+      'mock.r4': 'الرد الذكي على التعليقات والرسائل', 'mock.r4s': '4 ردود مقترحة للمراجعة',
       'mock.foot1': 'شعارك · ألوانك', 'mock.foot2': 'ع / EN',
       'aud.label': 'مصمَّم للأعمال في أنحاء العالم العربي:',
       'aud.1': 'مطاعم', 'aud.2': 'مقاهي', 'aud.3': 'نوادٍ رياضية', 'aud.4': 'متاجر', 'aud.5': 'عقارات', 'aud.6': 'تجارة إلكترونية', 'aud.7': 'علامات تجارية',
@@ -180,24 +250,32 @@
       'how.2.t': 'الموجز + صورك وفيديوهاتك', 'how.2.d': 'موجز قصير عن علامتك وجمهورك وأهدافك — مع صور وفيديوهات منتجاتك إن توفّرت.',
       'how.3.t': 'تبدأ الأدوات', 'how.3.d': 'يجهّز KJ الأدوات التي اخترتها. يُحرَّر المحتوى من موادك الحقيقية أولًا، وما ينقص يُولَّد بأسلوب علامتك.',
       'how.4.t': 'لوحتك المباشرة بهويتك', 'how.4.d': 'الإشعارات والمحتوى والموافقات والنشر في مكان واحد — بشعارك وألوانك، بالعربية أو الإنجليزية.',
-      'tools.eyebrow': 'الكتالوج', 'tools.title': 'سبع أدوات. نظام واحد.', 'tools.sub': 'ابدأ بأداة واحدة أو شغّل السبع كلها. كل أداة ترفع تقاريرها إلى نفس اللوحة، فتعرف دائمًا ما الذي أُنجز وما الذي يحتاجك.',
+      'tools.eyebrow': 'الكتالوج', 'tools.title': '13 أداة. خمس مجموعات. نظام واحد.', 'tools.sub': 'الهوية، المحتوى، التفاعل والمبيعات، النمو، البناء والحماية. ابدأ بأداة واحدة أو شغّلها كلها — كل أداة ترفع تقاريرها إلى نفس اللوحة، فتعرف دائمًا ما الذي أُنجز وما الذي يحتاجك.',
       'tools.cta': 'استفسر عن هذه الأداة',
       'pk.eyebrow': 'الباقات', 'pk.title': 'باقات حسب عدد المنصات', 'pk.sub': 'كل باقة تشمل استوديو المحتوى وناشر السوشال ميديا والتحليلات والتقارير ولوحتك المباشرة بهويتك. يُرسل لك التسعير شخصيًا بعد الموجز.',
       'pk.starter.name': 'البداية', 'pk.starter.reach': 'منصة أو منصتان', 'pk.starter.d': 'لبداية مركّزة على المنصات التي يتواجد فيها عملاؤك أصلًا.',
-      'pk.growth.name': 'النمو', 'pk.growth.reach': '3–4 منصات', 'pk.growth.d': 'للأعمال الجاهزة للظهور بانتظام على منصات أكثر.',
-      'pk.full.name': 'الكاملة', 'pk.full.reach': 'جميع المنصات السبع + هوية العلامة', 'pk.full.d': 'النظام الكامل، يبدأ بهوية متكاملة لعلامتك ويغطي كل المنصات.',
+      'pk.growth.name': 'النمو', 'pk.growth.reach': '3–4 منصات', 'pk.growth.d': 'للأعمال الجاهزة للظهور بانتظام على منصات أكثر — والرد على كل تعليق ورسالة.',
+      'pk.full.name': 'الكاملة', 'pk.full.reach': 'جميع المنصات السبع + الهوية والإعلانات وواتساب الذكي', 'pk.full.d': 'النظام الكامل: هوية متكاملة، كل المنصات، حملات مدفوعة، ومساعد واتساب يستقبل الطلبات على مدار الساعة.',
       'pk.i1': 'محتوى محرَّر من صورك وفيديوهاتك', 'pk.i2': 'موافقتك قبل أي نشر', 'pk.i3': 'تقرير تحليلات أسبوعي', 'pk.i4': 'لوحة مباشرة بهويتك (عربي / إنجليزي)',
       'pk.i5': 'باني هوية العلامة مشمول', 'pk.i6': 'تقويم محتوى لكل المنصات',
       'pk.cta': 'استفسر عن باقة {name}',
-      'pk.note': 'أضف مُنشئ الثلاثي الأبعاد أو الرسومات الهندسية أو وكيل الأمان إلى أي باقة — أو استخدمها بشكل مستقل.',
+      'pk.note': 'أضف تدقيق العلامة والسوق أو نمو يوتيوب أو إعلانات وتسويق جوجل أو مُنشئ الثلاثي الأبعاد أو الرسومات الهندسية أو وكيل الأمان إلى أي باقة — أو استخدمها بشكل مستقل. ميزانيات الإعلانات تدفعها أنت مباشرة لكل منصة.',
       'demo.eyebrow': 'عرض مباشر', 'demo.title': 'شوف لوحتك قبل ما تبدأ', 'demo.sub': 'جرّب عرضًا تفاعليًا بعلامة مقهى نموذجية: وافق على المنشورات، تصفّح التقويم، ارفع الصور، وبدّل بين الثيمات. بدون تسجيل دخول.', 'demo.cta': 'افتح العرض المباشر',
       'faq.eyebrow': 'الأسئلة الشائعة', 'faq.title': 'أسئلة وإجابات',
       'faq.1.q': 'هل ZKJ SYSTEM خدمة أم منتج؟', 'faq.1.a': 'منتج. ZKJ SYSTEM مجموعة أدوات ذكاء اصطناعي تقدّمها ZKJ VERSE. يجهّز KJ أدواتك من الموجز وموادك، وتتابع أنت كل شيء من لوحتك الخاصة بهويتك.',
       'faq.2.q': 'هل لازم أرسل صوري وفيديوهاتي؟', 'faq.2.a': 'هذا أول ما نطلبه — منتجاتك ومكانك وفريقك الحقيقيون يحققون أفضل النتائج. وإن لم تتوفر لديك مواد بعد، يولّد استوديو المحتوى صورًا بأسلوب علامتك، وتظهر هذه المنشورات معلَّمة بوضوح في لوحتك.',
-      'faq.3.q': 'هل يُنشر أي شيء بدون موافقتي؟', 'faq.3.a': 'لا. كل منشور وكاروسيل وريل ينتظر في قائمة الموافقات. توافق عليه أو تطلب تعديلًا، ولا يُجدول ويُنشر إلا المحتوى المعتمد.',
-      'faq.4.q': 'على أي منصات تنشرون؟', 'faq.4.a': 'إنستغرام وفيسبوك وتيك توك ويوتيوب وبنترست وإكس ولينكدإن. وباقتك تحدد عدد المنصات التي تبدأ بها.',
+      'faq.3.q': 'هل يُنشر أو يُرسل أي شيء بدون موافقتي؟', 'faq.3.a': 'لا. كل منشور وكاروسيل وريل وستوري ينتظر في قائمة الموافقات. والردود على التعليقات والرسائل وواتساب تتبع إجابات وقواعد اعتمدتها أنت، وأي رسالة جديدة أو حساسة تنتظرك أو تُحوَّل إليك.',
+      'faq.4.q': 'على أي منصات تنشرون؟', 'faq.4.a': 'ننشر على إنستغرام وفيسبوك وتيك توك ويوتيوب وبنترست وإكس ولينكدإن، ونشغّل الإعلانات على ميتا وتيك توك وسناب شات وجوجل، ونرد على عملائك في واتساب. وباقتك تحدد من أين تبدأ.',
       'faq.5.q': 'هل يعمل بالعربية والإنجليزية؟', 'faq.5.a': 'نعم. التعليقات ولوحتك وتقاريرك متاحة بالعربية والإنجليزية، مع اتجاه صحيح من اليمين إلى اليسار بالعربية.',
       'faq.6.q': 'كيف يتم التسعير والدفع؟', 'faq.6.a': 'لا يوجد دفع على هذا الموقع. أرسل استفسارك ويرد عليك KJ شخصيًا بعرض للأدوات التي اخترتها، ويتفق معك على الدفع مباشرة.',
+      'faq.8.q': 'هل هذا آمن لحساباتي؟', 'faq.8.a': 'نعم. النشر والرد على التعليقات والرسائل وواتساب تتم فقط عبر الواجهات الرسمية وأدوات الأعمال للمنصات — ميتا وتيك توك ويوتيوب وجوجل ومنصة واتساب للأعمال. بدون أي برامج غير رسمية أو طرق ملتوية، وتقدر تلغي الصلاحية في أي وقت.',
+      'faq.9.q': 'هل ميزانية الإعلانات مشمولة؟', 'faq.9.a': 'لا — ميزانية الإعلانات تدفعها أنت مباشرة للمنصة (ميتا أو تيك توك أو سناب شات أو جوجل). ZKJ SYSTEM يخطط الحملات ويديرها، وتشوف الصرف مقابل الميزانية في لوحتك.',
+      'safe.eyebrow': 'أمان من الأساس', 'safe.title': 'قنوات رسمية فقط. وموافقتك أولًا.', 'safe.sub': 'حساباتك هي رأس مالك. ZKJ SYSTEM يتعامل معها بالطريقة التي تعتمدها المنصات نفسها.',
+      'safe.1.t': 'الواجهات الرسمية للمنصات', 'safe.1.d': 'النشر والرد على التعليقات والرسائل وواتساب تتم عبر الواجهات الرسمية (API) وأدوات الأعمال لميتا وتيك توك ويوتيوب وجوجل ومنصة واتساب للأعمال — بأمان تام لحساباتك.',
+      'safe.2.t': 'لا شيء يخرج بدون موافقتك', 'safe.2.d': 'المنشورات تنتظر في قائمة الموافقات. والردود تتبع إجابات وقواعد اعتمدتها، وأي رسالة حساسة تُحوَّل إليك.',
+      'safe.3.t': 'تبقى أنت المالك', 'safe.3.d': 'الصفحات والقنوات والحسابات الإعلانية تبقى باسمك. الصلاحيات تُمنح عبر الأذونات الرسمية لكل منصة، وتقدر تلغيها متى ما شئت.',
+      'safe.4.t': 'ميزانية الإعلانات للمنصة مباشرة', 'safe.4.d': 'ميزانية الإعلانات تدفعها أنت مباشرة لميتا أو تيك توك أو سناب شات أو جوجل، وتشوف صرف كل حملة مقابل ميزانيتها.',
+      'pk.i7': 'ردود ذكية على التعليقات والرسائل', 'pk.i8': 'تسويق السوشال ميديا — إعلانات على ميتا وتيك توك وسناب شات', 'pk.i9': 'مساعد واتساب الذكي',
       'faq.7.q': 'هل أقدر أبدأ بشيء بسيط وأضيف أدوات لاحقًا؟', 'faq.7.a': 'أكيد. ابدأ بأداة واحدة أو بباقة البداية، وأضف الأدوات متى ما كنت جاهز — وكلها تنضم لنفس اللوحة.',
       'enq.eyebrow': 'استفسر', 'enq.title': 'البداية محادثة', 'enq.sub': 'اختر الطريقة اللي تناسبك. KJ يقرأ كل استفسار ويرد عليك شخصيًا.',
       'enq.ctx': 'استفسار عن:', 'enq.ctx.clear': 'إلغاء الاختيار',
@@ -335,7 +413,7 @@
       if (pk) pk.value = c.type === 'package' ? c.id : '';
       if (c.type === 'package' && c.id === 'full') {
         form.querySelectorAll('input[name="platforms"]').forEach(function (p) { p.checked = true; });
-        var bk = form.querySelector('input[name="tools"][value="brand"]'); if (bk) bk.checked = true;
+        ['brand', 'smm', 'whatsapp'].forEach(function (id) { var bk = form.querySelector('input[name="tools"][value="' + id + '"]'); if (bk) bk.checked = true; });
       }
     }
     if (form && !c) { var pk2 = form.querySelector('input[name="package"]'); if (pk2) pk2.value = ''; }
@@ -343,20 +421,26 @@
   }
 
   /* ---------- Index renderers ---------- */
+  function toolCard(tl) {
+    var d = tl[lang];
+    return '<li><article class="plate tool-card" id="tool-' + tl.id + '">' +
+      '<span class="tag tool-id">' + tl.code + '</span>' +
+      '<div class="tool-icon">' + tl.icon + '</div>' +
+      '<h3>' + esc(d.name) + '</h3>' +
+      '<p class="tool-tag">' + esc(d.tag) + '</p>' +
+      '<p class="tool-desc">' + esc(d.desc) + '</p>' +
+      '<ul>' + d.points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+      '<a class="btn btn-ghost btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('tools.cta')) + ' ' + ICONS.arrow + '</a>' +
+      '</article></li>';
+  }
   function renderTools() {
-    var grid = document.getElementById('tools-grid');
-    if (!grid) return;
-    grid.innerHTML = TOOLS.map(function (tl) {
-      var d = tl[lang];
-      return '<li><article class="plate tool-card" id="tool-' + tl.id + '">' +
-        '<span class="tag tool-id">' + tl.code + '</span>' +
-        '<div class="tool-icon">' + tl.icon + '</div>' +
-        '<h3>' + esc(d.name) + '</h3>' +
-        '<p class="tool-tag">' + esc(d.tag) + '</p>' +
-        '<p class="tool-desc">' + esc(d.desc) + '</p>' +
-        '<ul>' + d.points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
-        '<a class="btn btn-ghost btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('tools.cta')) + ' ' + ICONS.arrow + '</a>' +
-        '</article></li>';
+    var wrap = document.getElementById('tools-grid');
+    if (!wrap) return;
+    wrap.innerHTML = GROUPS.map(function (g) {
+      var list = TOOLS.filter(function (tl) { return tl.group === g.id; });
+      return '<div class="tool-group" id="group-' + g.id + '">' +
+        '<div class="group-head"><span class="tag">' + g.code + '</span><h3>' + esc(g[lang].name) + '</h3><p>' + esc(g[lang].d) + '</p></div>' +
+        '<ul class="tools-grid">' + list.map(toolCard).join('') + '</ul></div>';
     }).join('');
   }
   function renderPackages() {
@@ -364,8 +448,8 @@
     if (!grid) return;
     var items = {
       starter: ['pk.i1', 'pk.i2', 'pk.i3', 'pk.i4'],
-      growth: ['pk.i1', 'pk.i2', 'pk.i6', 'pk.i3', 'pk.i4'],
-      full: ['pk.i5', 'pk.i1', 'pk.i2', 'pk.i6', 'pk.i3', 'pk.i4']
+      growth: ['pk.i1', 'pk.i2', 'pk.i6', 'pk.i7', 'pk.i3', 'pk.i4'],
+      full: ['pk.i5', 'pk.i8', 'pk.i9', 'pk.i7', 'pk.i1', 'pk.i6', 'pk.i3', 'pk.i4']
     };
     grid.innerHTML = PACKAGES.map(function (id) {
       return '<article class="plate pkg' + (id === 'full' ? ' is-accent' : '') + '" id="pkg-' + id + '">' +
@@ -385,10 +469,13 @@
     if (!tb || !pb || !form) return;
     var checkedTools = Array.prototype.map.call(form.querySelectorAll('input[name="tools"]:checked'), function (i) { return i.value; });
     var checkedPl = Array.prototype.map.call(form.querySelectorAll('input[name="platforms"]:checked'), function (i) { return i.value; });
-    tb.innerHTML = TOOLS.map(function (tl) {
-      return '<label class="check"><input type="checkbox" name="tools" value="' + tl.id + '"' + (checkedTools.indexOf(tl.id) > -1 ? ' checked' : '') + '><span>' + esc(tl[lang].name) + '</span></label>';
+    tb.innerHTML = GROUPS.map(function (g) {
+      return '<div class="check-group"><span class="check-group-label">' + esc(g[lang].name) + '</span><div class="checks">' +
+        TOOLS.filter(function (tl) { return tl.group === g.id; }).map(function (tl) {
+          return '<label class="check"><input type="checkbox" name="tools" value="' + tl.id + '"' + (checkedTools.indexOf(tl.id) > -1 ? ' checked' : '') + '><span>' + esc(tl[lang].name) + '</span></label>';
+        }).join('') + '</div></div>';
     }).join('');
-    pb.innerHTML = PLATFORMS.map(function (p) {
+    pb.innerHTML = PLATFORMS.concat(FORM_EXTRA_PLATFORMS).map(function (p) {
       return '<label class="check"><input type="checkbox" name="platforms" value="' + p.id + '"' + (checkedPl.indexOf(p.id) > -1 ? ' checked' : '') + '><span>' + esc(p[lang]) + '</span></label>';
     }).join('');
   }
@@ -442,7 +529,8 @@
       if (form.elements._gotcha.value) { showStatus('ok', 'f.ok'); form.reset(); return; }
       var vals = function (name) { return Array.prototype.map.call(form.querySelectorAll('input[name="' + name + '"]:checked'), function (i) { return i.value; }); };
       var toolNames = vals('tools').map(function (id) { var tl = toolById(id); return tl ? tl.en.name : id; });
-      var plNames = vals('platforms').map(function (id) { for (var i = 0; i < PLATFORMS.length; i++) if (PLATFORMS[i].id === id) return PLATFORMS[i].en; return id; });
+      var allPl = PLATFORMS.concat(FORM_EXTRA_PLATFORMS);
+      var plNames = vals('platforms').map(function (id) { for (var i = 0; i < allPl.length; i++) if (allPl[i].id === id) return allPl[i].en; return id; });
       var fd = new FormData();
       fd.append('name', form.elements.name.value.trim());
       fd.append('business', form.elements.business.value.trim());
@@ -521,7 +609,7 @@
 
   window.ZKJ = {
     t: t, tLang: tLang, extend: extend, esc: esc, onLang: onLang, setLang: setLang, getLang: function () { return lang; },
-    toast: toast, waLink: waLink, store: store, TOOLS: TOOLS, PLATFORMS: PLATFORMS, ICONS: ICONS, IG_URL: IG_URL,
+    toast: toast, waLink: waLink, store: store, TOOLS: TOOLS, GROUPS: GROUPS, PLATFORMS: PLATFORMS, ICONS: ICONS, IG_URL: IG_URL,
     applyLang: applyLang
   };
 

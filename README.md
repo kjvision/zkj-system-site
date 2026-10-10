@@ -2,7 +2,7 @@
 
 Static marketing site for **ZKJ SYSTEM**, the AI tools sold by **ZKJ VERSE**, plus a clickable live demo of the client dashboard.
 
-- `index.html` — marketing site (hero, how it works, 7 tools, packages, FAQ, enquiries)
+- `index.html` — marketing site (hero, how it works, 13 tools in 5 groups — Brand / Content / Engage & Sell / Grow / Build & Protect — safety, packages, FAQ, enquiries)
 - `dashboard.html` — live demo client dashboard (sample brand "Qahwa House" / «بيت القهوة»), no login, all state in memory
 - `404.html` — not-found page
 - `assets/style.css` — shared styles (ZKJ VERSE dark theme + the demo's brand theme)
@@ -52,6 +52,10 @@ There is no payment or checkout on the site. Every call to action is an enquiry:
 - **Instagram** — DM link.
 
 To change the WhatsApp number, Instagram handle or Formspree endpoint, edit the constants at the top of `assets/app.js`.
+
+## Platform wording
+
+The site states that publishing, comment/DM replies and WhatsApp run through the platforms' official APIs and business tools (Meta, TikTok, YouTube, Google, WhatsApp Business Platform), that nothing goes out without the client's approval, and that ad budgets are paid by the client directly to each platform. Keep any new copy consistent with that.
 
 ## Editing copy
 

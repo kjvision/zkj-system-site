@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Live demo dashboard — ZKJ SYSTEM</title>
-  <meta name="description" content="Click through a live demo of the ZKJ SYSTEM client dashboard: branded header, tool status, content calendar, approvals, notifications and media upload — in Arabic and English.">
+  <meta name="description" content="Click through a live demo of the ZKJ SYSTEM client dashboard: 13 tools by category, content calendar, approvals, AI inbox replies, ads, notifications and media upload — in Arabic and English.">
   <meta name="theme-color" content="#2A1910">
   <link rel="canonical" href="https://system.zkjverse.com/dashboard.html">
   <meta property="og:type" content="website">
@@ -102,7 +102,7 @@
           <li><span class="dot off"></span><span data-i18n="d.st.off">Not started</span></li>
         </ul>
       </div>
-      <ul class="dtools" id="dtools"></ul>
+      <div class="dtool-groups" id="dtools"></div>
     </section>
 
     <div class="dash-cols single">
@@ -133,6 +133,32 @@
           <button class="btn btn-ghost btn-sm" type="button" data-action="approve-all" data-i18n="d.appr.all">Approve all</button>
         </div>
         <ul class="approvals" id="appr-list"></ul>
+      </section>
+    </div>
+
+    <div class="dash-cols">
+      <section class="dash-section" id="inbox" aria-labelledby="inbox-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="inbox-title" data-i18n="d.inbox.title">Inbox</h2>
+            <p data-i18n="d.inbox.sub">Comments, DMs and WhatsApp — with AI-suggested replies.</p>
+          </div>
+        </div>
+        <ul class="approvals inbox-list" id="inbox-list"></ul>
+        <p class="upload-note" data-i18n="d.inbox.note"></p>
+      </section>
+
+      <section class="dash-section" id="ads" aria-labelledby="ads-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="ads-title" data-i18n="d.ads.title">Ads</h2>
+            <p data-i18n="d.ads.sub">Campaigns.</p>
+          </div>
+          <span class="pill pill-demo" data-i18n="d.ads.demo">Demo numbers</span>
+        </div>
+        <ul class="approvals ads-list" id="ads-list"></ul>
+        <p class="ads-total" id="ads-total"></p>
+        <p class="upload-note" data-i18n="d.ads.note">Ad budget is paid by you directly to each platform.</p>
       </section>
     </div>
 

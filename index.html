@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ZKJ SYSTEM — AI tools for your brand, by ZKJ VERSE</title>
-  <meta name="description" content="ZKJ SYSTEM: seven AI tools by ZKJ VERSE for businesses across the Arab world — brand kit, content from your own photos and videos, approved publishing to 7 platforms, weekly insights, and a live branded dashboard in Arabic and English.">
+  <meta name="description" content="ZKJ SYSTEM: 13 AI tools by ZKJ VERSE for businesses across the Arab world — brand kit and market audit, content from your own photos and videos, publishing and replies through official platform APIs, WhatsApp AI, ads on Meta, TikTok, Snapchat and Google, and a live branded dashboard in Arabic and English.">
   <meta name="theme-color" content="#0B0B0F">
   <link rel="canonical" href="https://system.zkjverse.com/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ZKJ SYSTEM by ZKJ VERSE">
   <meta property="og:title" content="ZKJ SYSTEM — AI tools that run your brand’s content">
-  <meta property="og:description" content="Seven AI tools, one live branded dashboard. Your photos and videos, edited and published with your approval — in Arabic and English.">
+  <meta property="og:description" content="13 AI tools, one live branded dashboard. Your photos and videos, edited and published with your approval through official platform APIs — in Arabic and English.">
   <meta property="og:url" content="https://system.zkjverse.com/">
   <meta property="og:locale" content="en_US">
   <meta property="og:locale:alternate" content="ar_AE">
@@ -35,6 +35,7 @@
           <li><a href="#how" data-i18n="nav.how">How it works</a></li>
           <li><a href="#tools" data-i18n="nav.tools">Tools</a></li>
           <li><a href="#packages" data-i18n="nav.packages">Packages</a></li>
+          <li><a href="#safety" data-i18n="nav.safe">Safety</a></li>
           <li><a href="dashboard.html" data-i18n="nav.demo">Live demo</a></li>
           <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
         </ul>
@@ -62,7 +63,7 @@
             <a class="btn btn-ghost" href="dashboard.html"><span data-i18n="hero.cta.demo">Open the live demo</span></a>
           </div>
           <ul class="hero-facts">
-            <li><strong>7</strong><span data-i18n="hero.f1">AI tools</span></li>
+            <li><strong>13</strong><span data-i18n="hero.f1">AI tools</span></li>
             <li><strong>7</strong><span data-i18n="hero.f2">platforms published</span></li>
             <li><strong>2</strong><span data-i18n="hero.f3">Arabic + English</span></li>
             <li><strong>0</strong><span data-i18n="hero.f4">nothing posts without you</span></li>
@@ -124,7 +125,24 @@
           <h2 id="tools-title" data-i18n="tools.title">Seven tools. One system.</h2>
           <p data-i18n="tools.sub"></p>
         </div>
-        <ul class="tools-grid" id="tools-grid"></ul>
+        <div class="tool-groups" id="tools-grid"></div>
+      </div>
+    </section>
+
+    <!-- Safety -->
+    <section id="safety" aria-labelledby="safe-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" data-i18n="safe.eyebrow">Safe by design</span>
+          <h2 id="safe-title" data-i18n="safe.title">Official channels only. Your approval first.</h2>
+          <p data-i18n="safe.sub"></p>
+        </div>
+        <ul class="safety">
+          <li class="plate is-accent"><span class="num">API /</span><h3 data-i18n="safe.1.t">Official platform APIs</h3><p data-i18n="safe.1.d"></p><p class="api-list" dir="ltr">Meta · TikTok · YouTube · Google · WhatsApp Business Platform</p></li>
+          <li class="plate"><span class="num">OK /</span><h3 data-i18n="safe.2.t">Nothing goes out without approval</h3><p data-i18n="safe.2.d"></p></li>
+          <li class="plate"><span class="num">ID /</span><h3 data-i18n="safe.3.t">You stay the owner</h3><p data-i18n="safe.3.d"></p></li>
+          <li class="plate"><span class="num">AD /</span><h3 data-i18n="safe.4.t">Ad budget goes to the platform</h3><p data-i18n="safe.4.d"></p></li>
+        </ul>
       </div>
     </section>
 
@@ -169,6 +187,8 @@
           <details><summary data-i18n="faq.4.q"></summary><div class="answer"><p data-i18n="faq.4.a"></p></div></details>
           <details><summary data-i18n="faq.5.q"></summary><div class="answer"><p data-i18n="faq.5.a"></p></div></details>
           <details><summary data-i18n="faq.6.q"></summary><div class="answer"><p data-i18n="faq.6.a"></p></div></details>
+          <details><summary data-i18n="faq.8.q"></summary><div class="answer"><p data-i18n="faq.8.a"></p></div></details>
+          <details><summary data-i18n="faq.9.q"></summary><div class="answer"><p data-i18n="faq.9.a"></p></div></details>
           <details><summary data-i18n="faq.7.q"></summary><div class="answer"><p data-i18n="faq.7.a"></p></div></details>
         </div>
       </div>
@@ -248,7 +268,7 @@
               </div>
               <fieldset class="field full">
                 <legend data-i18n="f.tools">Tools you’re interested in</legend>
-                <div class="checks" id="tools-checks"></div>
+                <div id="tools-checks"></div>
               </fieldset>
               <fieldset class="field full">
                 <legend data-i18n="f.platforms">Platforms you use</legend>
