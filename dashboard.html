@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live demo dashboard — ZKJ SYSTEM</title>
+  <meta name="description" content="Click through a live demo of the ZKJ SYSTEM client dashboard: 13 tools by category, content calendar, approvals, AI inbox replies, ads, notifications and media upload — in Arabic and English.">
+  <meta name="theme-color" content="#2A1910">
+  <link rel="canonical" href="https://system.zkjverse.com/dashboard.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ZKJ SYSTEM by ZKJ VERSE">
+  <meta property="og:title" content="ZKJ SYSTEM — live demo client dashboard">
+  <meta property="og:description" content="See the branded dashboard every ZKJ SYSTEM client gets: approvals, calendar, tool status and weekly insights.">
+  <meta property="og:url" content="https://system.zkjverse.com/dashboard.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%230B0B0F'/%3E%3Cpath d='M8 3h29v29l-5 5H3V8z' fill='none' stroke='%23F5C518' stroke-width='2'/%3E%3Cpath d='M12 13h16L12 27h16' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-title-key="d.meta.title">
+<div class="dash" id="dash" data-theme="brand">
+  <a class="skip-link" href="#dash-main" data-i18n="skip">Skip to content</a>
+
+  <header class="dash-header">
+    <div class="container">
+      <div class="client-brand">
+        <svg class="client-logo" viewBox="0 0 48 48" role="img" aria-labelledby="logo-title">
+          <title id="logo-title">Qahwa House</title>
+          <circle cx="24" cy="24" r="23" fill="#C8853B"/>
+          <circle cx="24" cy="24" r="19.5" fill="none" stroke="#2A1910" stroke-width="1.2" stroke-dasharray="2 2.4"/>
+          <path d="M14 20h16v6a7 7 0 01-7 7h-2a7 7 0 01-7-7z" fill="#2A1910"/>
+          <path d="M30 22h2a3 3 0 010 6h-2.4" fill="none" stroke="#2A1910" stroke-width="2"/>
+          <path d="M19 12c0 2 1.6 2 1.6 4M24 11c0 2 1.6 2 1.6 4" fill="none" stroke="#FFF8EE" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M13 35h20" stroke="#2A1910" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="client-name">
+          <strong data-i18n="d.client">Qahwa House</strong>
+          <small data-i18n="d.client.sub">Client dashboard · ZKJ SYSTEM</small>
+        </div>
+        <span class="pill pill-demo" data-i18n="d.demo">DEMO</span>
+      </div>
+      <div class="dash-actions">
+        <button class="btn btn-ghost btn-sm" type="button" data-action="theme" id="theme-btn" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 010 18z" fill="currentColor"/></svg>
+          <span id="theme-label">Theme</span>
+        </button>
+        <button class="lang-toggle" type="button" data-lang-toggle><span class="lt-ar" lang="ar">العربية</span></button>
+        <div class="notif">
+          <button class="icon-btn" type="button" data-action="notif-toggle" id="bell" aria-expanded="false" aria-controls="notif-panel" data-i18n-attr="aria-label:d.notif.title" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 004 0"/></svg>
+            <span class="badge-count" id="bell-count">0</span>
+          </button>
+          <div class="notif-panel" id="notif-panel" hidden>
+            <div class="notif-head">
+              <strong data-i18n="d.notif.title">Notifications</strong>
+              <button class="link-btn" type="button" data-action="notif-read-all" data-i18n="d.notif.readall">Mark all as read</button>
+            </div>
+            <ul class="notif-list" id="notif-list"></ul>
+          </div>
+        </div>
+        <a class="btn btn-ghost btn-sm hide-sm" href="index.html" data-i18n="d.back">Back to site</a>
+        <button class="btn btn-primary btn-sm" type="button" data-action="enquire" data-i18n="d.enquire">Enquire</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="demo-banner" role="note">
+    <div class="container">
+      <span class="pill pill-demo" data-i18n="d.demo">DEMO</span>
+      <p data-i18n="d.banner">This is a live demo with a sample café brand. Everything is clickable; nothing is saved or sent. Your dashboard uses your own logo and colours.</p>
+      <button class="btn btn-ghost btn-sm" type="button" data-action="reset" data-i18n="d.reset">Reset demo</button>
+      <a class="btn btn-ghost btn-sm" href="index.html" data-i18n="d.back">Back to site</a>
+    </div>
+  </div>
+
+  <main class="dash-main container" id="dash-main">
+    <div class="dash-title">
+      <div>
+        <h1 data-i18n="d.hello">Welcome back, Qahwa House</h1>
+        <p data-i18n="d.hello.sub">Here’s what your tools did this week — and what needs you.</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" type="button" data-action="go" data-target="approvals" id="needs-you-btn">…</button>
+    </div>
+
+    <section class="dash-section" id="kpis" aria-labelledby="kpi-title">
+      <h2 class="sr-only" id="kpi-title" data-i18n="d.kpi.title">Key numbers</h2>
+      <div class="kpis" id="kpi-row"></div>
+    </section>
+
+    <section class="dash-section" id="tools" aria-labelledby="tools-title">
+      <div class="sec-head">
+        <div>
+          <h2 id="tools-title" data-i18n="d.tools.title">Your tools</h2>
+          <p data-i18n="d.tools.sub">Each card shows what’s pending and what’s done.</p>
+        </div>
+        <ul class="legend">
+          <li><span class="dot ok"></span><span data-i18n="d.st.ok">On track</span></li>
+          <li><span class="dot warn"></span><span data-i18n="d.st.warn">In progress</span></li>
+          <li><span class="dot bad"></span><span data-i18n="d.st.bad">Needs you</span></li>
+          <li><span class="dot off"></span><span data-i18n="d.st.off">Not started</span></li>
+        </ul>
+      </div>
+      <div class="dtool-groups" id="dtools"></div>
+    </section>
+
+    <div class="dash-cols single">
+      <section class="dash-section" id="calendar" aria-labelledby="cal-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="cal-title" data-i18n="d.cal.title">Content calendar</h2>
+            <p data-i18n="d.cal.sub">Posts, carousels and reels per platform.</p>
+          </div>
+          <div class="toolbar" id="cal-filters" role="group" data-i18n-attr="aria-label:d.cal.filter"></div>
+        </div>
+        <div class="plate cal-wrap">
+          <div class="cal-nav">
+            <button class="btn btn-ghost btn-sm" type="button" data-action="cal-prev" id="cal-prev"><span aria-hidden="true" class="dir-arrow">‹</span> <span data-i18n="d.cal.prev">This week</span></button>
+            <strong id="cal-label" aria-live="polite">This week</strong>
+            <button class="btn btn-ghost btn-sm" type="button" data-action="cal-next" id="cal-next"><span data-i18n="d.cal.next">Next week</span> <span aria-hidden="true" class="dir-arrow">›</span></button>
+          </div>
+          <div class="cal" id="cal"></div>
+        </div>
+      </section>
+
+      <section class="dash-section" id="approvals" aria-labelledby="appr-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="appr-title" data-i18n="d.appr.title">Approvals queue</h2>
+            <p data-i18n="d.appr.sub">Nothing is published until you approve it.</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" type="button" data-action="approve-all" data-i18n="d.appr.all">Approve all</button>
+        </div>
+        <ul class="approvals" id="appr-list"></ul>
+      </section>
+    </div>
+
+    <div class="dash-cols">
+      <section class="dash-section" id="inbox" aria-labelledby="inbox-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="inbox-title" data-i18n="d.inbox.title">Inbox</h2>
+            <p data-i18n="d.inbox.sub">Comments, DMs and WhatsApp — with AI-suggested replies.</p>
+          </div>
+        </div>
+        <ul class="approvals inbox-list" id="inbox-list"></ul>
+        <p class="upload-note" data-i18n="d.inbox.note"></p>
+      </section>
+
+      <section class="dash-section" id="ads" aria-labelledby="ads-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="ads-title" data-i18n="d.ads.title">Ads</h2>
+            <p data-i18n="d.ads.sub">Campaigns.</p>
+          </div>
+          <span class="pill pill-demo" data-i18n="d.ads.demo">Demo numbers</span>
+        </div>
+        <ul class="approvals ads-list" id="ads-list"></ul>
+        <p class="ads-total" id="ads-total"></p>
+        <p class="upload-note" data-i18n="d.ads.note">Ad budget is paid by you directly to each platform.</p>
+      </section>
+    </div>
+
+    <div class="dash-cols">
+      <section class="dash-section" id="insights" aria-labelledby="ins-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="ins-title" data-i18n="d.ins.title">This week’s insights</h2>
+            <p data-i18n="d.ins.sub">From Insights &amp; Reports.</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" type="button" data-action="report" data-i18n="d.ins.full">Open full report</button>
+        </div>
+        <div class="plate insight">
+          <strong data-i18n="d.ins.chart">Reach by platform (last 7 days)</strong>
+          <ul class="bars" id="bars"></ul>
+          <div class="insight-notes">
+            <div><strong data-i18n="d.ins.w">What worked</strong><span data-i18n="d.ins.w.t"></span></div>
+            <div><strong data-i18n="d.ins.n">Post next</strong><span data-i18n="d.ins.n.t"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="dash-section" id="upload" aria-labelledby="up-title">
+        <div class="sec-head">
+          <div>
+            <h2 id="up-title" data-i18n="d.up.title">Upload your photos &amp; videos</h2>
+            <p data-i18n="d.up.sub">Content Studio edits your own footage first.</p>
+          </div>
+        </div>
+        <div class="plate upload">
+          <div class="dropzone" id="dropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+            <p data-i18n="d.up.drop">Drag photos and videos here, or choose files.</p>
+            <input class="file-input" type="file" id="file-input" accept="image/*,video/*" multiple>
+            <label class="btn btn-primary btn-sm file-label" for="file-input" data-i18n="d.up.choose">Choose files</label>
+          </div>
+          <ul class="thumbs" id="thumbs" aria-live="polite"></ul>
+          <div class="upload-actions">
+            <button class="btn btn-primary btn-sm" type="button" data-action="upload-send" data-i18n="d.up.send">Send to Content Studio</button>
+            <button class="btn btn-ghost btn-sm" type="button" data-action="upload-clear" data-i18n="d.up.clear">Clear</button>
+            <span class="upload-note" id="up-count"></span>
+          </div>
+          <p class="upload-note" data-i18n="d.up.note">Demo: files stay on your device and are only previewed in this browser. Nothing is uploaded.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="dash-footer">
+    <div class="container">
+      <a class="wordmark" href="index.html" aria-label="ZKJ VERSE — ZKJ SYSTEM">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 3h29v29l-5 5H3V8z" fill="none" style="stroke:var(--accent)" stroke-width="2"/><path d="M12 13h16L12 27h16" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+        <span class="wm-text"><span class="wm-main">ZKJ VERSE</span><span class="wm-sub">SYSTEM</span></span>
+      </a>
+      <span data-i18n="d.foot">Powered by ZKJ SYSTEM · Where Engineering Meets Light</span>
+      <div class="row">
+        <a class="btn btn-ghost btn-sm" href="index.html" data-i18n="d.back">Back to site</a>
+        <button class="btn btn-primary btn-sm" type="button" data-action="enquire" data-i18n="d.enquire.long">Get a dashboard like this</button>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="modal" id="modal" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h2 id="modal-title"></h2>
+      <button class="icon-btn" type="button" data-action="modal-close" data-i18n-attr="aria-label:d.close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </dialog>
+
+  <a class="wa-float" data-wa href="https://wa.me/971541668700" data-i18n-attr="aria-label:wa.float" aria-label="Chat with us on WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.56 2 2.1 6.45 2.1 11.93c0 1.75.46 3.46 1.33 4.97L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.47 0 9.93-4.45 9.93-9.93A9.9 9.9 0 0012.04 2zm0 18.15a8.25 8.25 0 01-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.36c0-4.55 3.71-8.25 8.27-8.25 4.55 0 8.26 3.7 8.26 8.26 0 4.55-3.71 8.21-8.28 8.21zm4.53-6.16c-.25-.12-1.47-.72-1.7-.8-.23-.09-.39-.13-.56.12-.17.25-.64.8-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.12-.15.17-.25.25-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.42h-.48c-.17 0-.44.06-.66.31-.23.25-.87.85-.87 2.07s.89 2.4 1.01 2.57c.12.17 1.75 2.67 4.24 3.74 1.48.64 2.06.7 2.8.59.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.08.15-1.18-.06-.11-.23-.17-.48-.29z"/></svg>
+  </a>
+</div>
+
+<script src="assets/app.js"></script>
+<script src="assets/dashboard.js"></script>
+</body>
+</html>
