@@ -273,16 +273,16 @@
       inbox: [
         { id: 'i1', p: 'instagram', k: 'comment', who: '@layla.k', state: 'pending',
           msg: { en: 'Do you have the saffron latte iced too?', ar: 'عندكم لاتيه الزعفران بارد؟' },
-          reply: { en: 'Yes! The iced Saffron Cardamom Latte is on the autumn menu all day. See you soon.', ar: 'إيه أكيد! لاتيه الزعفران والهيل البارد موجود في قائمة الخريف طول اليوم. ننتظرك!' } },
+          reply: { en: 'Yes. The iced Saffron Cardamom Latte is on the autumn menu all day. See you soon.', ar: 'إيه أكيد، لاتيه الزعفران والهيل البارد موجود في قائمة الخريف طول اليوم. ننتظرك.' } },
         { id: 'i2', p: 'instagram', k: 'dm', who: '@omar.events', state: 'pending',
           msg: { en: 'Hi, can we book a table for 8 on Friday evening?', ar: 'مرحبا، نقدر نحجز طاولة لـ8 أشخاص الجمعة المسا؟' },
-          reply: { en: 'Hi Omar, happy to host you! We have space for 8 on Friday from 7 PM. Shall I reserve it under your name?', ar: 'هلا عمر، يسعدنا! عندنا مكان لـ8 أشخاص يوم الجمعة من الساعة 7 المسا. أحجزها باسمك؟' } },
+          reply: { en: 'Hi Omar, happy to host you. We have space for 8 on Friday from 7 PM. Shall I reserve it under your name?', ar: 'هلا عمر، يسعدنا. عندنا مكان لـ8 أشخاص يوم الجمعة من الساعة 7 المسا. أحجزها باسمك؟' } },
         { id: 'i3', p: 'tiktok', k: 'comment', who: '@coffee.nerd', state: 'pending',
           msg: { en: 'Which beans are you using for the V60?', ar: 'أي بن تستخدمون للـV60؟' },
-          reply: { en: 'This week it’s Ethiopia Guji — floral and light roast. Ask the bar for a free tasting!', ar: 'هالأسبوع إثيوبيا قوجي — زهري وتحميص فاتح. اطلب تذوّق مجاني من البار!' } },
+          reply: { en: 'This week it’s Ethiopia Guji — floral and light roast. Ask the bar for a free tasting.', ar: 'هالأسبوع إثيوبيا قوجي — زهري وتحميص فاتح. اطلب تذوّق مجاني من البار.' } },
         { id: 'i4', p: 'whatsapp', k: 'msg', who: '+971 5• ••• 2231', state: 'pending', sensitive: true,
           msg: { en: 'My order yesterday was missing a croissant.', ar: 'طلبي أمس كان ناقص كرواسون.' },
-          reply: { en: 'We’re sorry about that! I’m passing this to the team now so they can make it right.', ar: 'نعتذر منك! بحوّل الموضوع للفريق الحين عشان يعوضونك.' } }
+          reply: { en: 'We’re sorry about that. I’m passing this to the team now so they can make it right.', ar: 'نعتذر منك. بحوّل الموضوع للفريق الحين عشان يعوضونك.' } }
       ],
       ads: [
         { id: 'ad1', p: 'meta', state: 'active', spend: 1240, budget: 2000,

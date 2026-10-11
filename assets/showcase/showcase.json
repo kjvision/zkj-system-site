@@ -1,0 +1,172 @@
+{
+  "client": "KJ VISION",
+  "interval_ms": 5000,
+  "_how_to": "Each step shows `media.video` if set (mp4, muted loop), otherwise `media.images` behind the `overlay` UI. Paths are relative to the site root. Items in `pending_assets` are NOT loaded — move a path into `media.images` (or set `media.video`) once the file exists.",
+  "steps": [
+    {
+      "id": "brandkit",
+      "num": "01",
+      "title_en": "Brand Kit",
+      "title_ar": "هوية العلامة",
+      "caption_en": "Brand Kit built KJ VISION: emblem from the artist’s own art, wordmark, palette, voice, an 18-page guideline.",
+      "caption_ar": "باني الهوية صنع KJ VISION: شعار مستخرج من فن الفنان نفسه، الكلمة الشعارية، الألوان، النبرة، ودليل هوية من 18 صفحة.",
+      "overlay": "brandkit",
+      "media": {
+        "images": [
+          "assets/showcase/brandkit/brandkit-logo.webp",
+          "assets/showcase/brandkit/brandkit-palette.webp",
+          "assets/showcase/brandkit/brandkit-guideline-cover.webp",
+          "assets/showcase/brandkit/brandkit-applications.webp"
+        ],
+        "video": null,
+        "background": "assets/showcase/brandkit/brandkit-logo.webp"
+      },
+      "pending_assets": [],
+      "duration_ms": 7000,
+      "frames_en": [
+        "Logo lockup",
+        "Palette",
+        "Guideline",
+        "Applications"
+      ],
+      "frames_ar": [
+        "الشعار",
+        "الألوان",
+        "الدليل",
+        "التطبيقات"
+      ]
+    },
+    {
+      "id": "setup",
+      "num": "02",
+      "title_en": "Setup",
+      "title_ar": "الإعداد",
+      "caption_en": "The client profile is created and the channels are connected through official APIs: Instagram, TikTok, YouTube and X.",
+      "caption_ar": "يُنشأ ملف العميل وتُربط القنوات عبر الواجهات الرسمية: إنستغرام، تيك توك، يوتيوب وإكس.",
+      "overlay": "setup",
+      "media": {
+        "images": [
+          "assets/art/frequency-3-600.webp"
+        ],
+        "video": null
+      },
+      "pending_assets": [],
+      "profile": {
+        "emblem": "assets/showcase/brandkit/kjvision-emblem-gold.svg",
+        "handle": "@zkj.verse",
+        "name": "KJ VISION"
+      }
+    },
+    {
+      "id": "content",
+      "num": "03",
+      "title_en": "Content Studio",
+      "title_ar": "استوديو المحتوى",
+      "caption_en": "Content Studio writes in the feed’s own editorial voice — then the same post becomes a story and a reel cover with KJ’s artwork.",
+      "caption_ar": "استوديو المحتوى يكتب بنفس الأسلوب التحريري للحساب — ثم يتحوّل نفس المنشور إلى ستوري وغلاف ريل بعمل من أعمال KJ.",
+      "overlay": "content",
+      "media": {
+        "images": [
+          "assets/art/frequency-4-600.webp",
+          "assets/art/frequency-2-600.webp"
+        ],
+        "video": null
+      },
+      "pending_assets": [
+        {
+          "path": "assets/showcase/instagram/reel-01.mp4",
+          "note": "TODO: real reel from @unknown.presence.kj (KJ will send) — set as media.video"
+        },
+        {
+          "path": "assets/showcase/instagram/reel-02.mp4",
+          "note": "TODO: second real reel from @unknown.presence.kj (KJ will send)"
+        }
+      ],
+      "posts": [
+        {
+          "label": "THE FLIPPED DIMENSION",
+          "pre": "The world I am building has ",
+          "gold": "two skies.",
+          "post": "",
+          "ar": "العالم اللي أبنيه له سماءين."
+        },
+        {
+          "label": "THE EDITION OF 10",
+          "pre": "Limited is not a mood. It is ",
+          "gold": "arithmetic.",
+          "post": "",
+          "ar": "المحدود مو كلمة تسويق — المحدود رقم."
+        },
+        {
+          "label": "KJ VISION ORIGINS",
+          "pre": "Before the glow, there is ",
+          "gold": "observation.",
+          "post": "",
+          "ar": "قبل الضوء، في نظرة."
+        }
+      ]
+    },
+    {
+      "id": "approval",
+      "num": "04",
+      "title_en": "Approval",
+      "title_ar": "الموافقة",
+      "caption_en": "Every piece waits in the approvals queue. Approve, or request a change — nothing goes out without a yes.",
+      "caption_ar": "كل عمل ينتظر في قائمة الموافقات. وافق أو اطلب تعديلًا — لا شيء يُنشر بدون موافقة.",
+      "overlay": "approval",
+      "media": {
+        "images": [
+          "assets/art/frequency-2-600.webp",
+          "assets/art/frequency-4-600.webp",
+          "assets/art/frequency-1-600.webp"
+        ],
+        "video": null
+      },
+      "pending_assets": []
+    },
+    {
+      "id": "publisher",
+      "num": "05",
+      "title_en": "Social Publisher",
+      "title_ar": "ناشر السوشال",
+      "caption_en": "Live on @unknown.presence.kj — planned by Content Studio, published on schedule by Social Publisher.",
+      "caption_ar": "مباشر على ‎@unknown.presence.kj — خطّطه استوديو المحتوى، ونشره ناشر السوشال في موعده.",
+      "overlay": "publisher",
+      "media": {
+        "images": [
+          "assets/art/frequency-4-600.webp"
+        ],
+        "grid": "assets/showcase/instagram/profile-grid.webp",
+        "grid_source": "Real screenshot of the @unknown.presence.kj profile grid, 2026-10-11",
+        "video": null
+      },
+      "pending_assets": [
+        {
+          "path": "assets/showcase/instagram/publisher-reel.mp4",
+          "note": "TODO: screen recording of the live feed / a published reel (KJ will send)"
+        }
+      ]
+    },
+    {
+      "id": "inbox",
+      "num": "06",
+      "title_en": "Inbox & Insights",
+      "title_ar": "الرسائل والتحليلات",
+      "caption_en": "Comments get a reply in the brand voice, and the weekly report shows what reached people.",
+      "caption_ar": "التعليقات تُرد بنبرة العلامة، والتقرير الأسبوعي يوضّح ما الذي وصل للناس.",
+      "overlay": "inbox",
+      "media": {
+        "images": [
+          "assets/art/frequency-3-600.webp"
+        ],
+        "video": null
+      },
+      "pending_assets": [
+        {
+          "path": "assets/showcase/instagram/insights-01.webp",
+          "note": "TODO: real insights screenshot from @unknown.presence.kj (optional)"
+        }
+      ]
+    }
+  ]
+}
