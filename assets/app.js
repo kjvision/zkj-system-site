@@ -3,7 +3,7 @@
   'use strict';
 
   var WA_NUMBER = '971541668700';
-  var IG_URL = 'https://instagram.com/unknown.presence.kj';
+  var IG_URL = 'https://instagram.com/zkjsystem';
   var FORM_ENDPOINT = 'https://formspree.io/f/mvkzrbog';
   var LANG_KEY = 'zkj-lang';
 
@@ -156,6 +156,22 @@
     en: {
       'meta.title': 'ZKJ SYSTEM — 13 AI tools by KJ VISION · ZKJ VERSE',
       'skip': 'Skip to content',
+      'nav.story': 'Story',
+      'st.eyebrow': 'Our story',
+      'st.title': 'Every project becomes a tool.',
+      'st.lead': 'ZKJ SYSTEM was never planned as a product. It grew out of building ZKJ VERSE from zero, and every tool here was first tested on our own brands.',
+      'st.1.t': 'Starting from zero',
+      'st.1.b': 'KJ, a civil engineer and artist in Dubai, spent four months learning Claude and the cloud by building for his own brand. He built around 20 dashboards before the one that went live.',
+      'st.2.t': 'The first goal: publish automatically',
+      'st.2.b': 'The first goal was simple: social media that publishes itself. While building it, he found much more that could be automated: content, reels, photos and marketing strategy.',
+      'st.3.t': 'Mother HQ',
+      'st.3.b': 'Every job became a short instruction that does one thing well, so each job made the central system a little smarter.',
+      'st.4.t': 'Projects become tools',
+      'st.4.b': 'Publishing, the content studio, the 3D world of ZKJ VERSE, and engineering drawings and SketchUp work all ended up as reusable tools that keep improving with real use.',
+      'st.5.t': 'Live, 24/7',
+      'st.5.b': 'Mother HQ now runs around the clock, with tasks, approvals and notifications on one live dashboard. ZKJ SYSTEM opens the same proven tools to your brand.',
+      'st.img.alt': 'Mother HQ, the live 24/7 dashboard that runs ZKJ VERSE. Private details are blurred.',
+      'st.img.cap': 'Mother HQ: the live system behind ZKJ VERSE. Private details are blurred.',
       'nav.safe': 'Safety', 'nav.how': 'Journey', 'nav.tools': 'Collection', 'nav.packages': 'Packages', 'nav.demo': 'Live demo', 'nav.faq': 'FAQ', 'nav.enquire': 'Enquire',
       'nav.menu': 'Open menu', 'lang.switch': 'Switch language to Arabic',
       'hero.eyebrow': 'ZKJ VERSE · Where Engineering Meets Light',
@@ -222,7 +238,7 @@
       'wa.pkg': '{name} package ({reach})',
       'wa.float': 'Chat with us on WhatsApp',
       'ft.tag': 'AI tools for brands across the Arab world — by ZKJ VERSE.',
-      'ft.line': 'Where Engineering Meets Light',
+      'ft.line': 'Every project becomes a tool.',
       'ft.product': 'Product', 'ft.contact': 'Contact', 'ft.copy': '© {year} ZKJ VERSE. ZKJ SYSTEM is a product of ZKJ VERSE.',
       'ft.demo': 'Live demo dashboard',
       'nf.title.doc': 'Page not found — ZKJ SYSTEM', 'nf.title': 'This page doesn’t exist', 'nf.sub': 'The link may be old or mistyped. Let’s get you back on track.', 'nf.home': 'Back to home', 'nf.demo': 'Open the live demo',
@@ -309,11 +325,27 @@
       'sc.suggested': 'Suggested reply',
       'sc.reply': 'It is — in limited acrylic and resin editions. I will send you the sizes.',
       'sc.reach': 'Reach · last 7 days',
-      'sc.grid.alt': 'Real screenshot of the @unknown.presence.kj Instagram grid: editorial posts in gold and white serif on black, architecture photographs and artworks'
+      'sc.grid.alt': 'Real screenshot of the @zkjverse Instagram grid: editorial posts in gold and white serif on black, architecture photographs and artworks'
     },
     ar: {
       'meta.title': 'ZKJ SYSTEM — 13 أداة ذكاء اصطناعي من KJ VISION · ZKJ VERSE',
       'skip': 'انتقل إلى المحتوى',
+      'nav.story': 'القصة',
+      'st.eyebrow': 'قصتنا',
+      'st.title': 'كل مشروع يصبح أداة.',
+      'st.lead': 'لم تبدأ ZKJ SYSTEM كمنتج، بل وُلدت أثناء بناء ZKJ VERSE من الصفر، وكل أداة هنا جُرّبت أولاً على علاماتنا نحن.',
+      'st.1.t': 'البداية من الصفر',
+      'st.1.b': 'أمضى KJ، المهندس المدني والفنان في دبي، أربعة أشهر يتعلّم Claude والسحابة بالبناء لعلامته الخاصة، وبنى نحو 20 لوحة تحكّم قبل أن تعمل النسخة النهائية.',
+      'st.2.t': 'الهدف الأول: نشر تلقائي',
+      'st.2.b': 'كان الهدف الأول بسيطاً: حسابات تنشر وحدها. وأثناء العمل ظهر الكثير مما يمكن أتمتته: المحتوى، والريلز، والصور، واستراتيجية التسويق.',
+      'st.3.t': 'Mother HQ',
+      'st.3.b': 'تحوّلت كل مهمة إلى تعليمة قصيرة تتقن عملاً واحداً، فصار النظام المركزي أذكى قليلاً مع كل مهمة.',
+      'st.4.t': 'المشاريع تصبح أدوات',
+      'st.4.b': 'النشر، واستوديو المحتوى، وعالم ZKJ VERSE ثلاثي الأبعاد، والرسومات الهندسية وأعمال SketchUp؛ كلها أصبحت أدوات قابلة لإعادة الاستخدام وتتحسّن مع العمل الحقيقي.',
+      'st.5.t': 'مباشر على مدار الساعة',
+      'st.5.b': 'يعمل Mother HQ اليوم على مدار الساعة: مهام، وموافقات، وتنبيهات في لوحة واحدة مباشرة. وZKJ SYSTEM تفتح الأدوات نفسها المجرّبة لعلامتك.',
+      'st.img.alt': 'Mother HQ، اللوحة المباشرة التي تدير ZKJ VERSE على مدار الساعة. التفاصيل الخاصة مموّهة.',
+      'st.img.cap': 'Mother HQ: النظام المباشر خلف ZKJ VERSE. التفاصيل الخاصة مموّهة.',
       'nav.safe': 'الأمان', 'nav.how': 'الرحلة', 'nav.tools': 'المجموعة', 'nav.packages': 'الباقات', 'nav.demo': 'العرض المباشر', 'nav.faq': 'الأسئلة الشائعة', 'nav.enquire': 'استفسر',
       'nav.menu': 'فتح القائمة', 'lang.switch': 'تغيير اللغة إلى الإنجليزية',
       'hero.eyebrow': 'ZKJ VERSE · حيث تلتقي الهندسة بالضوء',
@@ -380,7 +412,7 @@
       'wa.pkg': 'باقة {name} ({reach})',
       'wa.float': 'تواصل معنا على واتساب',
       'ft.tag': 'أدوات ذكاء اصطناعي للعلامات التجارية في العالم العربي — من ZKJ VERSE.',
-      'ft.line': 'حيث تلتقي الهندسة بالضوء',
+      'ft.line': 'كل مشروع يصبح أداة.',
       'ft.product': 'المنتج', 'ft.contact': 'تواصل', 'ft.copy': '© {year} ZKJ VERSE. ‏ZKJ SYSTEM منتج من ZKJ VERSE.',
       'ft.demo': 'لوحة العرض المباشر',
       'nf.title.doc': 'الصفحة غير موجودة — ZKJ SYSTEM', 'nf.title': 'هذه الصفحة غير موجودة', 'nf.sub': 'قد يكون الرابط قديمًا أو مكتوبًا بشكل خاطئ. خلّنا نرجعك للمسار الصحيح.', 'nf.home': 'العودة للرئيسية', 'nf.demo': 'افتح العرض المباشر',
@@ -467,7 +499,7 @@
       'sc.suggested': 'الرد المقترح',
       'sc.reply': 'نعم — بإصدارات محدودة على الأكريليك والريزن. بأرسل لك المقاسات.',
       'sc.reach': 'الوصول · آخر 7 أيام',
-      'sc.grid.alt': 'لقطة شاشة حقيقية لشبكة حساب ‎@unknown.presence.kj على إنستغرام: منشورات تحريرية بخط ذهبي وأبيض على الأسود، وصور معمارية وأعمال فنية'
+      'sc.grid.alt': 'لقطة شاشة حقيقية لشبكة حساب ‎@zkjverse على إنستغرام: منشورات تحريرية بخط ذهبي وأبيض على الأسود، وصور معمارية وأعمال فنية'
     }
   };
 
