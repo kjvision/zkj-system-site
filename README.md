@@ -59,6 +59,7 @@ Titles and alt text live in `assets/art/art.json` ("Unknown Presence — Frequen
 - `overlay` — the UI drawn over the media: `brandkit`, `setup`, `content`, `approval`, `publisher`, `inbox`, or `none`
 - `media.images` — background/frames (paths from the site root)
 - `media.video` (+ optional `media.poster`) — an MP4 that plays muted on that step instead of the image background
+- `duration_ms` — optional per-step length (step 01 uses 7000 for its four brand-kit frames)
 - `pending_assets` — TODO placeholders that are **not loaded**. When a file arrives (brand-kit images in `assets/showcase/brandkit/`, Instagram screenshots or reels from @unknown.presence.kj in `assets/showcase/instagram/`), move its path into `media.images` or `media.video`.
 
 ## Publish with GitHub Pages

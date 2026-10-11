@@ -208,14 +208,15 @@
     var im = function (i) { return m[i % (m.length || 1)] || ''; };
     switch (st.overlay) {
       case 'brandkit':
-        var sw = [['#0B0B0F', 'Obsidian'], ['#15151B', 'Charcoal'], ['#D4AF37', 'Antique Gold'], ['#EAD9A6', 'Gold Light'], ['#9AA0A6', 'Silver']];
-        return '<div class="ov ov-brandkit">' +
-          '<div class="ovc bk-logo"><span class="ovk">' + esc(t('sc.k.logo')) + '</span><b class="bk-word">KJ VISION</b><small>' + esc(t('sc.bk.note')) + '</small></div>' +
-          '<div class="ovc bk-pal"><span class="ovk">' + esc(t('sc.k.palette')) + '</span><div class="sw">' + sw.map(function (c) { return '<span><i style="background:' + c[0] + '"></i><em dir="ltr">' + c[0] + '</em></span>'; }).join('') + '</div></div>' +
-          '<div class="ovc bk-type"><span class="ovk">' + esc(t('sc.k.type')) + '</span><b class="cz">Aa · Cinzel</b><span>Aa · Inter</span><span lang="ar">أب · IBM Plex Sans Arabic</span></div>' +
-          '<div class="ovc bk-voice"><span class="ovk">' + esc(t('sc.k.voice')) + '</span><span>' + esc(t('sc.voice')) + '</span></div></div>';
+        var fl = st['frames_' + L()] || st.frames_en || [];
+        return '<div class="ov ov-bk4">' + m.map(function (src, i) {
+          return '<figure class="fr bk-frame" style="--d:' + (0.2 + i * 0.9) + 's"><img src="' + esc(src) + '" alt="' + esc('KJ VISION — ' + (st.frames_en && st.frames_en[i] || '')) + '" loading="lazy" decoding="async"><figcaption><span class="tag" style="color:var(--gold)">0' + (i + 1) + '</span> ' + esc(fl[i] || '') + '</figcaption></figure>';
+        }).join('') + '</div>';
       case 'setup':
-        return '<div class="ov ov-setup"><div class="ovc prof">' + img(im(0), 'avatar') + '<div><b>KJ VISION</b><span dir="ltr">@unknown.presence.kj</span><small>' + esc(t('sc.profile')) + '</small></div></div>' +
+        var pf = st.profile || {};
+        return '<div class="ov ov-setup"><div class="ovc prof">' + (pf.emblem ? '<span class="avatar emblem"><img src="' + esc(pf.emblem) + '" alt="" loading="lazy"></span>' : img(im(0), 'avatar')) + '<div>' +
+          (pf.wordmark ? '<img class="wordmark-img" src="' + esc(pf.wordmark) + '" alt="KJ VISION" loading="lazy">' : '<b>KJ VISION</b>') +
+          '<span dir="ltr">' + esc(pf.handle || '') + '</span><small>' + esc(t('sc.profile')) + '</small></div></div>' +
           '<ul class="ovc chans">' + ['instagram', 'tiktok', 'youtube', 'x'].map(function (k, i) {
             return '<li style="--d:' + (i * 0.35 + 0.4) + 's"><i style="background:' + PLAT[k][1] + '"></i><span>' + PLAT[k][0] + '</span><em>' + esc(t('sc.connected')) + '</em></li>';
           }).join('') + '</ul></div>';
@@ -260,7 +261,7 @@
     var m = st.media || {};
     var bg = m.video
       ? '<video class="shot-bg" muted loop playsinline preload="none" ' + (m.poster ? 'poster="' + esc(m.poster) + '"' : '') + ' aria-hidden="true"><source src="' + esc(m.video) + '" type="video/mp4"></video>'
-      : (m.images && m.images[0] ? '<div class="shot-bg" style="background-image:url(\'' + esc(m.images[0]) + '\')" aria-hidden="true"></div>' : '');
+      : ((m.background || (m.images && m.images[0])) ? '<div class="shot-bg" style="background-image:url(\'' + esc(m.background || m.images[0]) + '\')" aria-hidden="true"></div>' : '');
     return '<article class="shot' + (i === R.index ? ' active' : '') + '" id="shot-' + st.id + '" data-step="' + i + '" aria-roledescription="slide" aria-label="' + esc(t('sc.step', { n: i + 1, title: st['title_' + L()] || st.title_en })) + '"' + (R.mode === 'player' && i !== R.index ? ' aria-hidden="true"' : '') + '>' +
       bg + (st.overlay && st.overlay !== 'none' ? overlay(st) : '') +
       '<div class="shot-cap"><span class="num">' + esc(st.num || ('0' + (i + 1))) + '</span><div><h3>' + esc(st['title_' + L()] || st.title_en) + '</h3><p>' + esc(st['caption_' + L()] || st.caption_en) + '</p></div></div>' +
@@ -290,13 +291,14 @@
     tg.setAttribute('aria-pressed', R.playing ? 'false' : 'true');
     tg.setAttribute('aria-label', t(R.playing ? 'sc.pause' : 'sc.play'));
     reel.classList.toggle('paused', !R.playing || R.hover || !R.visible);
-    reel.style.setProperty('--dur', R.interval + 'ms');
+    reel.style.setProperty('--dur', ((R.steps[R.index] || {}).duration_ms || R.interval) + 'ms');
     schedule();
   }
   function schedule() {
     clearTimeout(R.timer);
     if (R.mode !== 'player' || !R.playing || R.hover || !R.visible || R.steps.length < 2) return;
-    R.timer = setTimeout(function () { goStep(R.index + 1); }, R.interval);
+    var cur = R.steps[R.index] || {};
+    R.timer = setTimeout(function () { goStep(R.index + 1); }, cur.duration_ms || R.interval);
   }
   function goStep(i) {
     if (!R.steps.length) return;

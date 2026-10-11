@@ -8,28 +8,32 @@
       "num": "01",
       "title_en": "Brand Kit",
       "title_ar": "هوية العلامة",
-      "caption_en": "Brand Kit Builder sets the identity first: mark, palette, typography and voice — documented in one guideline.",
-      "caption_ar": "باني الهوية يضبط الأساس أولًا: الشعار، الألوان، الخطوط والنبرة — موثّقة في دليل واحد.",
+      "caption_en": "Brand Kit built KJ VISION: emblem from the artist’s own art, wordmark, palette, voice, an 18-page guideline.",
+      "caption_ar": "باني الهوية صنع KJ VISION: شعار مستخرج من فن الفنان نفسه، الكلمة الشعارية، الألوان، النبرة، ودليل هوية من 18 صفحة.",
       "overlay": "brandkit",
       "media": {
         "images": [
-          "assets/art/frequency-5-600.webp"
+          "assets/showcase/brandkit/brandkit-logo.webp",
+          "assets/showcase/brandkit/brandkit-palette.webp",
+          "assets/showcase/brandkit/brandkit-guideline-cover.webp",
+          "assets/showcase/brandkit/brandkit-applications.webp"
         ],
-        "video": null
+        "video": null,
+        "background": "assets/showcase/brandkit/brandkit-logo.webp"
       },
-      "pending_assets": [
-        {
-          "path": "assets/showcase/brandkit/brandkit-logo.png",
-          "note": "TODO: KJ VISION logo from the brand-kit agent"
-        },
-        {
-          "path": "assets/showcase/brandkit/brandkit-palette.png",
-          "note": "TODO: KJ VISION palette sheet from the brand-kit agent"
-        },
-        {
-          "path": "assets/showcase/brandkit/brandkit-guideline-cover.png",
-          "note": "TODO: KJ VISION guideline cover page from the brand-kit agent"
-        }
+      "pending_assets": [],
+      "duration_ms": 7000,
+      "frames_en": [
+        "Logo lockup",
+        "Palette",
+        "Guideline",
+        "Applications"
+      ],
+      "frames_ar": [
+        "الشعار",
+        "الألوان",
+        "الدليل",
+        "التطبيقات"
       ]
     },
     {
@@ -46,7 +50,12 @@
         ],
         "video": null
       },
-      "pending_assets": []
+      "pending_assets": [],
+      "profile": {
+        "emblem": "assets/showcase/brandkit/kjvision-emblem-gold.svg",
+        "wordmark": "assets/showcase/brandkit/kjvision-wordmark-gold.svg",
+        "handle": "@zkj.verse"
+      }
     },
     {
       "id": "content",
