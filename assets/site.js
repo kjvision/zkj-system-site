@@ -215,7 +215,7 @@
       case 'setup':
         var pf = st.profile || {};
         return '<div class="ov ov-setup"><div class="ovc prof">' + (pf.emblem ? '<span class="avatar emblem"><img src="' + esc(pf.emblem) + '" alt="" loading="lazy"></span>' : img(im(0), 'avatar')) + '<div>' +
-          (pf.wordmark ? '<img class="wordmark-img" src="' + esc(pf.wordmark) + '" alt="KJ VISION" loading="lazy">' : '<b>KJ VISION</b>') +
+          '<b class="plain-name">' + esc(pf.name || 'KJ VISION') + '</b>' +
           '<span dir="ltr">' + esc(pf.handle || '') + '</span><small>' + esc(t('sc.profile')) + '</small></div></div>' +
           '<ul class="ovc chans">' + ['instagram', 'tiktok', 'youtube', 'x'].map(function (k, i) {
             return '<li style="--d:' + (i * 0.35 + 0.4) + 's"><i style="background:' + PLAT[k][1] + '"></i><span>' + PLAT[k][0] + '</span><em>' + esc(t('sc.connected')) + '</em></li>';

@@ -938,9 +938,9 @@ html[lang="ar"] .fr figcaption { letter-spacing: 0; font-size: 12px; }
 @keyframes bkfocus { 0% { box-shadow: 0 0 0 1px rgba(212, 175, 55, .45); } 10% { box-shadow: 0 0 0 2px var(--gold), 0 0 40px rgba(212, 175, 55, .25); } 30%, 100% { box-shadow: 0 0 0 1px rgba(212, 175, 55, .45); } }
 .prof .avatar.emblem { width: 72px; height: 72px; border-radius: 50%; border: 1px solid var(--gold); background: #0B0B0F; display: grid; place-items: center; flex: none; overflow: hidden; }
 .prof .avatar.emblem img { width: 74%; height: auto; }
-.prof .wordmark-img { display: block; height: 20px; width: auto; margin-bottom: 4px; }
+.prof .plain-name { font-family: "Cinzel", serif; font-weight: 600; letter-spacing: 4px; color: var(--white); direction: ltr; }
 .kjv-lockup { display: inline-flex; vertical-align: middle; }
-.kjv-lockup img { height: 18px; width: auto; display: block; }
+.kjv-lockup img { height: 22px; width: auto; display: block; }
 .kjv-lockup:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
 .site-footer .presented { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; }
 @media (max-width: 860px) { .ov-bk4 { inset: 4% 5% 34%; gap: 8px; } }
