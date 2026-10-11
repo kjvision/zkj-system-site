@@ -154,14 +154,14 @@
   /* ---------- Strings ---------- */
   var STR = {
     en: {
-      'meta.title': 'ZKJ SYSTEM — AI tools for your brand, by ZKJ VERSE',
+      'meta.title': 'ZKJ SYSTEM — 13 AI tools by KJ VISION · ZKJ VERSE',
       'skip': 'Skip to content',
-      'nav.safe': 'Safety', 'nav.how': 'How it works', 'nav.tools': 'Tools', 'nav.packages': 'Packages', 'nav.demo': 'Live demo', 'nav.faq': 'FAQ', 'nav.enquire': 'Enquire',
+      'nav.safe': 'Safety', 'nav.how': 'Journey', 'nav.tools': 'Collection', 'nav.packages': 'Packages', 'nav.demo': 'Live demo', 'nav.faq': 'FAQ', 'nav.enquire': 'Enquire',
       'nav.menu': 'Open menu', 'lang.switch': 'Switch language to Arabic',
       'hero.eyebrow': 'ZKJ VERSE · Where Engineering Meets Light',
       'hero.title': 'AI tools that run your brand’s content — <span class="hl">and show you every step.</span>',
       'hero.lead': 'ZKJ SYSTEM is a set of 13 AI tools built by ZKJ VERSE. Send a short brief and your own photos and videos — the tools build your brand, edit your content, publish and reply through official platform APIs with your approval, run your campaigns and tell you what worked. All inside a live dashboard in your logo and colours.',
-      'hero.cta.wa': 'Enquire on WhatsApp', 'hero.cta.demo': 'Open the live demo',
+      'hero.cta.wa': 'Enquire on WhatsApp', 'hero.cta.demo': 'See a live dashboard',
       'hero.f1': 'AI tools', 'hero.f2': 'platforms published', 'hero.f3': 'languages — Arabic & English', 'hero.f4': 'posts go live without your approval',
       'mock.client': 'Your brand here', 'mock.demo': 'Live demo',
       'mock.r1': 'Content Studio', 'mock.r1s': '2 reels and 1 story in edit from your footage',
@@ -171,12 +171,12 @@
       'mock.foot1': 'Your logo · your colours', 'mock.foot2': 'EN / AR',
       'aud.label': 'Built for businesses across the Arab world:',
       'aud.1': 'Restaurants', 'aud.2': 'Cafés', 'aud.3': 'Gyms', 'aud.4': 'Retail', 'aud.5': 'Real estate', 'aud.6': 'E-commerce', 'aud.7': 'Brands',
-      'how.eyebrow': 'How it works', 'how.title': 'From first message to a live dashboard', 'how.sub': 'Four clear steps. You stay in control of everything that goes out under your name.',
+      'how.eyebrow': 'The Journey', 'how.title': 'From first message to a live dashboard', 'how.sub': 'How it works, in three acts.',
       'how.1.t': 'Enquire', 'how.1.d': 'Tell us about your business on WhatsApp, Instagram or the form below. KJ replies personally.',
       'how.2.t': 'Brief + your photos & videos', 'how.2.d': 'A short brief on your brand, audience and goals — plus your own product photos and videos, if you have them.',
       'how.3.t': 'Tools start', 'how.3.d': 'KJ sets up the tools you chose. Content is edited from your real footage first; anything missing is generated in your style.',
       'how.4.t': 'Your live branded dashboard', 'how.4.d': 'Notifications, content, approvals and publishing in one place — in your logo and colours, in Arabic or English.',
-      'tools.eyebrow': 'The catalogue', 'tools.title': '13 tools. Five groups. One system.', 'tools.sub': 'Brand, Content, Engage & Sell, Grow, Build & Protect. Start with one tool or run them all — every tool reports into the same dashboard, so you always know what’s done and what needs you.',
+      'tools.eyebrow': 'The Collection', 'tools.title': '13 tools. Five groups. One system.', 'tools.sub': 'Brand, Content, Engage & Sell, Grow, Build & Protect. Start with one tool or run them all — every tool reports into the same dashboard, so you always know what’s done and what needs you.',
       'tools.cta': 'Enquire about this tool',
       'pk.eyebrow': 'Packages', 'pk.title': 'Packages by channel', 'pk.sub': 'Every package includes Content Studio, Social Media Publisher, Insights & Reports and your live branded dashboard. Pricing is shared with you personally after your brief.',
       'pk.starter.name': 'Starter', 'pk.starter.reach': '1–2 platforms', 'pk.starter.d': 'For a focused start on the channels where your customers already are.',
@@ -225,17 +225,100 @@
       'ft.line': 'Where Engineering Meets Light',
       'ft.product': 'Product', 'ft.contact': 'Contact', 'ft.copy': '© {year} ZKJ VERSE. ZKJ SYSTEM is a product of ZKJ VERSE.',
       'ft.demo': 'Live demo dashboard',
-      'nf.title.doc': 'Page not found — ZKJ SYSTEM', 'nf.title': 'This page doesn’t exist', 'nf.sub': 'The link may be old or mistyped. Let’s get you back on track.', 'nf.home': 'Back to home', 'nf.demo': 'Open the live demo'
+      'nf.title.doc': 'Page not found — ZKJ SYSTEM', 'nf.title': 'This page doesn’t exist', 'nf.sub': 'The link may be old or mistyped. Let’s get you back on track.', 'nf.home': 'Back to home', 'nf.demo': 'Open the live demo',
+      'nav.gallery': 'Gallery',
+      'hero.label': '◆ Where Engineering Meets Light',
+      'hero.sub': '13 AI tools. One living dashboard. Your brand, made visible.',
+      'hero.cta.enter': 'Enter the system',
+      'hero.scroll': 'Scroll',
+      'intro.title': 'About ZKJ SYSTEM',
+      'gal.eyebrow': 'The Gallery',
+      'gal.title': 'Unknown Presence — five frequencies',
+      'gal.sub': 'The energy-face series by KJ VISION, in five colour worlds. The same eye for light and precision shapes every tool in the system.',
+      'gal.quote': 'Light is not illumination. It is energy.',
+      'gal.hint': 'Move to light the room · Select a work to view it',
+      'gal.handed': 'Hand-edited light work',
+      'gal.prev': 'Previous',
+      'gal.next': 'Next',
+      'gal.close': 'Close',
+      'gal.view': 'View {title}',
+      'gal.count': 'Work {n} of {total}',
+      'ex.cta': 'Enquire',
+      'ex.room': 'Room {n}',
+      'act.1.era': 'Past · Act I',
+      'act.1.t': 'Enquire, and bring your light',
+      'act.1.d': 'Every system begins with what is already yours — your story, your space, your people.',
+      'act.1.cap': 'Brief · Photos · Videos',
+      'act.2.era': 'Present · Act II',
+      'act.2.t': 'The tools run. You approve.',
+      'act.2.d': 'Your tools work in the background and report into one dashboard. Nothing reaches your audience until you say so.',
+      'act.2.cap': 'Approve · Request changes',
+      'act.3.era': 'Future · Act III',
+      'act.3.t': 'Your brand, live on every channel',
+      'act.3.d': 'Published, answered and measured — consistently, in Arabic and English.',
+      'act.3.l2': 'Posts, replies, WhatsApp and campaigns run through the platforms’ official APIs, and every week you see what worked.',
+      'act.3.cap': '7 platforms · Live dashboard',
+      'world.eyebrow': 'See it in your world',
+      'world.title': 'Art and brand, living together',
+      'world.sub': 'One of KJ’s works on your wall, your newest post on your customer’s screen. Choose a space.',
+      'world.tabs': 'Spaces',
+      'world.cafe': 'Café',
+      'world.hotel': 'Hotel lobby',
+      'world.office': 'Office',
+      'world.likes': 'likes',
+      'world.cafe.post': 'Autumn menu, poured slowly',
+      'world.cafe.cap': 'New season. Same slow ritual.',
+      'world.cafe.scene': 'Frequency I above the counter — beside the café’s latest post.',
+      'world.hotel.post': 'Check in to the quiet hour',
+      'world.hotel.cap': 'The lobby, after sunset.',
+      'world.hotel.scene': 'Frequency IV in the lobby — beside the hotel’s evening post.',
+      'world.office.post': 'Precision is a kind of light',
+      'world.office.cap': 'Drawings, delivered in two languages.',
+      'world.office.scene': 'Frequency III in the studio — beside the firm’s latest post.',
+      'ft.presented': 'ZKJ SYSTEM — by KJ VISION · ZKJ VERSE',
+      'sc.eyebrow': 'The tools at work',
+      'sc.title': 'Case study: KJ VISION',
+      'sc.sub': 'Six steps, one real brand. Watch the system take KJ VISION from identity to live channels.',
+      'sc.prev': 'Previous step',
+      'sc.next': 'Next step',
+      'sc.pause': 'Pause walkthrough',
+      'sc.play': 'Play walkthrough',
+      'sc.step': 'Step {n}: {title}',
+      'sc.k.logo': 'Logo',
+      'sc.k.palette': 'Palette',
+      'sc.k.type': 'Typography',
+      'sc.k.voice': 'Voice',
+      'sc.voice': 'Precise · Mystical · Premium',
+      'sc.bk.note': 'Brand-kit preview — final files follow',
+      'sc.profile': 'Photography & digital art',
+      'sc.connected': 'Connected · official API',
+      'sc.f.post': 'Post',
+      'sc.f.carousel': 'Carousel',
+      'sc.f.reel': 'Reel',
+      'sc.f.story': 'Story',
+      'sc.ap.0': 'Frequency I — reel',
+      'sc.ap.1': 'Frequency IV — carousel',
+      'sc.ap.2': 'Frequency II — story',
+      'sc.approve': 'Approve',
+      'sc.changes': 'Request changes',
+      'sc.approved': 'Approved',
+      'sc.days': 'Sun,Mon,Tue,Wed,Thu,Fri,Sat',
+      'sc.published': 'Published',
+      'sc.comment': 'Is this piece available as a print?',
+      'sc.suggested': 'Suggested reply',
+      'sc.reply': 'It is — in limited acrylic and resin editions. I will send you the sizes.',
+      'sc.reach': 'Reach · last 7 days',
+      'sc.grid.alt': 'Real screenshot of the @unknown.presence.kj Instagram grid: editorial posts in gold and white serif on black, architecture photographs and artworks'
     },
     ar: {
-      'meta.title': 'ZKJ SYSTEM — أدوات ذكاء اصطناعي لعلامتك من ZKJ VERSE',
+      'meta.title': 'ZKJ SYSTEM — 13 أداة ذكاء اصطناعي من KJ VISION · ZKJ VERSE',
       'skip': 'انتقل إلى المحتوى',
-      'nav.safe': 'الأمان', 'nav.how': 'كيف يعمل', 'nav.tools': 'الأدوات', 'nav.packages': 'الباقات', 'nav.demo': 'العرض المباشر', 'nav.faq': 'الأسئلة الشائعة', 'nav.enquire': 'استفسر',
+      'nav.safe': 'الأمان', 'nav.how': 'الرحلة', 'nav.tools': 'المجموعة', 'nav.packages': 'الباقات', 'nav.demo': 'العرض المباشر', 'nav.faq': 'الأسئلة الشائعة', 'nav.enquire': 'استفسر',
       'nav.menu': 'فتح القائمة', 'lang.switch': 'تغيير اللغة إلى الإنجليزية',
       'hero.eyebrow': 'ZKJ VERSE · حيث تلتقي الهندسة بالضوء',
       'hero.title': 'أدوات ذكاء اصطناعي تدير محتوى علامتك — <span class="hl">وتريك كل خطوة.</span>',
       'hero.lead': 'ZKJ SYSTEM مجموعة من 13 أداة ذكاء اصطناعي من تطوير ZKJ VERSE. أرسل موجزًا قصيرًا مع صورك وفيديوهاتك — والأدوات تبني هويتك، وتحرّر محتواك، وتنشر وترد عبر الواجهات الرسمية للمنصات بعد موافقتك، وتدير حملاتك، وتخبرك بما نجح. وكل ذلك داخل لوحة تحكم مباشرة بشعارك وألوانك.',
-      'hero.cta.wa': 'تواصل معنا على واتساب', 'hero.cta.demo': 'افتح العرض المباشر',
+      'hero.cta.wa': 'تواصل معنا على واتساب', 'hero.cta.demo': 'شاهد لوحة تحكم حيّة',
       'hero.f1': 'أدوات ذكاء اصطناعي', 'hero.f2': 'منصات للنشر', 'hero.f3': 'لغتان — العربية والإنجليزية', 'hero.f4': 'منشورات تُنشر بدون موافقتك',
       'mock.client': 'علامتك هنا', 'mock.demo': 'عرض مباشر',
       'mock.r1': 'استوديو المحتوى', 'mock.r1s': 'ريلزان وستوري قيد التحرير من موادك',
@@ -245,12 +328,12 @@
       'mock.foot1': 'شعارك · ألوانك', 'mock.foot2': 'ع / EN',
       'aud.label': 'مصمَّم للأعمال في أنحاء العالم العربي:',
       'aud.1': 'مطاعم', 'aud.2': 'مقاهي', 'aud.3': 'نوادٍ رياضية', 'aud.4': 'متاجر', 'aud.5': 'عقارات', 'aud.6': 'تجارة إلكترونية', 'aud.7': 'علامات تجارية',
-      'how.eyebrow': 'كيف يعمل', 'how.title': 'من أول رسالة إلى لوحة تحكم مباشرة', 'how.sub': 'أربع خطوات واضحة، وتبقى أنت المتحكم في كل ما يُنشر باسمك.',
+      'how.eyebrow': 'الرحلة', 'how.title': 'من أول رسالة إلى لوحة تحكم مباشرة', 'how.sub': 'كيف يعمل، في ثلاثة فصول.',
       'how.1.t': 'استفسر', 'how.1.d': 'عرّفنا على نشاطك عبر واتساب أو إنستغرام أو النموذج بالأسفل، ويرد عليك KJ شخصيًا.',
       'how.2.t': 'الموجز + صورك وفيديوهاتك', 'how.2.d': 'موجز قصير عن علامتك وجمهورك وأهدافك — مع صور وفيديوهات منتجاتك إن توفّرت.',
       'how.3.t': 'تبدأ الأدوات', 'how.3.d': 'يجهّز KJ الأدوات التي اخترتها. يُحرَّر المحتوى من موادك الحقيقية أولًا، وما ينقص يُولَّد بأسلوب علامتك.',
       'how.4.t': 'لوحتك المباشرة بهويتك', 'how.4.d': 'الإشعارات والمحتوى والموافقات والنشر في مكان واحد — بشعارك وألوانك، بالعربية أو الإنجليزية.',
-      'tools.eyebrow': 'الكتالوج', 'tools.title': '13 أداة. خمس مجموعات. نظام واحد.', 'tools.sub': 'الهوية، المحتوى، التفاعل والمبيعات، النمو، البناء والحماية. ابدأ بأداة واحدة أو شغّلها كلها — كل أداة ترفع تقاريرها إلى نفس اللوحة، فتعرف دائمًا ما الذي أُنجز وما الذي يحتاجك.',
+      'tools.eyebrow': 'المجموعة', 'tools.title': '13 أداة. خمس مجموعات. نظام واحد.', 'tools.sub': 'الهوية، المحتوى، التفاعل والمبيعات، النمو، البناء والحماية. ابدأ بأداة واحدة أو شغّلها كلها — كل أداة ترفع تقاريرها إلى نفس اللوحة، فتعرف دائمًا ما الذي أُنجز وما الذي يحتاجك.',
       'tools.cta': 'استفسر عن هذه الأداة',
       'pk.eyebrow': 'الباقات', 'pk.title': 'باقات حسب عدد المنصات', 'pk.sub': 'كل باقة تشمل استوديو المحتوى وناشر السوشال ميديا والتحليلات والتقارير ولوحتك المباشرة بهويتك. يُرسل لك التسعير شخصيًا بعد الموجز.',
       'pk.starter.name': 'البداية', 'pk.starter.reach': 'منصة أو منصتان', 'pk.starter.d': 'لبداية مركّزة على المنصات التي يتواجد فيها عملاؤك أصلًا.',
@@ -299,7 +382,90 @@
       'ft.line': 'حيث تلتقي الهندسة بالضوء',
       'ft.product': 'المنتج', 'ft.contact': 'تواصل', 'ft.copy': '© {year} ZKJ VERSE. ‏ZKJ SYSTEM منتج من ZKJ VERSE.',
       'ft.demo': 'لوحة العرض المباشر',
-      'nf.title.doc': 'الصفحة غير موجودة — ZKJ SYSTEM', 'nf.title': 'هذه الصفحة غير موجودة', 'nf.sub': 'قد يكون الرابط قديمًا أو مكتوبًا بشكل خاطئ. خلّنا نرجعك للمسار الصحيح.', 'nf.home': 'العودة للرئيسية', 'nf.demo': 'افتح العرض المباشر'
+      'nf.title.doc': 'الصفحة غير موجودة — ZKJ SYSTEM', 'nf.title': 'هذه الصفحة غير موجودة', 'nf.sub': 'قد يكون الرابط قديمًا أو مكتوبًا بشكل خاطئ. خلّنا نرجعك للمسار الصحيح.', 'nf.home': 'العودة للرئيسية', 'nf.demo': 'افتح العرض المباشر',
+      'nav.gallery': 'المعرض',
+      'hero.label': '◆ حيث تلتقي الهندسة بالضوء',
+      'hero.sub': '13 أداة ذكاء اصطناعي. لوحة تحكم حيّة واحدة. علامتك، مرئية.',
+      'hero.cta.enter': 'ادخل النظام',
+      'hero.scroll': 'مرّر',
+      'intro.title': 'عن ZKJ SYSTEM',
+      'gal.eyebrow': 'المعرض',
+      'gal.title': 'الحضور المجهول — خمسة ترددات',
+      'gal.sub': 'سلسلة «وجه الطاقة» من KJ VISION في خمسة عوالم لونية. نفس العين للضوء والدقة تصنع كل أداة في النظام.',
+      'gal.quote': 'الضوء ليس إنارة. إنه طاقة.',
+      'gal.hint': 'حرّك المؤشر لإضاءة القاعة · اختر عملًا لعرضه',
+      'gal.handed': 'عمل ضوئي محرَّر يدويًا',
+      'gal.prev': 'السابق',
+      'gal.next': 'التالي',
+      'gal.close': 'إغلاق',
+      'gal.view': 'عرض {title}',
+      'gal.count': 'العمل {n} من {total}',
+      'ex.cta': 'استفسر',
+      'ex.room': 'القاعة {n}',
+      'act.1.era': 'الماضي · الفصل الأول',
+      'act.1.t': 'استفسر، وأحضر ضوءك',
+      'act.1.d': 'كل نظام يبدأ بما هو لك أصلًا — قصتك، ومكانك، وناسك.',
+      'act.1.cap': 'الموجز · الصور · الفيديو',
+      'act.2.era': 'الحاضر · الفصل الثاني',
+      'act.2.t': 'الأدوات تعمل. وأنت توافق.',
+      'act.2.d': 'أدواتك تعمل في الخلفية وترفع تقاريرها إلى لوحة واحدة. ولا يصل شيء لجمهورك قبل أن تقول نعم.',
+      'act.2.cap': 'موافقة · طلب تعديل',
+      'act.3.era': 'المستقبل · الفصل الثالث',
+      'act.3.t': 'علامتك، حيّة على كل منصة',
+      'act.3.d': 'تُنشر، ويُرد عليها، وتُقاس — بانتظام، بالعربية والإنجليزية.',
+      'act.3.l2': 'المنشورات والردود وواتساب والحملات تعمل عبر الواجهات الرسمية للمنصات، وكل أسبوع تشوف ما الذي نجح.',
+      'act.3.cap': '7 منصات · لوحة مباشرة',
+      'world.eyebrow': 'شاهدها في عالمك',
+      'world.title': 'الفن والعلامة، يعيشان معًا',
+      'world.sub': 'عمل من أعمال KJ على جدارك، وأحدث منشوراتك على شاشة عميلك. اختر مساحة.',
+      'world.tabs': 'المساحات',
+      'world.cafe': 'مقهى',
+      'world.hotel': 'ردهة فندق',
+      'world.office': 'مكتب',
+      'world.likes': 'إعجاب',
+      'world.cafe.post': 'قائمة الخريف، تُسكب على مهل',
+      'world.cafe.cap': 'موسم جديد. نفس الطقس الهادئ.',
+      'world.cafe.scene': 'التردد الأول فوق البار — بجانب أحدث منشور للمقهى.',
+      'world.hotel.post': 'سجّل دخولك إلى الساعة الهادئة',
+      'world.hotel.cap': 'الردهة بعد الغروب.',
+      'world.hotel.scene': 'التردد الرابع في الردهة — بجانب منشور الفندق المسائي.',
+      'world.office.post': 'الدقة نوع من الضوء',
+      'world.office.cap': 'رسومات تُسلَّم بلغتين.',
+      'world.office.scene': 'التردد الثالث في المكتب — بجانب أحدث منشور للشركة.',
+      'ft.presented': 'ZKJ SYSTEM — من KJ VISION · ZKJ VERSE',
+      'sc.eyebrow': 'الأدوات أثناء العمل',
+      'sc.title': 'دراسة حالة: KJ VISION',
+      'sc.sub': 'ست خطوات، وعلامة حقيقية واحدة. شاهد النظام يأخذ KJ VISION من الهوية إلى القنوات المباشرة.',
+      'sc.prev': 'الخطوة السابقة',
+      'sc.next': 'الخطوة التالية',
+      'sc.pause': 'إيقاف العرض مؤقتًا',
+      'sc.play': 'تشغيل العرض',
+      'sc.step': 'الخطوة {n}: {title}',
+      'sc.k.logo': 'الشعار',
+      'sc.k.palette': 'الألوان',
+      'sc.k.type': 'الخطوط',
+      'sc.k.voice': 'النبرة',
+      'sc.voice': 'دقيقة · غامضة · راقية',
+      'sc.bk.note': 'معاينة الهوية — الملفات النهائية لاحقًا',
+      'sc.profile': 'تصوير وفن رقمي',
+      'sc.connected': 'متصل · واجهة رسمية',
+      'sc.f.post': 'منشور',
+      'sc.f.carousel': 'كاروسيل',
+      'sc.f.reel': 'ريل',
+      'sc.f.story': 'ستوري',
+      'sc.ap.0': 'التردد الأول — ريل',
+      'sc.ap.1': 'التردد الرابع — كاروسيل',
+      'sc.ap.2': 'التردد الثاني — ستوري',
+      'sc.approve': 'موافقة',
+      'sc.changes': 'طلب تعديل',
+      'sc.approved': 'تمت الموافقة',
+      'sc.days': 'أحد,اثنين,ثلاثاء,أربعاء,خميس,جمعة,سبت',
+      'sc.published': 'منشور',
+      'sc.comment': 'هل هذا العمل متوفر كطباعة؟',
+      'sc.suggested': 'الرد المقترح',
+      'sc.reply': 'نعم — بإصدارات محدودة على الأكريليك والريزن. بأرسل لك المقاسات.',
+      'sc.reach': 'الوصول · آخر 7 أيام',
+      'sc.grid.alt': 'لقطة شاشة حقيقية لشبكة حساب ‎@unknown.presence.kj على إنستغرام: منشورات تحريرية بخط ذهبي وأبيض على الأسود، وصور معمارية وأعمال فنية'
     }
   };
 
@@ -423,24 +589,24 @@
   /* ---------- Index renderers ---------- */
   function toolCard(tl) {
     var d = tl[lang];
-    return '<li><article class="plate tool-card" id="tool-' + tl.id + '">' +
-      '<span class="tag tool-id">' + tl.code + '</span>' +
-      '<div class="tool-icon">' + tl.icon + '</div>' +
-      '<h3>' + esc(d.name) + '</h3>' +
+    var ex = 'EX-' + tl.code.slice(2);
+    return '<li><article class="tool-card exhibit" id="tool-' + tl.id + '">' +
+      '<div class="plaque"><span class="tag">' + ex + '</span><div class="tool-icon">' + tl.icon + '</div></div>' +
+      '<h4>' + esc(d.name) + '</h4>' +
       '<p class="tool-tag">' + esc(d.tag) + '</p>' +
       '<p class="tool-desc">' + esc(d.desc) + '</p>' +
       '<ul>' + d.points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
-      '<a class="btn btn-ghost btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('tools.cta')) + ' ' + ICONS.arrow + '</a>' +
+      '<a class="btn btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('ex.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a>' +
       '</article></li>';
   }
   function renderTools() {
     var wrap = document.getElementById('tools-grid');
     if (!wrap) return;
-    wrap.innerHTML = GROUPS.map(function (g) {
+    wrap.innerHTML = GROUPS.map(function (g, gi) {
       var list = TOOLS.filter(function (tl) { return tl.group === g.id; });
-      return '<div class="tool-group" id="group-' + g.id + '">' +
-        '<div class="group-head"><span class="tag">' + g.code + '</span><h3>' + esc(g[lang].name) + '</h3><p>' + esc(g[lang].d) + '</p></div>' +
-        '<ul class="tools-grid">' + list.map(toolCard).join('') + '</ul></div>';
+      return '<div class="tool-group exroom" id="group-' + g.id + '">' +
+        '<div class="exroom-head"><span class="tag">' + esc(t('ex.room', { n: gi + 1 })) + ' · ' + g.code + '</span><h3>' + esc(g[lang].name) + '</h3><p>' + esc(g[lang].d) + '</p></div>' +
+        '<ul class="ex-track">' + list.map(toolCard).join('') + '</ul></div>';
     }).join('');
   }
   function renderPackages() {
@@ -452,8 +618,8 @@
       full: ['pk.i5', 'pk.i8', 'pk.i9', 'pk.i7', 'pk.i1', 'pk.i6', 'pk.i3', 'pk.i4']
     };
     grid.innerHTML = PACKAGES.map(function (id) {
-      return '<article class="plate pkg' + (id === 'full' ? ' is-accent' : '') + '" id="pkg-' + id + '">' +
-        '<span class="tag">' + ({ starter: 'P-01', growth: 'P-02', full: 'P-03' })[id] + '</span>' +
+      return '<article class="pkg' + (id === 'full' ? ' is-accent' : '') + '" id="pkg-' + id + '">' +
+        '<span class="tag">' + ({ starter: 'PLATE I', growth: 'PLATE II', full: 'PLATE III' })[id] + '</span>' +
         '<h3>' + esc(t('pk.' + id + '.name')) + '</h3>' +
         '<div class="pkg-reach">' + esc(t('pk.' + id + '.reach')) + '</div>' +
         '<p>' + esc(t('pk.' + id + '.d')) + '</p>' +

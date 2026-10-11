@@ -7,7 +7,12 @@ Static marketing site for **ZKJ SYSTEM**, the AI tools sold by **ZKJ VERSE**, pl
 - `404.html` — not-found page
 - `assets/style.css` — shared styles (ZKJ VERSE dark theme + the demo's brand theme)
 - `assets/app.js` — shared script: EN/AR i18n with RTL, tool catalogue, WhatsApp links, enquiry form
-- `assets/dashboard.js` — demo dashboard logic (approvals, calendar, notifications, uploads preview)
+- `assets/site.js` — home-page experience: hero video slot / artwork crossfade, gallery room + lightbox, showcase walkthrough, journey, mock-up rooms
+- `assets/dashboard.js` — demo dashboard logic (approvals, calendar, inbox, ads, notifications, uploads preview)
+- `assets/art/art.json` — KJ's artworks (file, thumbnail, hero version, EN/AR titles, collection, alt text)
+- `assets/media/hero.json` — hero background videos (empty = artwork crossfade)
+- `assets/showcase/showcase.json` — the "Tools at work — KJ VISION" walkthrough steps
+- `assets/brand/` — gold/white ZKJ mark (SVG), favicon (SVG + PNG), apple-touch icon, Open Graph image
 - `CNAME` — custom domain `system.zkjverse.com`
 - `.nojekyll` — serve files as-is (no Jekyll processing)
 
@@ -19,6 +24,42 @@ No build step and no frameworks. The only external dependency is Google Fonts.
 python3 -m http.server 8000
 # open http://localhost:8000/
 ```
+
+## Hero video (swap or add loops)
+
+The hero plays the first video listed in `assets/media/hero.json`. With an empty list it shows a slow crossfade of the artworks instead. Visitors who prefer reduced motion always get a still frame.
+
+1. Compress the loop (1080p, H.264, no audio, under ~8 MB):
+
+   ```bash
+   ffmpeg -i input.mov -vf "scale=-2:1080,fps=30" -c:v libx264 -preset slow -crf 28 -pix_fmt yuv420p -movflags +faststart -an assets/media/hero-1.mp4
+   # optional WebM (smaller in Chrome/Firefox)
+   ffmpeg -i input.mov -vf "scale=-2:1080,fps=30" -c:v libvpx-vp9 -crf 36 -b:v 0 -an assets/media/hero-1.webm
+   # poster frame (shown while loading)
+   ffmpeg -i assets/media/hero-1.mp4 -vf "select=eq(n\,0),scale=-2:1080" -frames:v 1 -q:v 4 assets/media/hero-1-poster.jpg
+   ```
+
+2. Add a line to `assets/media/hero.json`:
+
+   ```json
+   { "videos": [ { "src": "assets/media/hero-1.mp4", "webm": "assets/media/hero-1.webm", "poster": "assets/media/hero-1-poster.jpg" } ] }
+   ```
+
+   `webm` and `poster` are optional. To swap videos, replace the files or change the first entry.
+
+## Artworks
+
+Titles and alt text live in `assets/art/art.json` ("Unknown Presence — Frequency I…V" for now). Rename there; the gallery, lightbox and hero all read from it. Each work has a full image (max 1600px), a 600px thumbnail and a darker 1280px hero version, all WebP.
+
+## Showcase — "The tools at work: KJ VISION"
+
+`assets/showcase/showcase.json` drives the six-step walkthrough (brand kit → setup → content studio → approval → publisher → inbox & insights). Per step:
+
+- `title_en/ar`, `caption_en/ar` — text under the frame
+- `overlay` — the UI drawn over the media: `brandkit`, `setup`, `content`, `approval`, `publisher`, `inbox`, or `none`
+- `media.images` — background/frames (paths from the site root)
+- `media.video` (+ optional `media.poster`) — an MP4 that plays muted on that step instead of the image background
+- `pending_assets` — TODO placeholders that are **not loaded**. When a file arrives (brand-kit images in `assets/showcase/brandkit/`, Instagram screenshots or reels from @unknown.presence.kj in `assets/showcase/instagram/`), move its path into `media.images` or `media.video`.
 
 ## Publish with GitHub Pages
 

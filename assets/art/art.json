@@ -1,0 +1,11 @@
+{
+  "collection_en": "Unknown Presence",
+  "collection_ar": "الحضور المجهول",
+  "works": [
+    { "id": "frequency-1", "file": "assets/art/frequency-1.webp", "thumb": "assets/art/frequency-1-600.webp", "hero": "assets/art/frequency-1-hero.webp", "title_en": "Unknown Presence — Frequency I", "title_ar": "الحضور المجهول — التردد الأول", "collection": "Unknown Presence", "alt_en": "Symmetrical energy face in neon greens and blues on a yellow and lilac field", "alt_ar": "وجه طاقي متناظر بألوان نيون خضراء وزرقاء على خلفية صفراء وليلكية" },
+    { "id": "frequency-2", "file": "assets/art/frequency-2.webp", "thumb": "assets/art/frequency-2-600.webp", "hero": "assets/art/frequency-2-hero.webp", "title_en": "Unknown Presence — Frequency II", "title_ar": "الحضور المجهول — التردد الثاني", "collection": "Unknown Presence", "alt_en": "Mirrored energy face drawn in fine cyan lines over a magenta field", "alt_ar": "وجه طاقي منعكس مرسوم بخطوط سماوية دقيقة على خلفية أرجوانية" },
+    { "id": "frequency-3", "file": "assets/art/frequency-3.webp", "thumb": "assets/art/frequency-3-600.webp", "hero": "assets/art/frequency-3-hero.webp", "title_en": "Unknown Presence — Frequency III", "title_ar": "الحضور المجهول — التردد الثالث", "collection": "Unknown Presence", "alt_en": "Digital energy face built from glowing cyan pixels on black", "alt_ar": "وجه طاقي رقمي من بكسلات سماوية متوهجة على خلفية سوداء" },
+    { "id": "frequency-4", "file": "assets/art/frequency-4.webp", "thumb": "assets/art/frequency-4-600.webp", "hero": "assets/art/frequency-4-hero.webp", "title_en": "Unknown Presence — Frequency IV", "title_ar": "الحضور المجهول — التردد الرابع", "collection": "Unknown Presence", "alt_en": "Energy face split into four panels of red, violet, blue and olive light", "alt_ar": "وجه طاقي مقسوم إلى أربع لوحات من الضوء الأحمر والبنفسجي والأزرق والزيتوني" },
+    { "id": "frequency-5", "file": "assets/art/frequency-5.webp", "thumb": "assets/art/frequency-5-600.webp", "hero": "assets/art/frequency-5-hero.webp", "title_en": "Unknown Presence — Frequency V", "title_ar": "الحضور المجهول — التردد الخامس", "collection": "Unknown Presence", "alt_en": "Energy face as a fine black sketch on white", "alt_ar": "وجه طاقي كرسم أسود دقيق على خلفية بيضاء" }
+  ]
+}
