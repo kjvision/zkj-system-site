@@ -53,7 +53,7 @@
       "pending_assets": [],
       "profile": {
         "emblem": "assets/showcase/brandkit/kjvision-emblem-gold.svg",
-        "handle": "@zkj.verse",
+        "handle": "@kjvision.zkj",
         "name": "KJ VISION"
       }
     },
@@ -75,11 +75,11 @@
       "pending_assets": [
         {
           "path": "assets/showcase/instagram/reel-01.mp4",
-          "note": "TODO: real reel from @unknown.presence.kj (KJ will send) — set as media.video"
+          "note": "TODO: real reel from @zkjverse (KJ will send) — set as media.video"
         },
         {
           "path": "assets/showcase/instagram/reel-02.mp4",
-          "note": "TODO: second real reel from @unknown.presence.kj (KJ will send)"
+          "note": "TODO: second real reel from @zkjverse (KJ will send)"
         }
       ],
       "posts": [
@@ -129,15 +129,15 @@
       "num": "05",
       "title_en": "Social Publisher",
       "title_ar": "ناشر السوشال",
-      "caption_en": "Live on @unknown.presence.kj — planned by Content Studio, published on schedule by Social Publisher.",
-      "caption_ar": "مباشر على ‎@unknown.presence.kj — خطّطه استوديو المحتوى، ونشره ناشر السوشال في موعده.",
+      "caption_en": "Live on @zkjverse — planned by Content Studio, published on schedule by Social Publisher.",
+      "caption_ar": "مباشر على ‎@zkjverse — خطّطه استوديو المحتوى، ونشره ناشر السوشال في موعده.",
       "overlay": "publisher",
       "media": {
         "images": [
           "assets/art/frequency-4-600.webp"
         ],
         "grid": "assets/showcase/instagram/profile-grid.webp",
-        "grid_source": "Real screenshot of the @unknown.presence.kj profile grid, 2026-10-11",
+        "grid_source": "Real screenshot of the @zkjverse profile grid, 2026-10-11",
         "video": null
       },
       "pending_assets": [
@@ -164,7 +164,7 @@
       "pending_assets": [
         {
           "path": "assets/showcase/instagram/insights-01.webp",
-          "note": "TODO: real insights screenshot from @unknown.presence.kj (optional)"
+          "note": "TODO: real insights screenshot from @zkjverse (optional)"
         }
       ]
     }

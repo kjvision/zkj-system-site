@@ -243,7 +243,7 @@
         var fill = { 0: 'instagram', 1: 'tiktok', 2: 'youtube', 3: 'instagram', 4: 'x', 5: 'tiktok', 6: 'instagram' };
         var grid = st.media && st.media.grid;
         return '<div class="ov ov-pub">' +
-          (grid ? '<div class="ovc phone-live" style="--d:.2s"><div class="pl-top" dir="ltr">@unknown.presence.kj</div><div class="pl-screen"><img src="' + esc(grid) + '" alt="' + esc(t('sc.grid.alt')) + '" loading="lazy" decoding="async"></div></div>' : '') +
+          (grid ? '<div class="ovc phone-live" style="--d:.2s"><div class="pl-top" dir="ltr">@zkjverse</div><div class="pl-screen"><img src="' + esc(grid) + '" alt="' + esc(t('sc.grid.alt')) + '" loading="lazy" decoding="async"></div></div>' : '') +
           '<div class="pub-side"><div class="ovc cal7">' + days.map(function (d, i) {
           return '<div class="cd"><span>' + esc(d) + '</span><i style="--d:' + (i * 0.3 + 0.3) + 's;background:' + PLAT[fill[i]][1] + '"></i>' + (i % 2 ? '' : '<i style="--d:' + (i * 0.3 + 0.5) + 's;background:' + PLAT[fill[(i + 2) % 7]][1] + '"></i>') + '</div>';
         }).join('') + '</div><ul class="ovc ticks">' + ['instagram', 'tiktok', 'youtube', 'x'].map(function (k, i) {
