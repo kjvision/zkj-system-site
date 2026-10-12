@@ -9,7 +9,8 @@ You only do it once. Every step works on a phone or a laptop at **supabase.com/d
 - **Both clients already exist.** Step 1 creates them:
   - **KJ VISION** (client #1, case study): its real audit numbers, the first 5 posts from the 30-day calendar waiting for approval, the audit and strategy reports, and a welcome message.
   - **ZKJ VERSE** (client #2, Growth package): a welcome message only.
-- **You can see both right away.** As admin, use the client switcher at the top of your dashboard. A client login for each is optional; you can invite one later if you want.
+- **You land on ZKJ SYSTEM HQ.** As admin you first see HQ: one card per client (what's waiting for the client, your to-do, this week, published this month), your to-do list across all clients, and this week's timeline. Tap **Open workspace** on a card to see exactly what that client sees. A client login for each brand is optional; you can invite one later.
+- **Both brands are yours.** They are marked `internal = true` (own brand), so in their workspace you can **Approve as owner**. For any other client only the client can approve; you see "Waiting for client" instead.
 
 ---
 
@@ -65,7 +66,8 @@ KJ VISION and ZKJ VERSE already exist, so for them start at step 2 below.
       - `primary_color` and `accent_color`, for example `#0B0B0F` and `#D4AF37`
       - `instagram`: the handle
       - `plan`, and `plan_ar` for Arabic: the package name, for example `Growth` / `النمو`
-   3. Save.
+      - `internal`: leave it **false** for a real client. Set it to true only for your own brands.
+   3. Save. The new client appears as a card on HQ.
 
    The plan decides which panels the client sees:
    - **Starter:** approvals, calendar, numbers and reports.
@@ -82,12 +84,12 @@ The client can now log in. They see only their own brand.
 
 ## 6. Add content, numbers and messages from your dashboard
 
-1. Sign in, then pick the client in the switcher at the top. It opens on **KJ VISION**.
-2. Scroll to **Admin tools**. You can:
+1. Sign in. You land on **ZKJ SYSTEM HQ**.
+2. Open **Control Center** (in the dock, or **More** on a phone), choose the client, then:
    - **Add an item:** type (post, reel, story, carousel, reply or ad), title and caption in English and Arabic, media link, platform and date. The status starts as **Needs your approval**, so it appears in the client's approvals queue and on the calendar.
    - **Add a key number:** for example "Followers", 1358, as of today. It shows at the top of the client's dashboard.
    - **Send a notification:** it appears under the client's bell.
-3. When a client taps **Approve** or **Request changes** (with a note), you get a message under **your** bell. The item shows the new status and the client's note.
+3. When a client taps **Approve** or **Request changes** (with a note), you get a message under **your** bell and in **Your to-do** on HQ. Changes requested show the client's note.
 4. Anything else, for example changing a status to *scheduled* or *published*, or adding a report file link: use **Table Editor**. Edit the row in `items` or `reports`.
 
 Drafts (status `draft`) stay hidden from clients until you change the status.

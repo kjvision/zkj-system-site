@@ -17,6 +17,10 @@
 --                     header. It also decides which panels show: a plan
 --                     containing "Starter", "Growth" or "Full" (e.g.
 --                     "Growth", "Case study · Full"). Anything else = Full.
+--                     "internal" = true marks KJ's own brands (KJ VISION,
+--                     ZKJ VERSE). Only for those can KJ approve content
+--                     himself ("Approve as owner"); for every other client
+--                     only the client can approve.
 --      profiles       One row per login. Says whether the person is the
 --                     admin (KJ) or a client, and which client they belong to.
 --      items          Content and approvals: posts, reels, stories,
@@ -36,6 +40,7 @@
 --      • Clients can never insert, edit or delete rows directly. The only
 --        things they can do are:
 --          - review_item(...)            approve, or request changes with a note
+--        The admin can call review_item only for internal (own) brands.
 --          - mark_notifications_read()   clear their bell
 --      Helper functions is_admin() and my_client_id() are used by the rules.
 --
@@ -49,7 +54,7 @@
 --      Two clients are created: KJ VISION (client #1, case study, Full package, with its real audit numbers,
 --      first five posts from the 30-day calendar, reports and a welcome
 --      notification) and ZKJ VERSE (client #2, Growth package, welcome
---      notification only).
+--      notification only). Both are KJ's own brands (internal = true).
 --      Fixed IDs are used, so running the file again adds nothing twice
 --      and never overwrites changes you made.
 --
@@ -75,6 +80,7 @@ create table if not exists public.clients (
   plan          text,
   plan_ar       text,
   active        boolean not null default true,
+  internal      boolean not null default false,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
@@ -82,6 +88,17 @@ create table if not exists public.clients (
 alter table public.clients add column if not exists instagram text;
 alter table public.clients add column if not exists website text;
 alter table public.clients add column if not exists plan_ar text;
+-- "internal" (KJ's own brands). When the column is added to an existing
+-- database, mark the two starter brands as internal once; later edits are kept.
+do $$
+begin
+  if not exists (select 1 from information_schema.columns
+                  where table_schema = 'public' and table_name = 'clients' and column_name = 'internal') then
+    alter table public.clients add column internal boolean not null default false;
+    update public.clients set internal = true
+     where id in ('c1000000-0000-4000-8000-000000000001', 'c1000000-0000-4000-8000-000000000002');
+  end if;
+end $$;
 
 create table if not exists public.profiles (
   id         uuid primary key references auth.users (id) on delete cascade,
@@ -263,8 +280,10 @@ create policy reports_admin on public.reports for all to authenticated
 
 -- Approve an item, or request changes with a note.
 --   p_decision: 'approved' or 'changes_requested'
--- Only works on an item of the caller's own client that is waiting for
--- approval. Records who reviewed it and when, and tells KJ (admin bell).
+-- Only works on an item that is waiting for approval and belongs to the
+-- caller's own client. The admin (KJ) may also review items of an internal
+-- client (his own brands), never those of an external client.
+-- Records who reviewed it and when; a client's review tells KJ (admin bell).
 create or replace function public.review_item(p_item uuid, p_decision text, p_note text default null)
 returns public.items
 language plpgsql security definer set search_path = public as $$
@@ -285,7 +304,14 @@ begin
   end if;
 
   select * into v_item from public.items where id = p_item for update;
-  if not found or not (public.is_admin() or (v_client is not null and v_item.client_id = v_client)) then
+  if not found then
+    raise exception 'Item not found.' using errcode = '42501';
+  end if;
+  if public.is_admin() then
+    if not exists (select 1 from public.clients c where c.id = v_item.client_id and c.internal) then
+      raise exception 'Only the client can approve this item.' using errcode = '42501';
+    end if;
+  elsif v_client is null or v_item.client_id <> v_client then
     raise exception 'Item not found.' using errcode = '42501';
   end if;
   if v_item.status <> 'needs_approval' then
@@ -296,6 +322,11 @@ begin
      set status = p_decision, client_note = v_note, reviewed_at = now(), reviewed_by = auth.uid()
    where id = p_item
   returning * into v_item;
+
+  -- KJ reviewing his own brand needs no message to himself
+  if public.is_admin() then
+    return v_item;
+  end if;
 
   select coalesce(nullif(full_name, ''), email, 'Client') into v_who from public.profiles where id = auth.uid();
 
@@ -378,11 +409,11 @@ update public.profiles set role = 'admin' where lower(email) = 'kj@zkjverse.com'
 --    twice and never overwrites your edits.
 -- ---------------------------------------------------------------------
 
-insert into public.clients (id, name, name_ar, logo_url, primary_color, accent_color, instagram, website, plan, plan_ar, active) values
+insert into public.clients (id, name, name_ar, logo_url, primary_color, accent_color, instagram, website, plan, plan_ar, active, internal) values
   ('c1000000-0000-4000-8000-000000000001', 'KJ VISION', 'كي جي فيجن',
-   '/assets/showcase/brandkit/kjvision-emblem-gold.svg', '#0B0B0F', '#D4AF37', '@kjvision.zkj', null, 'Case study · Full', 'دراسة حالة · الكاملة', true),
+   '/assets/showcase/brandkit/kjvision-emblem-gold.svg', '#0B0B0F', '#D4AF37', '@kjvision.zkj', null, 'Case study · Full', 'دراسة حالة · الكاملة', true, true),
   ('c1000000-0000-4000-8000-000000000002', 'ZKJ VERSE', 'زد كي جي فيرس',
-   '/assets/brand/zkjverse-mark-gold.svg', '#0B0B0F', '#D4AF37', '@zkjverse', 'https://zkjverse.com', 'Growth', 'النمو', true)
+   '/assets/brand/zkjverse-mark-gold.svg', '#0B0B0F', '#D4AF37', '@zkjverse', 'https://zkjverse.com', 'Growth', 'النمو', true, true)
 on conflict (id) do nothing;
 
 -- KJ VISION key numbers (from the 11 Oct 2026 brand audit and the Oct–Nov plan)
