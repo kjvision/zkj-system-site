@@ -24,6 +24,12 @@
 --                     "cover_urls" = background images for the client's
 --                     dashboard (site paths or https links). Empty = the
 --                     client's logo is used as a glowing watermark instead.
+--                     "brand" = the client's brand guideline for their
+--                     dashboard: {bg, surface, text, primary, accent,
+--                     font_display, font_body, radius}. Colours are #RRGGBB;
+--                     fonts must be on the portal's Google Fonts allow-list.
+--                     Unreadable colour pairs are auto-corrected on screen.
+--                     Empty = primary_color / accent_color are used.
 --                     Starter art: KJ VISION = Dubai photography + the Golden
 --                     Eye series; ZKJ VERSE = the gold set + abstracts.
 --      profiles       One row per login. Says whether the person is the
@@ -87,6 +93,7 @@ create table if not exists public.clients (
   active        boolean not null default true,
   internal      boolean not null default false,
   cover_urls    text[],
+  brand         jsonb,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
@@ -105,6 +112,16 @@ begin
      where id = 'c1000000-0000-4000-8000-000000000002' and cover_urls is null;
     update public.clients set cover_urls = array['/assets/art/kj/kj-067.webp', '/assets/art/kj/kj-055.webp', '/assets/art/kj/kj-072.webp', '/assets/art/kj/kj-009.webp', '/assets/art/kj/kj-057.webp', '/assets/art/kj/kj-001.webp', '/assets/art/kj/kj-013.webp', '/assets/art/kj/kj-058.webp', '/assets/art/kj/kj-073.webp', '/assets/art/kj/kj-008.webp', '/assets/art/kj/kj-059.webp', '/assets/art/kj/kj-006.webp']
      where id = 'c1000000-0000-4000-8000-000000000001' and cover_urls is null;
+  end if;
+end $$;
+-- brand guideline (added later; safe to run again). KJ's two brands get the ZKJ look once.
+do $$
+begin
+  if not exists (select 1 from information_schema.columns
+                  where table_schema = 'public' and table_name = 'clients' and column_name = 'brand') then
+    alter table public.clients add column brand jsonb;
+    update public.clients set brand = '{"bg": "#0B0B0F", "surface": "#15151B", "text": "#FFFFFF", "primary": "#D4AF37", "accent": "#EAD9A6", "font_display": "Cinzel", "font_body": "Inter", "radius": 22}'::jsonb
+     where id in ('c1000000-0000-4000-8000-000000000001', 'c1000000-0000-4000-8000-000000000002') and brand is null;
   end if;
 end $$;
 -- "internal" (KJ's own brands). When the column is added to an existing
@@ -428,13 +445,15 @@ update public.profiles set role = 'admin' where lower(email) = 'kj@zkjverse.com'
 --    twice and never overwrites your edits.
 -- ---------------------------------------------------------------------
 
-insert into public.clients (id, name, name_ar, logo_url, primary_color, accent_color, instagram, website, plan, plan_ar, active, internal, cover_urls) values
+insert into public.clients (id, name, name_ar, logo_url, primary_color, accent_color, instagram, website, plan, plan_ar, active, internal, cover_urls, brand) values
   ('c1000000-0000-4000-8000-000000000001', 'KJ VISION', 'كي جي فيجن',
    '/assets/showcase/brandkit/kjvision-emblem-gold.svg', '#0B0B0F', '#D4AF37', '@kjvision.zkj', null, 'Case study · Full', 'دراسة حالة · الكاملة', true, true,
-   array['/assets/art/kj/kj-067.webp', '/assets/art/kj/kj-055.webp', '/assets/art/kj/kj-072.webp', '/assets/art/kj/kj-009.webp', '/assets/art/kj/kj-057.webp', '/assets/art/kj/kj-001.webp', '/assets/art/kj/kj-013.webp', '/assets/art/kj/kj-058.webp', '/assets/art/kj/kj-073.webp', '/assets/art/kj/kj-008.webp', '/assets/art/kj/kj-059.webp', '/assets/art/kj/kj-006.webp']),
+   array['/assets/art/kj/kj-067.webp', '/assets/art/kj/kj-055.webp', '/assets/art/kj/kj-072.webp', '/assets/art/kj/kj-009.webp', '/assets/art/kj/kj-057.webp', '/assets/art/kj/kj-001.webp', '/assets/art/kj/kj-013.webp', '/assets/art/kj/kj-058.webp', '/assets/art/kj/kj-073.webp', '/assets/art/kj/kj-008.webp', '/assets/art/kj/kj-059.webp', '/assets/art/kj/kj-006.webp'],
+   '{"bg": "#0B0B0F", "surface": "#15151B", "text": "#FFFFFF", "primary": "#D4AF37", "accent": "#EAD9A6", "font_display": "Cinzel", "font_body": "Inter", "radius": 22}'::jsonb),
   ('c1000000-0000-4000-8000-000000000002', 'ZKJ VERSE', 'زد كي جي فيرس',
    '/assets/brand/zkjverse-mark-gold.svg', '#0B0B0F', '#D4AF37', '@zkjverse', 'https://zkjverse.com', 'Growth', 'النمو', true, true,
-   array['/assets/art/kj/kj-054.webp', '/assets/art/kj/kj-051.webp', '/assets/art/kj/kj-060.webp', '/assets/art/kj/kj-052.webp', '/assets/art/kj/kj-053.webp', '/assets/art/kj/kj-070.webp', '/assets/art/kj/kj-016.webp', '/assets/art/kj/kj-018.webp', '/assets/art/kj/kj-019.webp', '/assets/art/kj/kj-003.webp'])
+   array['/assets/art/kj/kj-054.webp', '/assets/art/kj/kj-051.webp', '/assets/art/kj/kj-060.webp', '/assets/art/kj/kj-052.webp', '/assets/art/kj/kj-053.webp', '/assets/art/kj/kj-070.webp', '/assets/art/kj/kj-016.webp', '/assets/art/kj/kj-018.webp', '/assets/art/kj/kj-019.webp', '/assets/art/kj/kj-003.webp'],
+   '{"bg": "#0B0B0F", "surface": "#15151B", "text": "#FFFFFF", "primary": "#D4AF37", "accent": "#EAD9A6", "font_display": "Cinzel", "font_body": "Inter", "radius": 22}'::jsonb)
 on conflict (id) do nothing;
 
 -- KJ VISION key numbers (from the 11 Oct 2026 brand audit and the Oct–Nov plan)

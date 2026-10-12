@@ -68,6 +68,7 @@ KJ VISION and ZKJ VERSE already exist, so for them start at step 2 below.
       - `plan`, and `plan_ar` for Arabic: the package name, for example `Growth` / `النمو`
       - `internal`: leave it **false** for a real client. Set it to true only for your own brands.
       - `cover_urls` (optional): background images for their dashboard. You can also set them later in **Control Center → Background images**.
+      - `brand` (optional): their brand guideline (background, surface, text, primary and accent colours, display and body font, corner radius). Easiest from **Control Center → Brand**, which shows a live preview and fixes colours that would be hard to read.
    3. Save. The new client appears as a card on HQ.
 
    The plan decides which panels the client sees:
