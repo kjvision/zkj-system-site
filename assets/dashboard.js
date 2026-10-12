@@ -211,12 +211,12 @@
 
   Z.extend({
     en: {
-      'd.live': 'Live demo', 'd.plan': 'Full package · Demo', 'd.sb.glance': 'At a glance', 'd.sb.inbox': 'Replies to review', 'd.sb.next': 'Next to publish',
+      'd.live': 'Live demo', 'd.demo.long': 'Demo — this is what your clients see', 'd.plan': 'Full package · Demo', 'd.sb.glance': 'At a glance', 'd.sb.inbox': 'Replies to review', 'd.sb.next': 'Next to publish',
       'd.next.title': 'Up next', 'd.next.all': 'Open calendar', 'd.appr.done': 'Recently reviewed', 'd.stack.left': '{n} waiting',
       'd.inst.trend': 'Trend', 'd.inst.rate': 'Rate', 'd.inst.progress': 'Progress', 'd.inst.queue': 'Queue', 'd.k.pub.of': '/ {n} planned'
     },
     ar: {
-      'd.live': 'عرض مباشر', 'd.plan': 'الباقة الكاملة · تجريبي', 'd.sb.glance': 'نظرة سريعة', 'd.sb.inbox': 'ردود للمراجعة', 'd.sb.next': 'التالي للنشر',
+      'd.live': 'عرض مباشر', 'd.demo.long': 'عرض تجريبي — هذا ما يراه عملاؤك', 'd.plan': 'الباقة الكاملة · تجريبي', 'd.sb.glance': 'نظرة سريعة', 'd.sb.inbox': 'ردود للمراجعة', 'd.sb.next': 'التالي للنشر',
       'd.next.title': 'التالي', 'd.next.all': 'افتح التقويم', 'd.appr.done': 'تمت مراجعتها مؤخرًا', 'd.stack.left': '{n} بالانتظار',
       'd.inst.trend': 'الاتجاه', 'd.inst.rate': 'المعدل', 'd.inst.progress': 'التقدّم', 'd.inst.queue': 'الطابور', 'd.k.pub.of': '/ {n} مخطط'
     }
