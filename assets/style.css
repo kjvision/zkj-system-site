@@ -972,3 +972,32 @@ html[lang="ar"] .fr figcaption { letter-spacing: 0; font-size: 12px; }
 .zv-lockup { align-items: center; gap: 8px; color: var(--white); text-decoration: none; }
 .zv-lockup img { height: 22px; }
 .act .visual.ui.dim img { opacity: .28; }
+
+/* ---------- Type scale v2: bigger, bolder headings (KJ, 12 Oct) ---------- */
+h1, h2, h3, h4 { font-weight: 700; }
+.label { font-size: 14px; }
+html[lang="ar"] .label { font-size: 16px; }
+.tag { font-size: 13px; letter-spacing: 3.5px; }
+.section-head h2 { font-size: clamp(32px, 4.8vw, 56px); }
+.section-head p { font-size: 19px; }
+.exroom-head { gap: 24px; padding-bottom: 18px; }
+.exroom-head .tag { font-size: 16px; color: var(--gold); }
+.exroom-head h3 { font-size: clamp(32px, 4.2vw, 52px); letter-spacing: 4px; }
+.exroom-head p { font-size: 18px; color: var(--text-2); }
+.exhibit .tool-icon { width: 54px; height: 54px; }
+.exhibit .tool-icon svg { width: 26px; height: 26px; }
+.exhibit h4 { font-size: clamp(22px, 2vw, 26px); }
+.exhibit .tool-tag { font-size: 17px; font-weight: 500; }
+.exhibit .tool-desc { font-size: 15.5px; }
+.exhibit ul { font-size: 15px; gap: 8px; }
+.act h3 { font-size: clamp(26px, 3.2vw, 38px); }
+.pkg h3 { font-size: 32px; }
+.safety .num { font-size: 14px; }
+.safety h3 { font-size: 22px; }
+.channel h3 { font-size: 19px; }
+#enquiry-form > h3 { font-size: 22px; }
+.demo-band h2 { font-size: clamp(28px, 3.6vw, 42px); }
+.lb-side h2 { font-size: 24px; }
+.story-steps b { font-size: 19px; }
+.faq summary { font-size: 18px; }
+html[lang="ar"] .exroom-head h3, html[lang="ar"] .exhibit h4 { letter-spacing: 0; }
