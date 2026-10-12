@@ -2,10 +2,10 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Live demo dashboard — ZKJ SYSTEM</title>
   <meta name="description" content="Click through a live demo of the ZKJ SYSTEM client dashboard: 13 tools by category, content calendar, approvals, AI inbox replies, ads, notifications and media upload — in Arabic and English.">
-  <meta name="theme-color" content="#0B0B0F">
+  <meta name="theme-color" content="#070709">
   <link rel="canonical" href="https://system.zkjverse.com/dashboard.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ZKJ SYSTEM by ZKJ VERSE">
@@ -19,35 +19,39 @@
   <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Kufi+Arabic:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/device.css">
 </head>
 <body data-title-key="d.meta.title">
-<div class="dash" id="dash" data-theme="core">
+<div class="dash device demo" id="dash" data-theme="core" data-view="today">
   <a class="skip-link" href="#dash-main" data-i18n="skip">Skip to content</a>
+  <div class="stage-fx" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-  <header class="dash-header">
-    <div class="container">
-      <div class="client-brand">
-        <svg class="client-logo" viewBox="0 0 48 48" role="img" aria-labelledby="logo-title">
-          <title id="logo-title">Qahwa House</title>
-          <circle cx="24" cy="24" r="23" fill="#C8853B"/>
-          <circle cx="24" cy="24" r="19.5" fill="none" stroke="#2A1910" stroke-width="1.2" stroke-dasharray="2 2.4"/>
-          <path d="M14 20h16v6a7 7 0 01-7 7h-2a7 7 0 01-7-7z" fill="#2A1910"/>
-          <path d="M30 22h2a3 3 0 010 6h-2.4" fill="none" stroke="#2A1910" stroke-width="2"/>
-          <path d="M19 12c0 2 1.6 2 1.6 4M24 11c0 2 1.6 2 1.6 4" fill="none" stroke="#FFF8EE" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M13 35h20" stroke="#2A1910" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <div class="client-name">
-          <strong data-i18n="d.client">Qahwa House</strong>
-          <small class="powered"><img src="assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span data-i18n="d.client.sub">Client dashboard · ZKJ SYSTEM</span></small>
-        </div>
-        <span class="pill pill-demo" data-i18n="d.demo">DEMO</span>
+  <div class="menubar desk-only">
+    <a class="mb-brand" href="index.html"><img src="assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span>ZKJ SYSTEM</span></a>
+    <span class="mb-item" data-i18n="d.live">Live demo</span>
+    <span class="pill pill-demo" data-i18n="d.demo">DEMO</span>
+    <span class="mb-spacer"></span>
+    <a class="mb-link" href="index.html" data-i18n="d.back">Back to site</a>
+    <a class="mb-link" href="app/login.html" data-i18n="d.login">Client login</a>
+    <button class="mb-link mb-btn" type="button" data-action="enquire" data-i18n="d.enquire">Enquire</button>
+    <span class="mb-clock" id="mb-clock"></span>
+  </div>
+
+  <div class="mac-window" id="win">
+    <header class="titlebar dash-header">
+      <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="tb-title client-brand">
+        <span class="client-logo" data-qlogo></span>
+        <span class="tb-name client-name"><span class="tb-sys">ZKJ SYSTEM —</span> <strong data-i18n="d.client">Qahwa House</strong></span>
+        <span class="pill pill-demo pill-admin" data-i18n="d.demo">DEMO</span>
       </div>
-      <div class="dash-actions">
-        <button class="btn btn-ghost btn-sm" type="button" data-action="theme" id="theme-btn" aria-pressed="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 010 18z" fill="currentColor"/></svg>
-          <span id="theme-label">Theme</span>
+      <div class="tb-actions dash-actions">
+        <button class="tb-btn" type="button" data-action="theme" id="theme-btn" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18z" fill="currentColor"/></svg>
+          <span id="theme-label" class="desk-only">Theme</span>
         </button>
         <button class="lang-toggle" type="button" data-lang-toggle><span class="lt-ar" lang="ar">العربية</span></button>
         <div class="notif">
@@ -55,172 +59,228 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 004 0"/></svg>
             <span class="badge-count" id="bell-count">0</span>
           </button>
-          <div class="notif-panel" id="notif-panel" hidden>
+          <div class="notif-panel" id="notif-panel" hidden role="region" aria-labelledby="notif-title">
             <div class="notif-head">
-              <strong data-i18n="d.notif.title">Notifications</strong>
+              <strong id="notif-title" data-i18n="d.notif.title">Notifications</strong>
               <button class="link-btn" type="button" data-action="notif-read-all" data-i18n="d.notif.readall">Mark all as read</button>
             </div>
             <ul class="notif-list" id="notif-list"></ul>
           </div>
         </div>
-        <a class="btn btn-ghost btn-sm hide-sm" href="index.html" data-i18n="d.back">Back to site</a>
-        <a class="btn btn-ghost btn-sm" href="app/login.html" data-i18n="d.login">Client login</a>
-        <button class="btn btn-primary btn-sm" type="button" data-action="enquire" data-i18n="d.enquire">Enquire</button>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <div class="demo-banner" role="note">
-    <div class="container">
-      <span class="pill pill-demo" data-i18n="d.demo">DEMO</span>
-      <p data-i18n="d.banner">This is a live demo with a sample café brand. Everything is clickable; nothing is saved or sent. Your dashboard uses your own logo and colours.</p>
-      <button class="btn btn-ghost btn-sm" type="button" data-action="reset" data-i18n="d.reset">Reset demo</button>
-      <a class="btn btn-ghost btn-sm" href="index.html" data-i18n="d.back">Back to site</a>
+    <div class="win-body">
+      <aside class="sidebar" aria-label="Qahwa House">
+        <div class="sb-id">
+          <span class="sb-logo" data-qlogo></span>
+          <span class="sb-name" data-i18n="d.client">Qahwa House</span>
+          <span class="sb-handle">@qahwahouse</span>
+          <span class="pill pill-demo sb-pkg" data-i18n="d.plan">Full package · Demo</span>
+        </div>
+        <div class="sb-group">
+          <h3 data-i18n="d.sb.glance">At a glance</h3>
+          <ul class="sb-stats">
+            <li><button type="button" data-nav="approvals"><span class="sb-ic" data-icon="approvals"></span><span data-i18n="d.k.appr">Awaiting your approval</span><span class="sb-v" id="sb-need">0</span></button></li>
+            <li><button type="button" data-nav="inbox"><span class="sb-ic" data-icon="inbox"></span><span data-i18n="d.sb.inbox">Replies to review</span><span class="sb-v" id="sb-inbox">0</span></button></li>
+            <li><button type="button" data-nav="calendar"><span class="sb-ic" data-icon="calendar"></span><span data-i18n="d.k.pub">Published this week</span><span class="sb-v" id="sb-pub">0</span></button></li>
+          </ul>
+        </div>
+        <div class="sb-group">
+          <h3 data-i18n="d.sb.next">Next to publish</h3>
+          <button class="sb-next" type="button" data-action="cal-item" id="sb-next"></button>
+        </div>
+        <div class="sb-foot">
+          <a href="index.html"><span data-icon="site"></span><span data-i18n="d.back">Back to site</span></a>
+          <a data-wa href="https://wa.me/971541668700" target="_blank" rel="noopener"><span data-icon="whatsapp"></span><span data-i18n="wa.float">Chat with us on WhatsApp</span></a>
+        </div>
+      </aside>
+
+      <main class="win-content dash-main" id="dash-main" tabindex="-1">
+        <!-- TODAY -->
+        <section class="view is-active" id="today" data-view-panel="today" aria-labelledby="hello">
+          <div class="demo-note" role="note">
+            <span class="pill pill-demo" data-i18n="d.demo">DEMO</span>
+            <p data-i18n="d.banner">This is a live demo with a sample café brand. Everything is clickable; nothing is saved or sent. Your dashboard uses your own logo and colours.</p>
+            <button class="btn btn-ghost btn-sm" type="button" data-action="reset" data-i18n="d.reset">Reset demo</button>
+            <button class="btn btn-primary btn-sm" type="button" data-action="enquire" data-i18n="d.enquire.long">Get a dashboard like this</button>
+          </div>
+          <header class="view-head">
+            <div>
+              <span class="eyebrow" id="today-date"></span>
+              <h1 data-i18n="d.hello" data-view-title>Welcome back, Qahwa House</h1>
+              <p data-i18n="d.hello.sub">Here’s what your tools did this week — and what needs you.</p>
+            </div>
+            <button class="hello-cta" type="button" data-action="go" data-target="approvals" id="needs-you-btn">…</button>
+          </header>
+          <section id="kpis" aria-labelledby="kpi-title">
+            <h2 class="sr-only" id="kpi-title" data-i18n="d.kpi.title">Key numbers</h2>
+            <div class="instruments" id="kpi-row"></div>
+          </section>
+          <div class="today-grid">
+            <section aria-labelledby="next-title">
+              <div class="sub-head"><h3 id="next-title" data-i18n="d.next.title">Up next</h3><button class="link-btn" type="button" data-nav="calendar" data-i18n="d.next.all">Open calendar</button></div>
+              <ul class="upnext" id="next-list"></ul>
+            </section>
+            <section aria-labelledby="ins-mini">
+              <div class="sub-head"><h3 id="ins-mini" data-i18n="d.ins.chart">Reach by platform (last 7 days)</h3><button class="link-btn" type="button" data-nav="insights" data-i18n="d.ins.full">Open full report</button></div>
+              <div class="gcard"><ul class="bars eq" id="bars-mini"></ul></div>
+            </section>
+          </div>
+        </section>
+
+        <!-- APPROVALS -->
+        <section class="view" id="approvals" data-view-panel="approvals" aria-labelledby="appr-title">
+          <header class="view-head compact">
+            <div>
+              <span class="eyebrow" data-i18n="dv.approvals">Approvals</span>
+              <h2 id="appr-title" data-i18n="d.appr.title" data-view-title>Approvals queue</h2>
+              <p data-i18n="d.appr.sub">Nothing is published until you approve it.</p>
+            </div>
+            <div class="row-nav" id="row-nav">
+              <button class="btn btn-ghost btn-sm" type="button" data-action="approve-all" data-i18n="d.appr.all">Approve all</button>
+              <button class="round-btn" type="button" id="row-prev" data-i18n-attr="aria-label:dv.prev" aria-label="Previous post"><svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+              <span class="count" id="row-count" aria-live="polite"></span>
+              <button class="round-btn" type="button" id="row-next" data-i18n-attr="aria-label:dv.next" aria-label="Next post"><svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+          </header>
+          <div class="stack-hint" id="stack-hint" aria-hidden="true">
+            <span class="to-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 12H5M9 8l-4 4 4 4"/></svg><span data-i18n="dv.swipe.no">Changes</span></span>
+            <span class="to-yes"><span data-i18n="dv.swipe.yes">Approve</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 12h15M15 8l4 4-4 4"/></svg></span>
+          </div>
+          <div class="phone-row-wrap" role="region" aria-roledescription="carousel" data-i18n-attr="aria-label:dv.stack.label" aria-label="Posts waiting for approval">
+            <span class="stack-ghosts" id="stack-ghosts" aria-hidden="true"><i></i><i></i></span>
+            <ul class="phone-row approvals" id="appr-list"></ul>
+          </div>
+          <p class="stack-count" id="stack-count" aria-live="polite"></p>
+          <div id="done-wrap" hidden>
+            <div class="sub-head"><h3 data-i18n="d.appr.done">Recently reviewed</h3></div>
+            <ul class="done-list" id="appr-done"></ul>
+          </div>
+        </section>
+
+        <!-- CALENDAR -->
+        <section class="view" id="calendar" data-view-panel="calendar" aria-labelledby="cal-title">
+          <header class="view-head compact">
+            <div>
+              <span class="eyebrow" data-i18n="dv.calendar">Calendar</span>
+              <h2 id="cal-title" data-i18n="d.cal.title" data-view-title>Content calendar</h2>
+              <p data-i18n="d.cal.sub">Posts, carousels and reels per platform.</p>
+            </div>
+            <div class="transport">
+              <button class="round-btn" type="button" data-action="cal-prev" id="cal-prev" data-i18n-attr="aria-label:d.cal.w0" aria-label="This week"><svg class="flip" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 6v12L3 12zM20 6v12l-8-6z"/></svg></button>
+              <strong class="tc" id="cal-label" aria-live="polite">This week</strong>
+              <button class="round-btn" type="button" data-action="cal-next" id="cal-next" data-i18n-attr="aria-label:d.cal.w1" aria-label="Next week"><svg class="flip" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 6v12l8-6zM13 6v12l8-6z"/></svg></button>
+            </div>
+          </header>
+          <div class="toolbar" id="cal-filters" role="group" data-i18n-attr="aria-label:d.cal.filter"></div>
+          <div class="timeline" id="cal"></div>
+          <div class="cal-legend" id="cal-legend"></div>
+        </section>
+
+        <!-- INBOX -->
+        <section class="view" id="inbox" data-view-panel="inbox" aria-labelledby="inbox-title">
+          <header class="view-head"><div>
+            <span class="eyebrow" data-i18n="dv.inbox">Inbox</span>
+            <h2 id="inbox-title" data-i18n="d.inbox.title" data-view-title>Inbox</h2>
+            <p data-i18n="d.inbox.sub">Comments, DMs and WhatsApp — with AI-suggested replies.</p>
+          </div></header>
+          <ul class="glass-list inbox-list" id="inbox-list"></ul>
+          <p class="upload-note" data-i18n="d.inbox.note"></p>
+        </section>
+
+        <!-- ADS -->
+        <section class="view" id="ads" data-view-panel="ads" aria-labelledby="ads-title">
+          <header class="view-head">
+            <div>
+              <span class="eyebrow" data-i18n="dv.ads">Ads</span>
+              <h2 id="ads-title" data-i18n="d.ads.title" data-view-title>Ads</h2>
+              <p data-i18n="d.ads.sub">Campaigns.</p>
+            </div>
+            <span class="pill pill-demo" data-i18n="d.ads.demo">Demo numbers</span>
+          </header>
+          <ul class="glass-list ads-list" id="ads-list"></ul>
+          <p class="ads-total mono" id="ads-total"></p>
+          <p class="upload-note" data-i18n="d.ads.note">Ad budget is paid by you directly to each platform.</p>
+        </section>
+
+        <!-- INSIGHTS + UPLOAD -->
+        <section class="view" id="insights" data-view-panel="insights" aria-labelledby="ins-title">
+          <header class="view-head">
+            <div>
+              <span class="eyebrow" data-i18n="dv.insights">Insights</span>
+              <h2 id="ins-title" data-i18n="d.ins.title" data-view-title>This week’s insights</h2>
+              <p data-i18n="d.ins.sub">From Insights &amp; Reports.</p>
+            </div>
+            <button class="btn btn-ghost btn-sm" type="button" data-action="report" data-i18n="d.ins.full">Open full report</button>
+          </header>
+          <div class="ins-grid">
+            <div class="gcard insight">
+              <strong data-i18n="d.ins.chart">Reach by platform (last 7 days)</strong>
+              <ul class="bars eq" id="bars"></ul>
+              <div class="insight-notes">
+                <div><strong data-i18n="d.ins.w">What worked</strong><span data-i18n="d.ins.w.t"></span></div>
+                <div><strong data-i18n="d.ins.n">Post next</strong><span data-i18n="d.ins.n.t"></span></div>
+              </div>
+            </div>
+            <section class="gcard upload" id="upload" aria-labelledby="up-title">
+              <h3 id="up-title" data-i18n="d.up.title">Upload your photos &amp; videos</h3>
+              <p class="portal-muted" data-i18n="d.up.sub">Content Studio edits your own footage first.</p>
+              <div class="dropzone" id="dropzone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+                <p data-i18n="d.up.drop">Drag photos and videos here, or choose files.</p>
+                <input class="file-input" type="file" id="file-input" accept="image/*,video/*" multiple>
+                <label class="btn btn-primary btn-sm file-label" for="file-input" data-i18n="d.up.choose">Choose files</label>
+              </div>
+              <ul class="thumbs" id="thumbs" aria-live="polite"></ul>
+              <div class="upload-actions">
+                <button class="btn btn-primary btn-sm" type="button" data-action="upload-send" data-i18n="d.up.send">Send to Content Studio</button>
+                <button class="btn btn-ghost btn-sm" type="button" data-action="upload-clear" data-i18n="d.up.clear">Clear</button>
+                <span class="upload-note" id="up-count"></span>
+              </div>
+              <p class="upload-note" data-i18n="d.up.note">Demo: files stay on your device and are only previewed in this browser. Nothing is uploaded.</p>
+            </section>
+          </div>
+        </section>
+
+        <!-- TOOLS (launchpad) -->
+        <section class="view" id="tools" data-view-panel="tools" aria-labelledby="tools-title">
+          <header class="view-head">
+            <div>
+              <span class="eyebrow" data-i18n="dv.tools">Tools</span>
+              <h2 id="tools-title" data-i18n="d.tools.title" data-view-title>Your tools</h2>
+              <p data-i18n="d.tools.sub">Each card shows what’s pending and what’s done.</p>
+            </div>
+            <ul class="legend">
+              <li><span class="dot ok"></span><span data-i18n="d.st.ok">On track</span></li>
+              <li><span class="dot warn"></span><span data-i18n="d.st.warn">In progress</span></li>
+              <li><span class="dot bad"></span><span data-i18n="d.st.bad">Needs you</span></li>
+              <li><span class="dot off"></span><span data-i18n="d.st.off">Not started</span></li>
+            </ul>
+          </header>
+          <div class="launchpad" id="dtools"></div>
+        </section>
+
+        <!-- MORE (mobile) -->
+        <section class="view" id="more" data-view-panel="more" aria-labelledby="more-title">
+          <header class="view-head"><div><h2 id="more-title" data-i18n="dv.more" data-view-title>More</h2></div></header>
+          <ul class="ios-group" id="more-nav"></ul>
+          <ul class="ios-group">
+            <li><button class="ios-row" type="button" data-action="theme"><span class="ri" data-icon="globe"></span><span id="theme-label-m">Theme</span></button></li>
+            <li><button class="ios-row" type="button" data-action="reset"><span class="ri" data-icon="today"></span><span data-i18n="d.reset">Reset demo</span></button></li>
+          </ul>
+          <ul class="ios-group">
+            <li><a class="ios-row" href="index.html"><span class="ri" data-icon="site"></span><span data-i18n="d.back">Back to site</span><svg class="chev" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M1.5 1.5l5 5-5 5"/></svg></a></li>
+            <li><a class="ios-row" href="app/login.html"><span class="ri" data-icon="signout"></span><span data-i18n="d.login">Client login</span><svg class="chev" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M1.5 1.5l5 5-5 5"/></svg></a></li>
+            <li><button class="ios-row" type="button" data-action="enquire"><span class="ri" data-icon="box"></span><span data-i18n="d.enquire.long">Get a dashboard like this</span></button></li>
+          </ul>
+        </section>
+      </main>
     </div>
   </div>
 
-  <main class="dash-main container" id="dash-main">
-    <div class="dash-title">
-      <div>
-        <h1 data-i18n="d.hello">Welcome back, Qahwa House</h1>
-        <p data-i18n="d.hello.sub">Here’s what your tools did this week — and what needs you.</p>
-      </div>
-      <button class="btn btn-ghost btn-sm" type="button" data-action="go" data-target="approvals" id="needs-you-btn">…</button>
-    </div>
-
-    <section class="dash-section" id="kpis" aria-labelledby="kpi-title">
-      <h2 class="sr-only" id="kpi-title" data-i18n="d.kpi.title">Key numbers</h2>
-      <div class="kpis" id="kpi-row"></div>
-    </section>
-
-    <section class="dash-section" id="tools" aria-labelledby="tools-title">
-      <div class="sec-head">
-        <div>
-          <h2 id="tools-title" data-i18n="d.tools.title">Your tools</h2>
-          <p data-i18n="d.tools.sub">Each card shows what’s pending and what’s done.</p>
-        </div>
-        <ul class="legend">
-          <li><span class="dot ok"></span><span data-i18n="d.st.ok">On track</span></li>
-          <li><span class="dot warn"></span><span data-i18n="d.st.warn">In progress</span></li>
-          <li><span class="dot bad"></span><span data-i18n="d.st.bad">Needs you</span></li>
-          <li><span class="dot off"></span><span data-i18n="d.st.off">Not started</span></li>
-        </ul>
-      </div>
-      <div class="dtool-groups" id="dtools"></div>
-    </section>
-
-    <div class="dash-cols single">
-      <section class="dash-section" id="calendar" aria-labelledby="cal-title">
-        <div class="sec-head">
-          <div>
-            <h2 id="cal-title" data-i18n="d.cal.title">Content calendar</h2>
-            <p data-i18n="d.cal.sub">Posts, carousels and reels per platform.</p>
-          </div>
-          <div class="toolbar" id="cal-filters" role="group" data-i18n-attr="aria-label:d.cal.filter"></div>
-        </div>
-        <div class="plate cal-wrap">
-          <div class="cal-nav">
-            <button class="btn btn-ghost btn-sm" type="button" data-action="cal-prev" id="cal-prev"><span aria-hidden="true" class="dir-arrow">‹</span> <span data-i18n="d.cal.prev">This week</span></button>
-            <strong id="cal-label" aria-live="polite">This week</strong>
-            <button class="btn btn-ghost btn-sm" type="button" data-action="cal-next" id="cal-next"><span data-i18n="d.cal.next">Next week</span> <span aria-hidden="true" class="dir-arrow">›</span></button>
-          </div>
-          <div class="cal" id="cal"></div>
-        </div>
-      </section>
-
-      <section class="dash-section" id="approvals" aria-labelledby="appr-title">
-        <div class="sec-head">
-          <div>
-            <h2 id="appr-title" data-i18n="d.appr.title">Approvals queue</h2>
-            <p data-i18n="d.appr.sub">Nothing is published until you approve it.</p>
-          </div>
-          <button class="btn btn-ghost btn-sm" type="button" data-action="approve-all" data-i18n="d.appr.all">Approve all</button>
-        </div>
-        <ul class="approvals" id="appr-list"></ul>
-      </section>
-    </div>
-
-    <div class="dash-cols">
-      <section class="dash-section" id="inbox" aria-labelledby="inbox-title">
-        <div class="sec-head">
-          <div>
-            <h2 id="inbox-title" data-i18n="d.inbox.title">Inbox</h2>
-            <p data-i18n="d.inbox.sub">Comments, DMs and WhatsApp — with AI-suggested replies.</p>
-          </div>
-        </div>
-        <ul class="approvals inbox-list" id="inbox-list"></ul>
-        <p class="upload-note" data-i18n="d.inbox.note"></p>
-      </section>
-
-      <section class="dash-section" id="ads" aria-labelledby="ads-title">
-        <div class="sec-head">
-          <div>
-            <h2 id="ads-title" data-i18n="d.ads.title">Ads</h2>
-            <p data-i18n="d.ads.sub">Campaigns.</p>
-          </div>
-          <span class="pill pill-demo" data-i18n="d.ads.demo">Demo numbers</span>
-        </div>
-        <ul class="approvals ads-list" id="ads-list"></ul>
-        <p class="ads-total" id="ads-total"></p>
-        <p class="upload-note" data-i18n="d.ads.note">Ad budget is paid by you directly to each platform.</p>
-      </section>
-    </div>
-
-    <div class="dash-cols">
-      <section class="dash-section" id="insights" aria-labelledby="ins-title">
-        <div class="sec-head">
-          <div>
-            <h2 id="ins-title" data-i18n="d.ins.title">This week’s insights</h2>
-            <p data-i18n="d.ins.sub">From Insights &amp; Reports.</p>
-          </div>
-          <button class="btn btn-ghost btn-sm" type="button" data-action="report" data-i18n="d.ins.full">Open full report</button>
-        </div>
-        <div class="plate insight">
-          <strong data-i18n="d.ins.chart">Reach by platform (last 7 days)</strong>
-          <ul class="bars" id="bars"></ul>
-          <div class="insight-notes">
-            <div><strong data-i18n="d.ins.w">What worked</strong><span data-i18n="d.ins.w.t"></span></div>
-            <div><strong data-i18n="d.ins.n">Post next</strong><span data-i18n="d.ins.n.t"></span></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="dash-section" id="upload" aria-labelledby="up-title">
-        <div class="sec-head">
-          <div>
-            <h2 id="up-title" data-i18n="d.up.title">Upload your photos &amp; videos</h2>
-            <p data-i18n="d.up.sub">Content Studio edits your own footage first.</p>
-          </div>
-        </div>
-        <div class="plate upload">
-          <div class="dropzone" id="dropzone">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
-            <p data-i18n="d.up.drop">Drag photos and videos here, or choose files.</p>
-            <input class="file-input" type="file" id="file-input" accept="image/*,video/*" multiple>
-            <label class="btn btn-primary btn-sm file-label" for="file-input" data-i18n="d.up.choose">Choose files</label>
-          </div>
-          <ul class="thumbs" id="thumbs" aria-live="polite"></ul>
-          <div class="upload-actions">
-            <button class="btn btn-primary btn-sm" type="button" data-action="upload-send" data-i18n="d.up.send">Send to Content Studio</button>
-            <button class="btn btn-ghost btn-sm" type="button" data-action="upload-clear" data-i18n="d.up.clear">Clear</button>
-            <span class="upload-note" id="up-count"></span>
-          </div>
-          <p class="upload-note" data-i18n="d.up.note">Demo: files stay on your device and are only previewed in this browser. Nothing is uploaded.</p>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <footer class="dash-footer">
-    <div class="container">
-      <a class="brand-lockup" href="index.html" aria-label="ZKJ SYSTEM — home"><img src="assets/brand/zkjsystem-icon-primary.svg" alt="" width="28" height="32"><span>ZKJ SYSTEM</span></a>
-      <span data-i18n="d.foot">Powered by ZKJ SYSTEM · Where Engineering Meets Light</span>
-      <div class="row">
-        <a class="btn btn-ghost btn-sm" href="index.html" data-i18n="d.back">Back to site</a>
-        <button class="btn btn-primary btn-sm" type="button" data-action="enquire" data-i18n="d.enquire.long">Get a dashboard like this</button>
-      </div>
-    </div>
-  </footer>
+  <nav class="dock" id="dock" data-i18n-attr="aria-label:dv.sections" aria-label="Sections"></nav>
+  <nav class="tabbar" id="tabbar" data-i18n-attr="aria-label:dv.sections" aria-label="Sections"></nav>
 
   <dialog class="modal" id="modal" aria-labelledby="modal-title">
     <div class="modal-head">
@@ -239,6 +299,7 @@
 </div>
 
 <script src="assets/app.js"></script>
+<script src="assets/device.js"></script>
 <script src="assets/dashboard.js"></script>
 </body>
 </html>

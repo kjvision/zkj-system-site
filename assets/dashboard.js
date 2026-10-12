@@ -1,7 +1,7 @@
 /* ZKJ SYSTEM — live demo client dashboard. All state is in memory; nothing is sent anywhere. */
 (function () {
   'use strict';
-  var Z = window.ZKJ;
+  var Z = window.ZKJ, D = window.ZDEV;
   var t = Z.t, esc = Z.esc;
   var THEME_KEY = 'zkj-dash-theme';
 
@@ -209,6 +209,19 @@
     }
   });
 
+  Z.extend({
+    en: {
+      'd.live': 'Live demo', 'd.plan': 'Full package · Demo', 'd.sb.glance': 'At a glance', 'd.sb.inbox': 'Replies to review', 'd.sb.next': 'Next to publish',
+      'd.next.title': 'Up next', 'd.next.all': 'Open calendar', 'd.appr.done': 'Recently reviewed', 'd.stack.left': '{n} waiting',
+      'd.inst.trend': 'Trend', 'd.inst.rate': 'Rate', 'd.inst.progress': 'Progress', 'd.inst.queue': 'Queue', 'd.k.pub.of': '/ {n} planned'
+    },
+    ar: {
+      'd.live': 'عرض مباشر', 'd.plan': 'الباقة الكاملة · تجريبي', 'd.sb.glance': 'نظرة سريعة', 'd.sb.inbox': 'ردود للمراجعة', 'd.sb.next': 'التالي للنشر',
+      'd.next.title': 'التالي', 'd.next.all': 'افتح التقويم', 'd.appr.done': 'تمت مراجعتها مؤخرًا', 'd.stack.left': '{n} بالانتظار',
+      'd.inst.trend': 'الاتجاه', 'd.inst.rate': 'المعدل', 'd.inst.progress': 'التقدّم', 'd.inst.queue': 'الطابور', 'd.k.pub.of': '/ {n} مخطط'
+    }
+  });
+
   /* ---------- Seed data ---------- */
   function seed() {
     return {
@@ -331,31 +344,78 @@
   var STATUS_DOT = { published: 'ok', scheduled: 'warn', approval: 'bad', changes: 'warn' };
   function publishedThisWeek() { return S.cal.map(calItem).filter(function (c) { return c.w === 0 && c.s === 'published'; }); }
 
-  /* ---------- Renderers ---------- */
+  /* ---------- Renderers (device UI kit: assets/device.js) ---------- */
+  var QLOGO = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23" fill="#C8853B"/><circle cx="24" cy="24" r="19.5" fill="none" stroke="#2A1910" stroke-width="1.2" stroke-dasharray="2 2.4"/><path d="M14 20h16v6a7 7 0 01-7 7h-2a7 7 0 01-7-7z" fill="#2A1910"/><path d="M30 22h2a3 3 0 010 6h-2.4" fill="none" stroke="#2A1910" stroke-width="2"/><path d="M19 12c0 2 1.6 2 1.6 4M24 11c0 2 1.6 2 1.6 4" fill="none" stroke="#FFF8EE" stroke-width="1.8" stroke-linecap="round"/><path d="M13 35h20" stroke="#2A1910" stroke-width="2" stroke-linecap="round"/></svg>';
+  var HANDLE = 'qahwahouse';
+  document.querySelectorAll('[data-qlogo]').forEach(function (el) { el.innerHTML = QLOGO; });
+  function loc() { return L() === 'ar' ? 'ar-u-nu-latn' : 'en-GB'; }
+  function weekDate(w, d) { var x = new Date(); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - x.getDay() + w * 7 + d); return x; }
+
   function renderTheme() {
     var th = $('dash').getAttribute('data-theme');
-    $('theme-label').textContent = t(th === 'brand' ? 'd.theme.brand' : 'd.theme.core');
+    var label = t(th === 'brand' ? 'd.theme.brand' : 'd.theme.core');
+    $('theme-label').textContent = label;
+    $('theme-label-m').textContent = label;
     $('theme-btn').setAttribute('aria-pressed', th === 'core' ? 'true' : 'false');
+    $('theme-btn').setAttribute('aria-label', label);
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', th === 'brand' ? '#2A1910' : '#0B0B0F');
+    if (meta) meta.setAttribute('content', th === 'brand' ? '#2A1910' : '#070709');
   }
 
   function renderKpis() {
     var n = pendingCount();
     var pub = publishedThisWeek();
     var plats = {}; pub.forEach(function (c) { plats[c.p] = 1; });
-    var k = [
-      { l: 'd.k.reach', v: '48.2K', d: t('d.k.reach.d'), c: '' },
-      { l: 'd.k.eng', v: '5.8%', d: t('d.k.eng.d'), c: '' },
-      { l: 'd.k.pub', v: String(pub.length), d: t('d.k.pub.d', { n: Object.keys(plats).length }), c: '' },
-      { l: 'd.k.appr', v: String(n), d: t(n ? 'd.k.appr.d.bad' : 'd.k.appr.d.ok'), c: n ? 'bad' : '' },
-      { l: 'd.k.fol', v: '+612', d: t('d.k.fol.d'), c: '' }
+    var planned = S.cal.filter(function (c) { return c.w === 0; }).length;
+    var tag = function (k) { return '<span class="inst-tag">' + esc(t(k)) + '</span>'; };
+    var pips = ''; for (var i = 0; i < n; i++) pips += '<i></i>';
+    var tiles = [
+      '<div class="inst inst-num">' + tag('d.inst.trend') + '<span class="big">48.2K</span><div class="inst-spark">' + D.spark([31.4, 33.9, 30.2, 37.8, 41.1, 44.6, 48.2]) + '</div>' +
+        '<span class="inst-label">' + esc(t('d.k.reach')) + '</span><span class="inst-foot"><span class="status-ok">' + esc(t('d.k.reach.d')) + '</span></span></div>',
+      '<div class="inst inst-gauge">' + tag('d.inst.rate') + '<div class="inst-dial">' + D.gauge(0.58, { max: 10 }) + '<div class="inst-read"><span class="v">5.8%</span><span class="of">/ 10%</span></div></div>' +
+        '<span class="inst-label">' + esc(t('d.k.eng')) + '</span><span class="inst-foot"><span class="status-ok">' + esc(t('d.k.eng.d')) + '</span></span></div>',
+      '<div class="inst inst-ring">' + tag('d.inst.progress') + '<div class="inst-dial">' + D.ring(pub.length / planned) + '<div class="inst-read"><span class="v">' + pub.length + '</span><span class="of">' + esc(t('d.k.pub.of', { n: planned })) + '</span></div></div>' +
+        '<span class="inst-label">' + esc(t('d.k.pub')) + '</span><span class="inst-foot"><span class="mono">' + esc(t('d.k.pub.d', { n: Object.keys(plats).length })) + '</span></span></div>',
+      '<button class="inst inst-num inst-need' + (n ? '' : ' is-clear') + '" type="button" data-nav="approvals">' + tag('d.inst.queue') + '<span class="big">' + n + '</span>' +
+        (n ? '<span class="need-pips" aria-hidden="true">' + pips + '</span>' : '<div class="inst-ruler" aria-hidden="true"></div>') +
+        '<span class="inst-label">' + esc(t('d.k.appr')) + '</span><span class="inst-foot"><span class="' + (n ? 'status-bad' : 'status-ok') + '">' + esc(t(n ? 'd.k.appr.d.bad' : 'd.k.appr.d.ok')) + '</span></span></button>',
+      '<div class="inst inst-num">' + tag('d.inst.trend') + '<span class="big">+612</span><div class="inst-spark">' + D.spark([40, 62, 71, 88, 79, 120, 152]) + '</div>' +
+        '<span class="inst-label">' + esc(t('d.k.fol')) + '</span><span class="inst-foot"><span class="status-ok">' + esc(t('d.k.fol.d')) + '</span></span></div>'
     ];
-    $('kpi-row').innerHTML = k.map(function (x) {
-      return '<div class="plate kpi"><span class="k-label">' + esc(t(x.l)) + '</span><span class="k-value">' + esc(x.v) + '</span><span class="k-delta ' + x.c + '">' + esc(x.d) + '</span></div>';
-    }).join('');
+    $('kpi-row').innerHTML = tiles.join('');
+    D.animateIn($('kpi-row'));
     var nb = $('needs-you-btn');
     nb.textContent = n === 0 ? t('d.needs0') : n === 1 ? t('d.needs1') : t('d.needs', { n: n });
+    nb.classList.toggle('is-clear', n === 0);
+    $('today-date').textContent = new Intl.DateTimeFormat(loc(), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Asia/Dubai' }).format(new Date()) + ' · ' + t('dv.dubai');
+    D.setBadge('approvals', n);
+    D.setBadge('inbox', inboxPending());
+    renderSide();
+  }
+
+  function upcoming() {
+    var now = new Date(), today = now.getDay(), mins = now.getHours() * 60 + now.getMinutes();
+    var m = function (c) { var p = c.time.split(':'); return +p[0] * 60 + +p[1]; };
+    return S.cal.map(calItem).filter(function (c) { return c.s !== 'published' && (c.w > 0 || c.d > today || (c.d === today && m(c) >= mins)); })
+      .sort(function (a, b) { return a.w - b.w || a.d - b.d || m(a) - m(b); });
+  }
+  function statusTag(c) { return '<span class="status-tag ' + STATUS_DOT[c.s] + '">' + esc(t('d.s.' + c.s)) + '</span>'; }
+  function renderSide() {
+    var n = pendingCount();
+    $('sb-need').textContent = n; $('sb-need').classList.toggle('hot', n > 0);
+    $('sb-inbox').textContent = inboxPending(); $('sb-inbox').classList.toggle('hot', inboxPending() > 0);
+    $('sb-pub').textContent = publishedThisWeek().length;
+    var list = upcoming();
+    var nx = list[0];
+    if (nx) {
+      $('sb-next').setAttribute('data-id', nx.id);
+      $('sb-next').innerHTML = '<span class="when">' + esc(t(nx.w ? 'd.cal.w1' : 'd.cal.w0') + ' · ' + t('d.day.' + nx.d) + ' ') + '<span dir="ltr">' + esc(fmtTime(nx.time)) + '</span></span><strong>' + esc(nx.title[L()]) + '</strong><span>' + esc(plat(nx.p)[L()] + ' · ' + t('d.type.' + nx.type)) + '</span>';
+    }
+    $('next-list').innerHTML = list.slice(0, 4).map(function (c) {
+      var p = plat(c.p);
+      return '<li><button type="button" data-action="cal-item" data-id="' + c.id + '"><span class="un-when"><span>' + esc(t('d.day.' + c.d)) + '</span><b dir="ltr">' + esc(c.time) + '</b></span>' +
+        '<span class="un-title"><strong>' + esc(c.title[L()]) + '</strong><span><span class="pdot-round" style="background:' + p.color + '"></span>' + esc(p[L()]) + ' · ' + esc(t('d.type.' + c.type)) + '</span></span>' + statusTag(c) + '</button></li>';
+    }).join('');
   }
 
   function toolState(id) {
@@ -379,23 +439,15 @@
     return { s: 'off', p: '', d: '' };
   }
 
-  function dtoolCard(tl) {
-    var st = toolState(tl.id);
-    return '<li><article class="plate dtool state-' + st.s + '" id="dtool-' + tl.id + '">' +
-      '<div class="dtool-head"><span class="tool-icon">' + tl.icon + '</span><div><h4>' + esc(tl[L()].name) + '</h4>' +
-      '<span class="status-label status-' + st.s + '"><span class="dot ' + st.s + '"></span>' + esc(t('d.st.' + st.s)) + '</span></div></div>' +
-      '<div class="lines">' +
-      '<div class="line pending"><span class="dot ' + (st.s === 'off' ? 'off' : (st.s === 'bad' ? 'bad' : 'warn')) + '"></span><span>' + esc(st.p) + '</span></div>' +
-      '<div class="line done"><span class="dot ' + (st.s === 'off' ? 'off' : 'ok') + '"></span><span>' + esc(st.d) + '</span></div>' +
-      '</div>' +
-      '<button class="btn btn-ghost btn-sm" type="button" data-action="tool-detail" data-id="' + tl.id + '">' + esc(t('d.details')) + '<span class="sr-only"> — ' + esc(tl[L()].name) + '</span></button>' +
-      '</article></li>';
-  }
   function renderTools() {
     $('dtools').innerHTML = Z.GROUPS.map(function (g) {
       var list = Z.TOOLS.filter(function (tl) { return tl.group === g.id; });
-      return '<div class="dtool-group"><h3 class="dgroup-title"><span class="tag">' + g.code + '</span> ' + esc(g[L()].name) + '</h3>' +
-        '<ul class="dtools">' + list.map(dtoolCard).join('') + '</ul></div>';
+      return '<div class="lp-group"><h3 class="lp-title"><span class="tag">' + g.code + '</span> ' + esc(g[L()].name) + '</h3><ul class="lp-grid">' + list.map(function (tl) {
+        var st = toolState(tl.id);
+        return '<li><button class="lp-app state-' + st.s + '" type="button" data-action="tool-detail" data-id="' + tl.id + '" id="dtool-' + tl.id + '">' +
+          '<span class="lp-icon">' + tl.icon + '<span class="dot ' + st.s + '"></span></span><span class="lp-name">' + esc(tl[L()].name) + '</span>' +
+          '<span class="lp-state status-' + st.s + '">' + esc(t('d.st.' + st.s)) + '</span><span class="sr-only"> — ' + esc(st.p) + '</span></button></li>';
+      }).join('') + '</ul></div>';
     }).join('');
   }
 
@@ -403,21 +455,21 @@
     var list = $('inbox-list');
     list.innerHTML = S.inbox.map(function (m) {
       var p = plat(m.p);
-      var head = '<div class="inbox-meta"><span class="chip" style="min-height:24px;padding:0 8px;cursor:default"><span class="pdot" style="background:' + p.color + '"></span>' + esc(p[L()]) + ' · ' + esc(t('d.inbox.k.' + m.k)) + '</span><strong dir="ltr">' + esc(m.who) + '</strong></div>';
-      var body = '<p class="inbox-msg">' + esc(m.msg[L()]) + '</p>';
+      var head = '<div class="ib-head"><span class="chip chip-static"><span class="pdot" style="background:' + p.color + '"></span>' + esc(p[L()]) + ' · ' + esc(t('d.inbox.k.' + m.k)) + '</span><strong dir="ltr">' + esc(m.who) + '</strong></div>';
+      var body = '<p class="dm-bubble them inbox-msg">' + esc(m.msg[L()]) + '</p>';
       var actions, reply;
       if (m.state === 'pending') {
-        reply = '<div class="inbox-reply"><span>' + esc(t('d.inbox.suggested')) + '</span>' + (m.sensitive ? '<span class="sens status-bad"><span class="dot bad"></span>' + esc(t('d.inbox.sensitive')) + '</span>' : '') + '<p>' + esc(m.reply[L()]) + '</p></div>';
-        actions = '<button class="btn btn-approve btn-sm" type="button" data-action="inbox-send" data-id="' + m.id + '">' + esc(t('d.inbox.send')) + '</button>' +
+        reply = '<div class="ib-reply"><span class="ib-label">' + esc(t('d.inbox.suggested')) + (m.sensitive ? ' · <span class="status-bad">' + esc(t('d.inbox.sensitive')) + '</span>' : '') + '</span><p class="dm-bubble me">' + esc(m.reply[L()]) + '</p></div>';
+        actions = '<button class="btn btn-primary btn-sm" type="button" data-action="inbox-send" data-id="' + m.id + '">' + esc(t('d.inbox.send')) + '</button>' +
           '<button class="btn btn-ghost btn-sm" type="button" data-action="inbox-edit" data-id="' + m.id + '">' + esc(t('d.inbox.edit')) + '</button>' +
           '<button class="btn btn-ghost btn-sm" type="button" data-action="inbox-escalate" data-id="' + m.id + '">' + esc(t('d.inbox.escalate')) + '</button>';
       } else {
         var sent = m.state === 'sent';
-        reply = sent ? '<div class="inbox-reply is-sent"><p>' + esc(m.edited ? m.edited : m.reply[L()]) + '</p></div>' : '';
+        reply = sent ? '<div class="ib-reply"><p class="dm-bubble me">' + esc(m.edited ? m.edited : m.reply[L()]) + '</p></div>' : '';
         actions = '<span class="appr-state status-' + (sent ? 'ok' : 'warn') + '"><span class="dot ' + (sent ? 'ok' : 'warn') + '"></span>' + esc(t(sent ? 'd.inbox.sent' : 'd.inbox.escalated')) + '</span>' +
           '<button class="link-btn" type="button" data-action="inbox-undo" data-id="' + m.id + '">' + esc(t('d.inbox.undo')) + '</button>';
       }
-      return '<li><article class="plate inbox-item' + (m.state !== 'pending' ? ' is-done' : '') + '" id="inbox-' + m.id + '">' + head + body + reply + '<div class="appr-actions">' + actions + '</div></article></li>';
+      return '<li><article class="gcard inbox-item' + (m.state !== 'pending' ? ' is-done' : '') + '" id="inbox-' + m.id + '">' + head + body + reply + '<div class="appr-actions">' + actions + '</div></article></li>';
     }).join('');
   }
 
@@ -428,12 +480,12 @@
       var ap = AD_PLATFORMS[a.p];
       var stc = a.state === 'active' ? 'ok' : a.state === 'learning' ? 'warn' : 'off';
       var pct = Math.min(100, a.spend / a.budget * 100);
-      return '<li><article class="plate ad-item" id="ad-' + a.id + '">' +
-        '<div class="ad-top"><span class="chip" style="min-height:24px;padding:0 8px;cursor:default"><span class="pdot" style="background:' + ap.color + '"></span>' + esc(ap[L()]) + '</span>' +
-        '<span class="status-label status-' + stc + '" style="font-weight:700;font-size:12px;display:inline-flex;gap:6px;align-items:center"><span class="dot ' + stc + '"></span>' + esc(t('d.ads.st.' + a.state)) + '</span></div>' +
+      return '<li><article class="gcard ad-item" id="ad-' + a.id + '">' +
+        '<div class="ad-top"><span class="chip chip-static"><span class="pdot" style="background:' + ap.color + '"></span>' + esc(ap[L()]) + '</span>' +
+        '<span class="status-tag ' + stc + '">' + esc(t('d.ads.st.' + a.state)) + '</span></div>' +
         '<h4>' + esc(a.name[L()]) + '</h4>' +
-        '<div class="ad-bar" role="img" aria-label="' + esc(t('d.ads.spend', { s: money(a.spend), b: money(a.budget) })) + '"><span style="width:' + pct.toFixed(0) + '%"></span></div>' +
-        '<div class="ad-nums"><span>' + esc(t('d.ads.spend', { s: money(a.spend), b: money(a.budget) })) + '</span><span>' + esc(a.results[L()]) + '</span></div>' +
+        '<div class="fuel" role="img" aria-label="' + esc(t('d.ads.spend', { s: money(a.spend), b: money(a.budget) })) + '"><span style="width:' + pct.toFixed(0) + '%"></span><i style="inset-inline-start:25%"></i><i style="inset-inline-start:50%"></i><i style="inset-inline-start:75%"></i></div>' +
+        '<div class="ad-nums"><span class="mono">' + esc(t('d.ads.spend', { s: money(a.spend), b: money(a.budget) })) + '</span><span>' + esc(a.results[L()]) + '</span></div>' +
         '<div class="appr-actions"><button class="btn btn-ghost btn-sm" type="button" data-action="ad-toggle" data-id="' + a.id + '">' + esc(t(a.state === 'paused' ? 'd.ads.resume' : 'd.ads.pause')) + '</button>' +
         '<button class="link-btn" type="button" data-action="ad-details" data-id="' + a.id + '">' + esc(t('d.ads.details')) + '</button></div>' +
         '</article></li>';
@@ -449,62 +501,61 @@
     }).join('');
   }
 
+  var TRACKS = [['reel', 'V1'], ['story', 'V2'], ['post', 'P1'], ['carousel', 'P2']];
   function renderCalendar() {
-    $('cal-label').textContent = t(S.week === 0 ? 'd.cal.w0' : 'd.cal.w1');
+    var f = new Intl.DateTimeFormat(loc(), { day: 'numeric', month: 'short' });
+    $('cal-label').textContent = t(S.week === 0 ? 'd.cal.w0' : 'd.cal.w1') + ' · ' + f.format(weekDate(S.week, 0)) + ' – ' + f.format(weekDate(S.week, 6));
     $('cal-prev').setAttribute('aria-pressed', S.week === 0 ? 'true' : 'false');
     $('cal-next').setAttribute('aria-pressed', S.week === 1 ? 'true' : 'false');
     var items = S.cal.map(calItem).filter(function (c) { return c.w === S.week && (S.filter === 'all' || c.p === S.filter); });
-    var html = '';
-    for (var d = 0; d < 7; d++) {
-      var dayItems = items.filter(function (c) { return c.d === d; }).sort(function (a, b) { return parseFloat(a.time.replace(':', '.')) - parseFloat(b.time.replace(':', '.')); });
-      html += '<div class="cal-day"><h3>' + esc(t('d.day.' + d)) + '</h3>' +
-        (dayItems.length ? dayItems.map(function (c) {
-          var p = plat(c.p);
-          return '<button class="cal-item" type="button" data-action="cal-item" data-id="' + c.id + '" style="--pc:' + p.color + '">' +
-            '<span class="ci-top"><span>' + esc(p[L()]) + ' · ' + esc(t('d.type.' + c.type)) + '</span><span dir="ltr">' + esc(fmtTime(c.time)) + '</span></span>' +
-            '<span class="ci-title">' + esc(c.title[L()]) + '</span>' +
-            '<span class="ci-status status-' + STATUS_DOT[c.s] + '"><span class="dot ' + STATUS_DOT[c.s] + '"></span>' + esc(t('d.s.' + c.s)) + '</span>' +
-            '</button>';
-        }).join('') : '<span class="cal-empty">' + esc(t('d.cal.empty')) + '</span>') +
-        '</div>';
-    }
-    $('cal').innerHTML = html;
+    var now = new Date(), days = [];
+    for (var d = 0; d < 7; d++) days.push({ name: t('d.day.' + d), num: String(weekDate(S.week, d).getDate()), today: S.week === 0 && d === now.getDay() });
+    var byKind = {};
+    items.forEach(function (c) {
+      var p = plat(c.p), hm = c.time.split(':');
+      (byKind[c.type] = byKind[c.type] || []).push({ id: c.id, day: c.d, mins: +hm[0] * 60 + +hm[1], time: c.time.length < 5 ? '0' + c.time : c.time, title: c.title[L()], kind: p[L()], color: p.color, dot: STATUS_DOT[c.s], status: t('d.s.' + c.s), wave: c.type === 'reel' || c.type === 'story' });
+    });
+    var tracks = TRACKS.filter(function (k) { return byKind[k[0]]; }).map(function (k) { return { code: k[1], label: t('d.type.' + k[0]), clips: byKind[k[0]] }; });
+    if (!tracks.length) tracks = [{ code: '—', label: t('d.cal.empty'), clips: [] }];
+    var pos = S.week === 0 ? (now.getDay() + (now.getHours() * 60 + now.getMinutes()) / 1440) / 7 : null;
+    $('cal').innerHTML = D.timeline({ days: days, tracks: tracks, now: pos, nowLabel: t('dv.now') + ' ' + new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).format(now) });
+    $('cal-legend').innerHTML = ['approval', 'changes', 'scheduled', 'published'].map(function (s) { return '<span><span class="dot ' + STATUS_DOT[s] + '"></span>' + esc(t('d.s.' + s)) + '</span>'; }).join('');
+    if (D.current() === 'calendar') D.revealNow($('cal'));
   }
 
-  function thumbSvg(a) {
-    var gid = 'g-' + a.id;
-    var motif = a.type === 'reel'
-      ? '<circle cx="48" cy="54" r="16" fill="rgba(255,255,255,.18)"/><path d="M43 46l13 8-13 8z" fill="#fff"/>'
-      : a.type === 'carousel'
-        ? '<rect x="22" y="30" width="44" height="52" rx="2" fill="rgba(255,255,255,.14)"/><rect x="30" y="36" width="44" height="52" rx="2" fill="rgba(255,255,255,.22)"/><circle cx="52" cy="56" r="9" fill="none" stroke="#fff" stroke-width="2"/>'
-        : '<path d="M30 46h36v14a12 12 0 01-12 12h-12a12 12 0 01-12-12z" fill="rgba(255,255,255,.85)"/><path d="M66 50h4a5 5 0 010 10h-4" fill="none" stroke="#fff" stroke-width="2.5"/>';
-    return '<svg viewBox="0 0 96 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + a.art[0] + '"/><stop offset="1" stop-color="' + a.art[1] + '"/></linearGradient></defs><rect width="96" height="120" fill="url(#' + gid + ')"/>' + motif + '</svg>';
+  function media(a, sfx) {
+    return D.art({ a: a.art[0], b: a.art[1], title: a.title[L()], kind: a.type, seed: a.id, sfx: sfx, full: a.type === 'reel', mark: 'Qahwa House · ' + t('d.type.' + a.type) });
   }
-
+  function phoneOf(a, sfx) {
+    return D.phone({ kind: a.type, handle: HANDLE, avatar: QLOGO, media: media(a, sfx), caption: a.caption[L()], when: t('d.appr.when', { w: a.when[L()] }), slides: 5 });
+  }
+  function chips(a) { return a.platforms.map(function (p) { return '<span class="chip chip-static"><span class="pdot" style="background:' + plat(p).color + '"></span>' + esc(plat(p)[L()]) + '</span>'; }).join(''); }
+  var rowUpd = D.rowNav($('appr-list'), $('row-prev'), $('row-next'), $('row-count'));
   function renderApprovals() {
-    var list = $('appr-list');
-    if (!S.approvals.length) { list.innerHTML = '<li class="cal-empty">' + esc(t('d.appr.empty')) + '</li>'; return; }
-    list.innerHTML = S.approvals.map(function (a) {
-      var plats = a.platforms.map(function (p) { return '<span class="chip" style="min-height:24px;padding:0 8px;cursor:default"><span class="pdot" style="background:' + plat(p).color + '"></span>' + esc(plat(p)[L()]) + '</span>'; }).join('');
-      var actions;
-      if (a.state === 'pending') {
-        actions = '<button class="btn btn-approve btn-sm" type="button" data-action="approve" data-id="' + a.id + '">' + esc(t('d.appr.approve')) + '</button>' +
-          '<button class="btn btn-ghost btn-sm" type="button" data-action="changes" data-id="' + a.id + '">' + esc(t('d.appr.changes')) + '</button>' +
-          '<button class="link-btn" type="button" data-action="preview" data-id="' + a.id + '">' + esc(t('d.appr.preview')) + '</button>';
-      } else {
-        var ok = a.state === 'approved';
-        actions = '<span class="appr-state status-' + (ok ? 'ok' : 'warn') + '"><span class="dot ' + (ok ? 'ok' : 'warn') + '"></span>' + esc(t(ok ? 'd.appr.approved' : 'd.appr.changed')) + '</span>' +
-          '<button class="link-btn" type="button" data-action="undo" data-id="' + a.id + '">' + esc(t('d.appr.undo')) + '</button>';
-      }
-      return '<li><article class="plate appr' + (a.state !== 'pending' ? ' is-done' : '') + '" id="appr-' + a.id + '">' +
-        '<div class="appr-thumb">' + thumbSvg(a) + '<span class="type" style="position:relative">' + esc(t('d.type.' + a.type)) + '</span></div>' +
-        '<div class="appr-body"><h3>' + esc(a.title[L()]) + '</h3>' +
-        '<div class="appr-meta">' + plats + '</div>' +
-        '<div class="appr-meta"><span>' + esc(t('d.appr.when', { w: a.when[L()] })) + '</span><span class="src">' + esc(t('d.src.' + a.src)) + '</span></div>' +
-        '<p class="appr-caption">' + esc(a.caption[L()]) + '</p>' +
-        '<div class="appr-actions">' + actions + '</div></div>' +
-        '</article></li>';
+    var pend = S.approvals.filter(function (a) { return a.state === 'pending'; });
+    var done = S.approvals.filter(function (a) { return a.state !== 'pending'; });
+    $('appr-list').innerHTML = pend.length ? pend.map(function (a) {
+      var title = a.title[L()];
+      return '<li class="appr-slot"><article class="appr phone-card" id="appr-' + a.id + '" data-id="' + a.id + '" data-pending="1" aria-label="' + esc(title) + '">' + phoneOf(a) +
+        '<div class="pc-meta"><h3>' + esc(title) + '</h3><p>' + chips(a) + '</p><p><span class="mono">' + esc(a.when[L()]) + '</span> · <span>' + esc(t('d.src.' + a.src)) + '</span></p></div>' +
+        '<div class="pc-actions"><button class="tactile yes" type="button" data-action="approve" data-id="' + a.id + '">' + D.icon('check') + '<span>' + esc(t('d.appr.approve')) + '</span><span class="sr-only"> — ' + esc(title) + '</span></button>' +
+        '<button class="tactile no" type="button" data-action="changes" data-id="' + a.id + '">' + D.icon('pencil') + '<span>' + esc(t('d.appr.changes')) + '</span><span class="sr-only"> — ' + esc(title) + '</span></button></div>' +
+        '<button class="link-btn pc-more" type="button" data-action="preview" data-id="' + a.id + '">' + esc(t('d.appr.preview')) + '<span class="sr-only"> — ' + esc(title) + '</span></button></article></li>';
+    }).join('') : '<li class="appr-empty">' + D.icon('check') + '<span>' + esc(t('d.appr.empty')) + '</span></li>';
+    $('appr-done').innerHTML = done.map(function (a) {
+      var ok = a.state === 'approved';
+      return '<li><article class="appr row-card is-done" id="appr-' + a.id + '"><div class="rc-thumb">' + D.art({ a: a.art[0], b: a.art[1], kind: a.type, seed: a.id, sfx: '-t' }) + '</div>' +
+        '<div class="rc-body"><h3>' + esc(a.title[L()]) + '</h3><div class="rc-line">' + chips(a) + '</div>' +
+        (a.note ? '<p class="appr-note">' + esc(a.note) + '</p>' : '') +
+        '<div class="appr-actions"><span class="appr-state status-' + (ok ? 'ok' : 'warn') + '"><span class="dot ' + (ok ? 'ok' : 'warn') + '"></span>' + esc(t(ok ? 'd.appr.approved' : 'd.appr.changed')) + '</span>' +
+        '<button class="link-btn" type="button" data-action="undo" data-id="' + a.id + '">' + esc(t('d.appr.undo')) + '</button></div></div></article></li>';
     }).join('');
+    $('done-wrap').hidden = !done.length;
+    $('stack-ghosts').setAttribute('data-n', Math.min(pend.length, 3));
+    $('stack-ghosts').hidden = pend.length < 2;
+    $('stack-hint').hidden = !pend.length;
+    $('stack-count').textContent = pend.length ? t('d.stack.left', { n: pend.length }) : '';
+    if (rowUpd) rowUpd();
   }
 
   function renderNotifs() {
@@ -517,24 +568,27 @@
       var text = n.text ? n.text[L()] : t(n.key);
       var time = n.tkey ? t(n.tkey) : t('d.n.now');
       return '<li><button class="notif-item ' + (n.read ? 'read' : 'unread') + '" type="button" data-action="notif-open" data-id="' + n.id + '">' +
-        '<span class="dot ' + n.kind + '"></span><span><p>' + esc(text) + '</p><small>' + esc(time) + '</small></span></button></li>';
-    }).join('') : '<li class="cal-empty" style="padding:10px">' + esc(t('d.notif.empty')) + '</li>';
+        '<span class="nb-icon"><img src="assets/brand/zkjsystem-icon-primary.svg" alt="" width="20" height="23"></span><span class="nb-body">' +
+        '<span class="nb-top"><span class="app">ZKJ SYSTEM</span><span>' + esc(time) + '</span></span>' +
+        '<p class="nb-title">' + (n.read ? '' : '<span class="nb-unread" aria-hidden="true"></span>') + '<span class="dot ' + n.kind + '" aria-hidden="true" style="margin-inline-end:6px"></span>' + esc(text) + '</p></span></button></li>';
+    }).join('') : '<li class="nb-empty">' + esc(t('d.notif.empty')) + '</li>';
   }
 
-  function renderBars() {
+  function barsHtml() {
     var max = BARS[0][1];
-    $('bars').innerHTML = BARS.map(function (b) {
+    return BARS.map(function (b) {
       var p = plat(b[0]);
-      return '<li class="bar-row"><span>' + esc(p[L()]) + '</span><span class="bar-track"><span class="bar-fill" style="display:block;width:' + (b[1] / max * 100).toFixed(1) + '%"></span></span><span class="v">' + b[1].toFixed(1) + 'K</span></li>';
+      return '<li class="bar-row"><span>' + esc(p[L()]) + '</span><span class="bar-track"><span class="bar-fill" style="width:' + (b[1] / max * 100).toFixed(1) + '%;--pc:' + p.color + '"></span></span><span class="v">' + b[1].toFixed(1) + 'K</span></li>';
     }).join('');
   }
+  function renderBars() { $('bars').innerHTML = barsHtml(); $('bars-mini').innerHTML = barsHtml(); }
 
   function renderFiles() {
     $('thumbs').innerHTML = S.files.map(function (f, i) {
-      var media = f.kind === 'video'
+      var m = f.kind === 'video'
         ? '<video src="' + f.url + '" muted playsinline preload="metadata"></video>'
         : '<img src="' + f.url + '" alt="' + esc(f.name) + '">';
-      return '<li>' + media + '<span class="kind">' + esc(t(f.kind === 'video' ? 'd.up.video' : 'd.up.photo')) + '</span>' +
+      return '<li>' + m + '<span class="kind">' + esc(t(f.kind === 'video' ? 'd.up.video' : 'd.up.photo')) + '</span>' +
         '<button class="rm" type="button" data-action="upload-remove" data-idx="' + i + '" aria-label="' + esc(t('d.up.remove', { name: f.name })) + '">×</button></li>';
     }).join('');
     $('up-count').textContent = S.files.length ? t('d.up.count', { n: S.files.length }) : '';
@@ -562,15 +616,18 @@
     if (first) first.focus();
   }
   function closeModal() { modalState = null; if (modal.open) { if (typeof modal.close === 'function') modal.close(); else modal.removeAttribute('open'); } }
-  modal.addEventListener('close', function () { modalState = null; });
+  var keepFlown = false;
+  modal.addEventListener('close', function () {
+    modalState = null;
+    if (!keepFlown && document.querySelector('#appr-list .is-flown-left')) renderApprovals();
+  });
   modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
 
+  // section ids → device views (dock / tab bar)
+  var VIEW_OF = { approvals: 'approvals', calendar: 'calendar', inbox: 'inbox', ads: 'ads', insights: 'insights', upload: 'insights', tools: 'tools', today: 'today' };
   function goTo(id) {
-    var el = $(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    var target = el.querySelector('.plate, .dtools, .approvals') || el;
-    target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
+    D.show(VIEW_OF[id] || 'today', { focus: true });
+    if (id === 'upload') { var u = $('upload'); if (u) u.scrollIntoView({ block: 'start' }); }
   }
 
   function addNotif(kind, text, target) {
@@ -698,9 +755,8 @@
     approve: function (el) {
       var a = appr(el.getAttribute('data-id'));
       if (!a || a.state !== 'pending') { closeModal(); return; }
-      approveOne(a);
       closeModal();
-      refreshAfterApproval();
+      approveAnimated(a, false);
     },
     'approve-all': function () {
       var pend = S.approvals.filter(function (a) { return a.state === 'pending'; });
@@ -710,6 +766,11 @@
       refreshAfterApproval();
     },
     changes: function (el) {
+      var a = appr(el.getAttribute('data-id'));
+      if (!a) return;
+      openChanges(a);
+    },
+    'changes-open': function (el) {
       var a = appr(el.getAttribute('data-id'));
       if (!a) return;
       openModal({
@@ -739,7 +800,7 @@
       if (ta && !ta.value.trim()) { $('ch-err').textContent = t('d.ch.need'); ta.focus(); return; }
       a.state = 'changes';
       a.note = ta ? ta.value.trim() : '';
-      closeModal();
+      keepFlown = true; closeModal(); keepFlown = false;
       Z.toast(t('d.appr.toast.changes', { title: a.title[L()] }), 'warn');
       addNotif('warn', { en: tIn('en', 'd.n.changes', { title: a.title.en }), ar: tIn('ar', 'd.n.changes', { title: a.title.ar }) }, 'approvals');
       refreshAfterApproval();
@@ -754,15 +815,16 @@
     preview: function (el) {
       var a = appr(el.getAttribute('data-id'));
       if (!a) return;
+      var acts = a.state === 'pending' ? [
+        { action: 'approve', id: a.id, label: t('d.appr.approve'), cls: 'btn-primary' },
+        { action: 'changes', id: a.id, label: t('d.appr.changes') }
+      ] : [];
+      acts.push({ action: 'modal-close', label: t('d.close') });
       openModal({
         title: a.title[L()],
-        body: '<div class="appr-thumb" style="width:100%;height:220px">' + thumbSvg(a).replace('id="g-' + a.id + '"', 'id="gp-' + a.id + '"').replace('url(#g-' + a.id + ')', 'url(#gp-' + a.id + ')') + '<span class="type" style="position:relative">' + esc(t('d.type.' + a.type)) + '</span></div>' +
-          '<p>' + esc(a.caption[L()]) + '</p><p style="color:var(--muted);font-size:14px">' + esc(t('d.appr.when', { w: a.when[L()] })) + ' · ' + esc(t('d.src.' + a.src)) + '</p>',
-        actions: [
-          { action: 'approve', id: a.id, label: t('d.appr.approve'), cls: 'btn-approve' },
-          { action: 'changes', id: a.id, label: t('d.appr.changes') },
-          { action: 'modal-close', label: t('d.close') }
-        ]
+        body: '<div class="modal-preview">' + phoneOf(a, '-m') + '</div>' +
+          '<p style="color:var(--muted);font-size:14px;text-align:center">' + esc(t('d.appr.when', { w: a.when[L()] })) + ' · ' + esc(t('d.src.' + a.src)) + '</p>',
+        actions: acts
       });
     },
     report: function () {
@@ -876,6 +938,27 @@
   function adItem(id) { return S.ads.filter(function (a) { return a.id === id; })[0]; }
   function refreshInbox() { renderInbox(); renderTools(); renderKpis(); }
   function refreshAfterApproval() { renderKpis(); renderTools(); renderCalendar(); renderApprovals(); }
+  // approve with the device animation: the phone lifts away (desktop) or flies off the stack (mobile)
+  var busy = {};
+  function approveAnimated(a, flown) {
+    if (busy[a.id]) return;
+    busy[a.id] = true;
+    var card = $('appr-' + a.id);
+    var isPhone = card && card.classList.contains('phone-card');
+    if (isPhone && !flown) card.classList.add('is-approving');
+    if (card) card.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+    D.wait(isPhone ? (flown ? 380 : 1150) : 0).then(function () {
+      delete busy[a.id];
+      if (a.state !== 'pending') { refreshAfterApproval(); return; }
+      approveOne(a);
+      refreshAfterApproval();
+    });
+  }
+  function openChanges(a) { actions['changes-open']({ getAttribute: function () { return a.id; } }); }
+  D.swipe($('appr-list'), {
+    approve: function (id) { var a = appr(id); if (a && a.state === 'pending') approveAnimated(a, true); else renderApprovals(); },
+    changes: function (id) { var a = appr(id); if (a && a.state === 'pending') openChanges(a); else renderApprovals(); }
+  });
 
   function closeNotif() {
     $('notif-panel').hidden = true;
@@ -914,6 +997,26 @@
   ['dragenter', 'dragover'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('drag'); }); });
   ['dragleave', 'drop'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove('drag'); }); });
   dz.addEventListener('drop', function (e) { if (e.dataTransfer) addFiles(e.dataTransfer.files); });
+
+  D.buildNav({
+    items: [
+      { id: 'today', key: 'dv.today', icon: 'today', tone: 'gold' },
+      { id: 'approvals', key: 'dv.approvals', icon: 'approvals' },
+      { id: 'calendar', key: 'dv.calendar', icon: 'calendar', tone: 'cal' },
+      { id: 'inbox', key: 'dv.inbox', icon: 'inbox' },
+      { id: 'ads', key: 'dv.ads', icon: 'ads' },
+      { id: 'insights', key: 'dv.insights', icon: 'insights', tone: 'steel' },
+      { id: 'tools', key: 'dv.tools', icon: 'tools', sep: true }
+    ],
+    tabs: ['today', 'approvals', 'calendar', 'more']
+  });
+  D.clock($('mb-clock'), 'menubar');
+  D.onView(function (id) {
+    closeNotif();
+    if (id === 'approvals' && rowUpd) setTimeout(rowUpd, 0);
+    if (id === 'calendar') setTimeout(function () { D.revealNow($('cal')); }, 0);
+    if (id === 'today') D.animateIn($('kpi-row'));
+  });
 
   var savedTheme = Z.store(THEME_KEY);
   if (savedTheme === 'core' || savedTheme === 'brand') $('dash').setAttribute('data-theme', savedTheme);
