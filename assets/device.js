@@ -440,8 +440,76 @@
   }
   fillIcons();
 
+  /* ---------- Ambient layer (living background) ---------- */
+  // Logos with known geometry: the KJ VISION emblem's two eyes glow and blink.
+  var LOGO_GEOM = [
+    { re: /kjvision-emblem/i, ar: '1000 / 681', eyes: [[26.96, 49.71], [73.04, 49.71]], d: 8.5 },
+    { re: /zkjverse-mark/i, ar: '839 / 739' },
+    { re: /zkjsystem-icon/i, ar: '93.48 / 106.08' }
+  ];
+  function cssUrl(u) { return 'url(&quot;' + esc(String(u).replace(/["\\\n\r]/g, '')) + '&quot;)'; }
+  function neonLogo(url, cls) {
+    if (!url) return '';
+    var g = null; for (var i = 0; i < LOGO_GEOM.length; i++) if (LOGO_GEOM[i].re.test(url)) { g = LOGO_GEOM[i]; break; }
+    var eyes = g && g.eyes ? g.eyes.map(function (e) { return '<span class="eye" style="left:' + e[0] + '%;top:' + e[1] + '%;width:' + g.d + '%"></span>'; }).join('') : '';
+    return '<div class="neon-logo' + (cls ? ' ' + cls : '') + (eyes ? ' has-eyes' : '') + '" style="--ar:' + (g ? g.ar : '1') + '" aria-hidden="true"><i style="--logo:' + cssUrl(url) + '"></i>' + eyes + '</div>';
+  }
+  var CUBE_D = 'M48 95.04 L88.74 71.52 L88.74 24.48 L48 0.96 L7.26 24.48 L7.26 71.52ZM51.5 84.94 L51.5 55 L51.5 54.55 L48 58.05 L44.5 54.55 L44.5 55 L44.5 84.94 L17.76 69.5 L43.69 54.53 L44.19 54.24 L39.07 49.11 L14.26 63.44 L14.26 32.56 L39.07 46.89 L44.19 41.76 L17.76 26.5 L44.5 11.06 L44.5 41 L44.5 41.45 L48 37.95 L51.5 41.45 L51.5 41 L51.5 11.06 L78.24 26.5 L52.31 41.47 L51.81 41.76 L56.93 46.89 L81.74 32.56 L81.74 67.48ZM52.31 54.53 L53.4 52.64 L51.81 54.24Z';
+  // the cube's real edges with a light signal travelling along them
+  function cubeLight(cls) {
+    return '<svg class="cube-light' + (cls ? ' ' + cls : '') + '" viewBox="1.26 -5.04 93.48 106.08" aria-hidden="true">' +
+      '<path class="cl-base" d="' + CUBE_D + '"/><path class="cl-core" d="M48 40.5 L55.5 48 L48 55.5 L40.5 48Z"/>' +
+      '<path class="cl-sig" pathLength="1" d="' + CUBE_D + '"/><path class="cl-sig s2" pathLength="1" d="' + CUBE_D + '"/></svg>';
+  }
+  function fxLayers() {
+    var motes = ''; for (var i = 0; i < 14; i++) motes += '<i style="left:' + ((i * 37) % 100) + '%;animation-delay:-' + ((i * 2.3) % 18).toFixed(1) + 's;animation-duration:' + (14 + (i % 5) * 2) + 's"></i>';
+    return '<div class="amb-aurora"><b></b><b></b><b></b>' + motes + '</div>' +
+      '<div class="amb-blue"><div class="grid"></div>' +
+      '<svg class="dims" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"><g class="scan"><line x1="80" y1="520" x2="560" y2="520"/><path d="M80 512v16M560 512v16M80 520l10-4v8zM560 520l-10-4v8z"/><text x="290" y="510">4 800</text></g>' +
+      '<line x1="940" y1="120" x2="940" y2="460"/><path d="M932 120h16M932 460h16"/><text x="900" y="300" transform="rotate(-90 900 300)">3 400</text>' +
+      '<path d="M120 90h160M120 90v80" /><text x="128" y="84">± 0.00</text><circle cx="120" cy="90" r="4" fill="none" stroke="rgba(212,175,55,.6)"/></svg>' +
+      '<div class="iso"><div class="cube3d"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>';
+  }
+  var AMB_MS = 11000;
+  // el: an empty container. o: { covers: [urls], logo: url }
+  function ambient(el, o) {
+    if (!el) return;
+    o = o || {};
+    var key = JSON.stringify(o);
+    if (el._ambKey === key) return;
+    el._ambKey = key;
+    if (el._ambTimer) { clearInterval(el._ambTimer); el._ambTimer = null; }
+    var covers = (o.covers || []).filter(Boolean).slice(0, 12);
+    el.innerHTML = '<div class="amb-art">' + covers.map(function (u, i) { return '<div class="amb-slide' + (i === 0 ? ' is-on' : '') + '" data-src="' + esc(u) + '"></div>'; }).join('') + '</div>' +
+      (!covers.length && o.logo ? neonLogo(o.logo, 'amb-logo') : '') +
+      '<div class="amb-shade"></div><div class="amb-fx">' + fxLayers() + '</div>';
+    var slides = el.querySelectorAll('.amb-slide');
+    function load(s) { if (s && !s.style.backgroundImage) s.style.backgroundImage = 'url("' + s.getAttribute('data-src').replace(/"/g, '') + '")'; }
+    load(slides[0]);
+    if (slides.length < 2 || reduce) return;
+    var cur = 0;
+    setTimeout(function () { load(slides[1]); }, 2500); // lazy: only the next image is fetched
+    el._ambTimer = setInterval(function () {
+      if (document.hidden) return;
+      var next = (cur + 1) % slides.length;
+      load(slides[next]);
+      slides[cur].classList.remove('is-on'); slides[next].classList.add('is-on');
+      cur = next;
+      setTimeout(function () { load(slides[(cur + 1) % slides.length]); }, AMB_MS - 3000);
+    }, AMB_MS);
+  }
+  document.addEventListener('visibilitychange', function () { document.documentElement.classList.toggle('amb-paused', document.hidden); });
+  var MOOD_KEY = 'zkj-mood';
+  function getMood() { var m = null; try { m = window.localStorage.getItem(MOOD_KEY); } catch (e) { /* storage blocked */ } return /^[abc]$/.test(m || '') ? m : 'a'; }
+  function setMood(m, root) {
+    if (!/^[abc]$/.test(m)) m = 'a';
+    try { window.localStorage.setItem(MOOD_KEY, m); } catch (e) { /* storage blocked */ }
+    (root || document.getElementById('dash')).setAttribute('data-mood', m);
+    return m;
+  }
+
   window.ZDEV = {
-    fillIcons: fillIcons,
+    fillIcons: fillIcons, ambient: ambient, neonLogo: neonLogo, cubeLight: cubeLight, getMood: getMood, setMood: setMood,
     icon: icon, IC: IC, buildNav: buildNav, show: show, setAvailable: setAvailable, setBadge: setBadge,
     current: function () { return NAV.current; }, onView: function (fn) { NAV.listeners.push(fn); },
     clock: clock, ring: ring, gauge: gauge, spark: spark, animateIn: animateIn, art: art, phone: phone,

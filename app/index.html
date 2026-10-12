@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="../assets/portal.css">
 </head>
 <body data-title-key="p.app.meta">
-<div class="dash portal device no-client" id="dash" data-theme="core" data-state="loading" data-view="today">
+<div class="dash portal device no-client" id="dash" data-theme="core" data-state="loading" data-view="today" data-mood="a">
   <a class="skip-link" href="#dash-main" data-i18n="skip">Skip to content</a>
   <div class="stage-fx" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
@@ -58,6 +58,7 @@
         <button class="tb-btn" type="button" data-action="signout" id="signout-btn" data-i18n="p.signout" hidden>Sign out</button>
       </div>
     </header>
+    <div class="ambient" id="ambient" aria-hidden="true"></div>
 
     <div class="win-body">
       <aside class="sidebar" id="sidebar" hidden data-i18n-attr="aria-label:p.sb.label" aria-label="Sidebar">
@@ -139,6 +140,7 @@
           <!-- ZKJ SYSTEM HQ (admin only) -->
           <section class="view hq-view" id="hq" data-view-panel="hq" aria-labelledby="hq-hello" hidden>
             <header class="view-head">
+              <div class="hero-light is-cube" id="hq-light" aria-hidden="true"></div>
               <div>
                 <span class="eyebrow" id="hq-date"></span>
                 <h1 id="hq-hello" data-view-title>Good morning, KJ</h1>
@@ -183,6 +185,7 @@
           <!-- TODAY -->
           <section class="view is-active" id="today" data-view-panel="today" aria-labelledby="hello">
             <header class="view-head">
+              <div class="hero-light" id="ws-light" aria-hidden="true"></div>
               <div>
                 <span class="eyebrow" id="today-date"></span>
                 <h1 id="hello" data-view-title>Welcome back</h1>
@@ -328,6 +331,22 @@
               <button class="cc-tile" type="button" data-action="cc-open" data-form="f-kpi"><span class="cc-ic" data-icon="number"></span><span><strong data-i18n="p.adm.kpi">Add a key number</strong><small data-i18n="p.cc.kpi.sub">Shows as an instrument</small></span></button>
               <button class="cc-tile" type="button" data-action="cc-open" data-form="f-notif"><span class="cc-ic" data-icon="bell"></span><span><strong data-i18n="p.adm.notif">Send a notification</strong><small data-i18n="p.cc.notif.sub">Lands on their bell</small></span></button>
               <div class="cc-tile"><small data-i18n="p.cc.activity">Client activity · unread</small><span class="cc-big" id="cc-unread">0</span></div>
+              <div class="cc-tile cc-wide cc-covers" id="cc-covers">
+                <span class="cc-title"><span data-i18n="p.cov.title">Background images</span> · <span id="cc-covers-client"></span></span>
+                <label class="sr-only" for="cc-covers-input" data-i18n="p.cov.label">Background image links, separated by commas</label>
+                <textarea id="cc-covers-input" spellcheck="false" placeholder="/assets/art/kj/kj-067.webp, https://…"></textarea>
+                <div class="row"><button class="btn btn-primary btn-sm" type="button" data-action="save-covers" data-i18n="p.cov.save">Save images</button><p class="form-status" id="cc-covers-status" role="status"></p></div>
+                <small data-i18n="p.cov.help">Comma-separated links. Empty = the client’s logo glows instead.</small>
+              </div>
+              <div class="cc-tile cc-wide cc-mood">
+                <span class="cc-title"><span data-i18n="p.mood.title">Background mood</span></span>
+                <div class="mood-pick" role="group" data-i18n-attr="aria-label:p.mood.title">
+                  <button type="button" data-action="set-mood" data-mood="a" aria-pressed="true"><span data-i18n="p.mood.a">A · Neon lines</span><small data-i18n="p.mood.a.sub">Cube line-light</small></button>
+                  <button type="button" data-action="set-mood" data-mood="b" aria-pressed="false"><span data-i18n="p.mood.b">B · Aurora</span><small data-i18n="p.mood.b.sub">Gold aurora, particles</small></button>
+                  <button type="button" data-action="set-mood" data-mood="c" aria-pressed="false"><span data-i18n="p.mood.c">C · Blueprint</span><small data-i18n="p.mood.c.sub">Grid, dimensions, cube</small></button>
+                </div>
+                <small data-i18n="p.mood.help">Saved on this device. Art from each client’s background images plays in every mood.</small>
+              </div>
               <div class="cc-tile cc-wide cc-new" id="cc-new">
                 <span class="cc-title"><span data-i18n="p.new.title">Add a new client</span></span>
                 <ol class="cc-steps">

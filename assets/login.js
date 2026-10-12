@@ -15,6 +15,9 @@
     $('lock-date').textContent = new Intl.DateTimeFormat(ar ? 'ar-u-nu-latn' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Asia/Dubai' }).format(d);
   }
   lockClock(); setInterval(lockClock, 10000); Z.onLang(lockClock);
+  // faint crossfade of the covers behind the lock screen
+  var amb = $('ambient');
+  if (amb && window.ZDEV) window.ZDEV.ambient(amb, { covers: (amb.getAttribute('data-covers') || '').split(',').filter(function (u) { return /^\/(?!\/)|^https:\/\//.test(u); }) });
 
   function status(el, kind, key) {
     el.className = 'form-status' + (key ? ' show ' + kind : '');

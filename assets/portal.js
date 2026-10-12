@@ -496,6 +496,32 @@
   }
 
   /* ---------- Control Center (admin) ---------- */
+  /* ---------- Ambient (living background, data-driven from clients.cover_urls) ---------- */
+  // ZKJ SYSTEM's own art (teal neon architecture): HQ, and any client without covers yet. Swap freely.
+  var SYSTEM_COVERS = ['/assets/art/kj/kj-010.webp', '/assets/art/kj/kj-026.webp', '/assets/art/kj/kj-041.webp', '/assets/art/kj/kj-027.webp', '/assets/art/kj/kj-025.webp', '/assets/art/kj/kj-042.webp', '/assets/art/kj/kj-030.webp', '/assets/art/kj/kj-028.webp', '/assets/art/kj/kj-033.webp', '/assets/art/kj/kj-062.webp'];
+  function coversOf(c) { return (c && Array.isArray(c.cover_urls) ? c.cover_urls : []).map(safeUrl).filter(Boolean); }
+  function renderAmbient() {
+    if (S.mode === 'hq') {
+      // weave every client's covers together
+      D.ambient($('ambient'), { covers: SYSTEM_COVERS });
+      if (!$('hq-light').firstChild) $('hq-light').innerHTML = D.cubeLight();
+      return;
+    }
+    var c = S.client; if (!c) return;
+    var logo = safeUrl(c.logo_url);
+    D.ambient($('ambient'), { covers: coversOf(c).length ? coversOf(c) : SYSTEM_COVERS }); // the client's logo glows once, behind the title
+    var hl = $('ws-light'), k = 'logo:' + logo;
+    if (hl.getAttribute('data-k') !== k) {
+      hl.setAttribute('data-k', k);
+      hl.className = 'hero-light ' + (logo ? 'is-logo' : 'is-cube');
+      hl.innerHTML = logo ? D.neonLogo(logo) : D.cubeLight();
+    }
+  }
+  function renderMood() {
+    var m = $('dash').getAttribute('data-mood');
+    document.querySelectorAll('[data-action="set-mood"]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mood') === m ? 'true' : 'false'); });
+  }
+
   /* ---------- ZKJ SYSTEM HQ (admin overview across all clients) ---------- */
   function inWeek(x, off) {
     if (!x.scheduled_at) return false;
@@ -556,7 +582,9 @@
     $('hq-clients').innerHTML = S.clients.map(function (c, i) {
       var st = stats[i], nx = st.next;
       var stat = function (k, v, label, hot) { return '<div class="cs' + (hot && v ? ' hot' : '') + '" data-stat="' + k + '"><b class="mono">' + v + '</b><span>' + esc(label) + '</span></div>'; };
-      return '<li><article class="client-card' + (c.internal ? ' is-own' : '') + '" id="hqc-' + esc(c.id) + '" aria-labelledby="hqc-n-' + esc(c.id) + '">' +
+      var cov = coversOf(c)[0], lg = safeUrl(c.logo_url);
+      var art = '<div class="card-art" aria-hidden="true">' + (cov ? '<img src="' + esc(cov) + '" alt="" loading="lazy" decoding="async">' : D.neonLogo(lg || CUBE)) + '</div>';
+      return '<li><article class="client-card' + (c.internal ? ' is-own' : '') + (cov ? ' has-cover' : ' has-logo-art') + '" id="hqc-' + esc(c.id) + '" aria-labelledby="hqc-n-' + esc(c.id) + '">' + art +
         '<header class="cc-head"><span class="cc-logo">' + logoHtml(c) + '</span><div class="cc-id"><h3 id="hqc-n-' + esc(c.id) + '">' + esc(cName(c)) + '</h3>' +
         '<span class="cc-handle">' + esc(c.instagram ? '@' + handle(c) : '—') + '</span></div>' +
         '</header><div class="cc-badges"><span class="pill pill-demo cc-pkg" title="' + esc(t('p.pkg', { name: planName(c) })) + '">' + esc(planName(c)) + '</span>' +
@@ -633,6 +661,9 @@
     $('adm-sub').textContent = t('p.adm.sub2');
     $('cc-sheet-client').textContent = cName(target);
     $('cc-client-count').textContent = S.clients.length;
+    $('cc-covers-client').textContent = cName(target);
+    if (document.activeElement !== $('cc-covers-input')) $('cc-covers-input').value = coversOf(target).join(',\n');
+    renderMood();
     $('client-switch').innerHTML = S.clients.map(function (c) {
       var on = c.id === target.id;
       return '<button class="cc-client" type="button" data-action="cc-target" data-id="' + esc(c.id) + '" aria-pressed="' + on + '">' +
@@ -669,8 +700,9 @@
   });
 
   function renderBoard() {
-    if (S.mode === 'hq') { renderHeader(); renderNotifs(); renderHQ(); return; }
+    if (S.mode === 'hq') { renderHeader(); renderNotifs(); renderHQ(); renderAmbient(); return; }
     if (!S.client) return;
+    renderAmbient();
     renderHeader(); renderHello(); renderKpis(); renderNext(); renderApprovals();
     renderFilters(); renderCalendar(); renderPackage(); renderReports(); renderNotifs();
   }
@@ -1003,6 +1035,19 @@
     },
     'open-ws': function (el) { closeModal(); openWorkspace(el.getAttribute('data-id')).catch(loadError); },
     'back-hq': function () { backToHQ('hq'); },
+    'set-mood': function (el) { D.setMood(el.getAttribute('data-mood')); renderMood(); },
+    'save-covers': function (el) {
+      var target = clientById(S.ccClient); if (!S.isAdmin || !target) return;
+      var raw = $('cc-covers-input').value.split(/[\s,]+/).map(function (u) { return u.trim(); }).filter(Boolean);
+      var urls = raw.map(safeUrl).filter(Boolean), st = $('cc-covers-status');
+      if (urls.length !== raw.length) { st.className = 'form-status show error'; st.textContent = t('p.cov.bad'); return; }
+      el.disabled = true;
+      q(sb.from('clients').update({ cover_urls: urls.length ? urls : null }).eq('id', target.id).select()).then(function () {
+        st.className = 'form-status show ok'; st.textContent = t('p.cov.ok', { n: urls.length, name: cName(target) });
+        return loadHQ().then(function () { renderBoard(); });
+      }).catch(function (err) { st.className = 'form-status show error'; st.textContent = t('p.f.fail', { msg: (err && err.message) || '?' }); })
+        .then(function () { el.disabled = false; });
+    },
     'cc-target': function (el) { S.ccClient = el.getAttribute('data-id'); Z.store(CLIENT_KEY, S.ccClient); renderAdmin(); var b = document.querySelector('#client-switch [data-id="' + S.ccClient + '"]'); if (b) b.focus(); },
     'hq-prev': function () { S.hqWeek -= 1; renderHQWeek(); },
     'hq-next': function () { S.hqWeek += 1; renderHQWeek(); },
@@ -1089,6 +1134,7 @@
 
   /* ---------- Shell ---------- */
   navFor('client');
+  $('dash').setAttribute('data-mood', D.getMood());
   D.setAvailable('admin', false);
   D.clock($('mb-clock'), 'menubar');
 

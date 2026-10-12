@@ -17,9 +17,11 @@
   <link rel="stylesheet" href="../assets/portal.css">
 </head>
 <body data-title-key="p.login.meta">
-<div class="dash portal device lock" data-theme="core">
+<div class="dash portal device lock" id="dash" data-theme="core" data-mood="a">
   <a class="skip-link" href="#login-main" data-i18n="skip">Skip to content</a>
   <div class="stage-fx" aria-hidden="true"></div>
+  <!-- background art: KJ's near-black works, text-safe (swap freely) -->
+  <div class="ambient" id="ambient" aria-hidden="true" data-covers="/assets/art/kj/kj-043.webp,/assets/art/kj/kj-050.webp,/assets/art/kj/kj-045.webp,/assets/art/kj/kj-064.webp,/assets/art/kj/kj-044.webp,/assets/art/kj/kj-049.webp,/assets/art/kj/kj-063.webp"></div>
   <div class="lock-sweep" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
@@ -33,6 +35,7 @@
 
   <main class="lock-main" id="login-main">
     <div class="lock-clock" aria-hidden="true">
+      <svg class="hero-mark lock-mark" viewBox="1.26 -5.04 93.48 106.08" aria-hidden="true"><path class="hm-line" pathLength="1" fill-rule="evenodd" d="M48 95.04 L88.74 71.52 L88.74 24.48 L48 0.96 L7.26 24.48 L7.26 71.52ZM51.5 84.94 L51.5 55 L51.5 54.55 L48 58.05 L44.5 54.55 L44.5 55 L44.5 84.94 L17.76 69.5 L43.69 54.53 L44.19 54.24 L39.07 49.11 L14.26 63.44 L14.26 32.56 L39.07 46.89 L44.19 41.76 L17.76 26.5 L44.5 11.06 L44.5 41 L44.5 41.45 L48 37.95 L51.5 41.45 L51.5 41 L51.5 11.06 L78.24 26.5 L52.31 41.47 L51.81 41.76 L56.93 46.89 L81.74 32.56 L81.74 67.48ZM52.31 54.53 L53.4 52.64 L51.81 54.24Z"/><path pathLength="1" d="M48 40.5 L55.5 48 L48 55.5 L40.5 48Z"/></svg>
       <p class="lock-date" id="lock-date"></p>
       <p class="lock-time" id="lock-time">--:--</p>
       <p class="lock-zone"><span data-i18n="dv.dubai">Dubai</span> · GST +4</p>

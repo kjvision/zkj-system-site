@@ -216,3 +216,11 @@ html[dir="rtl"] .flip-rtl { transform: scaleX(-1); }
   .dash[data-mode="ws"] .phone-card { --pw: clamp(176px, calc((100svh - 470px) * .466), 276px); }
   .dash[data-mode="ws"] .stack-ghosts { width: clamp(176px, calc((100svh - 470px) * .466), 276px); }
 }
+/* lock screen: the cube draws itself in neon over the art */
+.lock .ambient { position: fixed; inset: 0; border-radius: 0; z-index: 0; --amb-o: .2; }
+.lock .lock-sweep { z-index: 1; }
+.lock-mark { display: block; margin: 0 auto 10px; width: 56px; filter: drop-shadow(0 0 6px rgba(255,236,170,.8)) drop-shadow(0 0 22px rgba(212,175,55,.55)); }
+.lock-mark path { stroke-width: .8; animation: draw 2.8s ease-out .3s forwards, fill 1.2s ease-out 2.6s forwards, lock-glow 5s ease-in-out 3.8s infinite; }
+@keyframes lock-glow { 0%, 100% { opacity: 1; } 50% { opacity: .75; } }
+@media (prefers-reduced-motion: reduce) { .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-dashoffset: 0; } }
+html.reduce-motion .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-dashoffset: 0; }
