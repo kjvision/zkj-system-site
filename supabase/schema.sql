@@ -21,6 +21,11 @@
 --                     ZKJ VERSE). Only for those can KJ approve content
 --                     himself ("Approve as owner"); for every other client
 --                     only the client can approve.
+--                     "cover_urls" = background images for the client's
+--                     dashboard (site paths or https links). Empty = the
+--                     client's logo is used as a glowing watermark instead.
+--                     Starter art: KJ VISION = Dubai photography + the Golden
+--                     Eye series; ZKJ VERSE = the gold set + abstracts.
 --      profiles       One row per login. Says whether the person is the
 --                     admin (KJ) or a client, and which client they belong to.
 --      items          Content and approvals: posts, reels, stories,
@@ -81,6 +86,7 @@ create table if not exists public.clients (
   plan_ar       text,
   active        boolean not null default true,
   internal      boolean not null default false,
+  cover_urls    text[],
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
@@ -88,6 +94,19 @@ create table if not exists public.clients (
 alter table public.clients add column if not exists instagram text;
 alter table public.clients add column if not exists website text;
 alter table public.clients add column if not exists plan_ar text;
+-- background images for the dashboard (added later; safe to run again).
+-- When the column is first added, the two starter brands get KJ's artworks once.
+do $$
+begin
+  if not exists (select 1 from information_schema.columns
+                  where table_schema = 'public' and table_name = 'clients' and column_name = 'cover_urls') then
+    alter table public.clients add column cover_urls text[];
+    update public.clients set cover_urls = array['/assets/art/kj/kj-054.webp', '/assets/art/kj/kj-051.webp', '/assets/art/kj/kj-060.webp', '/assets/art/kj/kj-052.webp', '/assets/art/kj/kj-053.webp', '/assets/art/kj/kj-070.webp', '/assets/art/kj/kj-016.webp', '/assets/art/kj/kj-018.webp', '/assets/art/kj/kj-019.webp', '/assets/art/kj/kj-003.webp']
+     where id = 'c1000000-0000-4000-8000-000000000002' and cover_urls is null;
+    update public.clients set cover_urls = array['/assets/art/kj/kj-067.webp', '/assets/art/kj/kj-055.webp', '/assets/art/kj/kj-072.webp', '/assets/art/kj/kj-009.webp', '/assets/art/kj/kj-057.webp', '/assets/art/kj/kj-001.webp', '/assets/art/kj/kj-013.webp', '/assets/art/kj/kj-058.webp', '/assets/art/kj/kj-073.webp', '/assets/art/kj/kj-008.webp', '/assets/art/kj/kj-059.webp', '/assets/art/kj/kj-006.webp']
+     where id = 'c1000000-0000-4000-8000-000000000001' and cover_urls is null;
+  end if;
+end $$;
 -- "internal" (KJ's own brands). When the column is added to an existing
 -- database, mark the two starter brands as internal once; later edits are kept.
 do $$
@@ -409,11 +428,13 @@ update public.profiles set role = 'admin' where lower(email) = 'kj@zkjverse.com'
 --    twice and never overwrites your edits.
 -- ---------------------------------------------------------------------
 
-insert into public.clients (id, name, name_ar, logo_url, primary_color, accent_color, instagram, website, plan, plan_ar, active, internal) values
+insert into public.clients (id, name, name_ar, logo_url, primary_color, accent_color, instagram, website, plan, plan_ar, active, internal, cover_urls) values
   ('c1000000-0000-4000-8000-000000000001', 'KJ VISION', 'كي جي فيجن',
-   '/assets/showcase/brandkit/kjvision-emblem-gold.svg', '#0B0B0F', '#D4AF37', '@kjvision.zkj', null, 'Case study · Full', 'دراسة حالة · الكاملة', true, true),
+   '/assets/showcase/brandkit/kjvision-emblem-gold.svg', '#0B0B0F', '#D4AF37', '@kjvision.zkj', null, 'Case study · Full', 'دراسة حالة · الكاملة', true, true,
+   array['/assets/art/kj/kj-067.webp', '/assets/art/kj/kj-055.webp', '/assets/art/kj/kj-072.webp', '/assets/art/kj/kj-009.webp', '/assets/art/kj/kj-057.webp', '/assets/art/kj/kj-001.webp', '/assets/art/kj/kj-013.webp', '/assets/art/kj/kj-058.webp', '/assets/art/kj/kj-073.webp', '/assets/art/kj/kj-008.webp', '/assets/art/kj/kj-059.webp', '/assets/art/kj/kj-006.webp']),
   ('c1000000-0000-4000-8000-000000000002', 'ZKJ VERSE', 'زد كي جي فيرس',
-   '/assets/brand/zkjverse-mark-gold.svg', '#0B0B0F', '#D4AF37', '@zkjverse', 'https://zkjverse.com', 'Growth', 'النمو', true, true)
+   '/assets/brand/zkjverse-mark-gold.svg', '#0B0B0F', '#D4AF37', '@zkjverse', 'https://zkjverse.com', 'Growth', 'النمو', true, true,
+   array['/assets/art/kj/kj-054.webp', '/assets/art/kj/kj-051.webp', '/assets/art/kj/kj-060.webp', '/assets/art/kj/kj-052.webp', '/assets/art/kj/kj-053.webp', '/assets/art/kj/kj-070.webp', '/assets/art/kj/kj-016.webp', '/assets/art/kj/kj-018.webp', '/assets/art/kj/kj-019.webp', '/assets/art/kj/kj-003.webp'])
 on conflict (id) do nothing;
 
 -- KJ VISION key numbers (from the 11 Oct 2026 brand audit and the Oct–Nov plan)
