@@ -18,7 +18,7 @@
       'dv.prev': 'Previous post', 'dv.next': 'Next post', 'dv.of': '{i} / {n}',
       'dv.now': 'Now', 'dv.tracks': 'Tracks', 'dv.target': '{p}% of target', 'dv.dubai': 'Dubai',
       'dv.ig.liked': 'Preview · not published yet', 'dv.ig.msg': 'Send message', 'dv.ig.audio': 'Original audio', 'dv.ig.follow': 'Follow',
-      'dv.hq': 'HQ', 'dv.todo': 'To-do', 'dv.week': 'This week', 'dv.backhq': 'Back to HQ',
+      'dv.core': 'Core', 'dv.hq': 'HQ', 'dv.todo': 'To-do', 'dv.week': 'This week', 'dv.backhq': 'Back to HQ',
       'dv.ig.sponsored': 'Sponsored', 'dv.ig.reply': 'Suggested reply', 'dv.ig.reels': 'Reels', 'dv.ig.dm': 'Message…'
     },
     ar: {
@@ -31,7 +31,7 @@
       'dv.prev': 'المنشور السابق', 'dv.next': 'المنشور التالي', 'dv.of': '{i} / {n}',
       'dv.now': 'الآن', 'dv.tracks': 'المسارات', 'dv.target': '{p}% من الهدف', 'dv.dubai': 'دبي',
       'dv.ig.liked': 'معاينة · لم يُنشر بعد', 'dv.ig.msg': 'أرسل رسالة', 'dv.ig.audio': 'صوت أصلي', 'dv.ig.follow': 'متابعة',
-      'dv.hq': 'المقر', 'dv.todo': 'مهامك', 'dv.week': 'هذا الأسبوع', 'dv.backhq': 'العودة للمقر',
+      'dv.core': 'النواة', 'dv.hq': 'المقر', 'dv.todo': 'مهامك', 'dv.week': 'هذا الأسبوع', 'dv.backhq': 'العودة للمقر',
       'dv.ig.sponsored': 'مُموَّل', 'dv.ig.reply': 'الرد المقترح', 'dv.ig.reels': 'ريلز', 'dv.ig.dm': 'رسالة…'
     }
   });
@@ -51,6 +51,7 @@
     ads: S + '<path d="M3.5 10v4h3l6.5 4.5v-13L6.5 10z"/><path d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg>',
     whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.56 2 2.1 6.45 2.1 11.93c0 1.75.46 3.46 1.33 4.97L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.47 0 9.93-4.45 9.93-9.93A9.9 9.9 0 0012.04 2zm4.53 11.99c-.25-.12-1.47-.72-1.7-.8-.23-.09-.39-.13-.56.12-.17.25-.64.8-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.12-.15.17-.25.25-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.42h-.48c-.17 0-.44.06-.66.31-.23.25-.87.85-.87 2.07s.89 2.4 1.01 2.57c.12.17 1.75 2.67 4.24 3.74 1.48.64 2.06.7 2.8.59.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.08.15-1.18-.06-.11-.23-.17-.48-.29z"/></svg>',
     reports: S + '<path d="M6.5 2.5h8l4 4v15h-12z"/><path d="M14.5 2.5v4h4M9.5 12h6M9.5 15.5h6M9.5 8.5h2"/></svg>',
+    core: S + '<circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="9.5" ry="4.2"/><ellipse cx="12" cy="12" rx="9.5" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="4.2" transform="rotate(-60 12 12)"/></svg>',
     control: S + '<rect x="3" y="3.5" width="18" height="7.5" rx="3.75"/><circle cx="7" cy="7.25" r="2" fill="currentColor"/><rect x="3" y="13" width="18" height="7.5" rx="3.75"/><circle cx="17" cy="16.75" r="2" fill="currentColor"/></svg>',
     more: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>',
     tools: S + '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>',
@@ -508,8 +509,93 @@
     return m;
   }
 
+  /* ---------- Brand theming (clients.brand) ----------
+     Applies a client's guideline as CSS variables on a root element. Colours are checked
+     against WCAG: text that would be unreadable is replaced (black / white), and brand colours
+     used as text are darkened or lightened until they reach 4.5:1. Fonts load from Google
+     Fonts only when they are on the allow-list. */
+  var FONT_ALLOW = ['Cinzel', 'Inter', 'Playfair Display', 'Cormorant Garamond', 'Montserrat', 'Poppins', 'DM Sans', 'Lora',
+    'Libre Baskerville', 'Space Grotesk', 'Tajawal', 'Cairo', 'IBM Plex Sans Arabic', 'Noto Kufi Arabic'];
+  var FONT_KIND = { 'Cinzel': 'serif', 'Playfair Display': 'serif', 'Cormorant Garamond': 'serif', 'Lora': 'serif', 'Libre Baskerville': 'serif' };
+  function hexOk(c) { return /^#[0-9a-f]{6}$/i.test(c || '') ? c.toUpperCase() : null; }
+  function rgb(h) { return [1, 3, 5].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
+  function toHex(a) { return '#' + a.map(function (v) { v = Math.max(0, Math.min(255, Math.round(v))); return (v < 16 ? '0' : '') + v.toString(16); }).join('').toUpperCase(); }
+  function lumOf(h) { return rgb(h).map(function (v) { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce(function (a, v, i) { return a + v * [.2126, .7152, .0722][i]; }, 0); }
+  function contrast(a, b) { var x = lumOf(a), y = lumOf(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+  function mix(a, b, w) { var p = rgb(a), q = rgb(b); return toHex(p.map(function (v, i) { return v + (q[i] - v) * w; })); }
+  // move colour c toward black or white until it reaches `min` contrast on bg
+  function readable(c, bg, min) {
+    if (contrast(c, bg) >= min) return { c: c, fixed: false };
+    var to = lumOf(bg) > .3 ? '#000000' : '#FFFFFF';
+    for (var w = .05; w <= 1.0001; w += .05) { var m = mix(c, to, w); if (contrast(m, bg) >= min) return { c: m, fixed: true }; }
+    return { c: to, fixed: true };
+  }
+  function bestInk(bg) { return contrast('#000000', bg) >= contrast('#FFFFFF', bg) ? '#0B0B0F' : '#FFFFFF'; }
+  var loadedFonts = {};
+  function loadFonts(list) {
+    var need = list.filter(function (f) { return f && FONT_ALLOW.indexOf(f) > -1 && !loadedFonts[f] && !/^(Inter|Cinzel|IBM Plex Sans Arabic|Noto Kufi Arabic)$/.test(f); });
+    if (!need.length) return;
+    need.forEach(function (f) { loadedFonts[f] = 1; });
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?' + need.map(function (f) { return 'family=' + f.replace(/ /g, '+') + ':wght@400;500;600;700'; }).join('&') + '&display=swap';
+    document.head.appendChild(l);
+  }
+  function fontStack(f, fallbackKind) {
+    if (!f || FONT_ALLOW.indexOf(f) < 0) return null;
+    return '"' + f + '", ' + (fallbackKind === 'serif' || FONT_KIND[f] === 'serif' ? 'Georgia, serif' : 'system-ui, sans-serif');
+  }
+  // brand: object from clients.brand (+ fallbacks). Returns { vars, light, notes }
+  function resolveBrand(b, fb) {
+    b = b || {}; fb = fb || {};
+    var bg = hexOk(b.bg) || hexOk(fb.bg) || '#0B0B0F';
+    var light = lumOf(bg) > .4;
+    var surface = hexOk(b.surface) || (light ? mix(bg, '#FFFFFF', .7) : mix(bg, '#FFFFFF', .05));
+    var primary = hexOk(b.primary) || hexOk(fb.primary) || '#D4AF37';
+    var accent = hexOk(b.accent) || hexOk(fb.accent) || primary;
+    var notes = [];
+    var text = hexOk(b.text) || bestInk(bg);
+    var worst = contrast(text, bg) < contrast(text, surface) ? bg : surface;
+    var tx = readable(text, worst, 7);
+    if (contrast(text, worst) < 4.5) { notes.push('text'); text = tx.c; }
+    var muted = readable(mix(text, bg, .38), worst, 4.6).c;
+    var pT = readable(primary, bg, 4.5); if (pT.fixed) notes.push('primary');
+    var aT = readable(accent, bg, 4.5); if (aT.fixed) notes.push('accent');
+    var onP = bestInk(primary), btn = primary;
+    if (contrast(onP, primary) < 4.5) {
+      // neither ink reads on this colour: buttons get a deeper shade of it (a scrim), with white text
+      notes.push('on-primary'); onP = '#FFFFFF';
+      btn = readable(primary, '#FFFFFF', 4.6).c;
+    }
+    var radius = Math.max(0, Math.min(32, parseInt(b.radius, 10)));
+    if (isNaN(radius)) radius = 22;
+    var vars = {
+      '--b-bg': bg, '--b-surface': surface, '--b-text': text, '--b-muted': muted,
+      '--b-primary': primary, '--b-primary-2': mix(primary, light ? '#000000' : '#FFFFFF', .25), '--b-on-primary': onP, '--b-btn': btn,
+      '--b-primary-text': pT.c, '--b-accent': accent, '--b-accent-text': aT.c,
+      '--b-line': light ? 'rgba(0,0,0,.1)' : 'rgba(255,255,255,.08)', '--b-radius': radius + 'px'
+    };
+    var fd = fontStack(b.font_display), fbd = fontStack(b.font_body);
+    if (fd) vars['--f-display'] = fd;
+    if (fbd) vars['--f-body'] = fbd;
+    return { vars: vars, light: light, notes: notes, fonts: [b.font_display, b.font_body].filter(Boolean) };
+  }
+  var BRAND_VARS = ['--b-btn', '--b-bg', '--b-surface', '--b-text', '--b-muted', '--b-primary', '--b-primary-2', '--b-on-primary', '--b-primary-text', '--b-accent', '--b-accent-text', '--b-line', '--b-radius', '--f-display', '--f-body'];
+  function applyBrand(root, b, fb) {
+    var r = resolveBrand(b, fb);
+    BRAND_VARS.forEach(function (k) { root.style.removeProperty(k); });
+    Object.keys(r.vars).forEach(function (k) { root.style.setProperty(k, r.vars[k]); });
+    root.setAttribute('data-brand', r.light ? 'light' : 'dark');
+    loadFonts(r.fonts);
+    return r;
+  }
+  function clearBrand(root) {
+    BRAND_VARS.forEach(function (k) { root.style.removeProperty(k); });
+    root.removeAttribute('data-brand');
+  }
+
   window.ZDEV = {
-    fillIcons: fillIcons, ambient: ambient, neonLogo: neonLogo, cubeLight: cubeLight, getMood: getMood, setMood: setMood,
+    fillIcons: fillIcons, applyBrand: applyBrand, clearBrand: clearBrand, resolveBrand: resolveBrand, contrast: contrast, FONT_ALLOW: FONT_ALLOW, ambient: ambient, neonLogo: neonLogo, cubeLight: cubeLight, getMood: getMood, setMood: setMood,
     icon: icon, IC: IC, buildNav: buildNav, show: show, setAvailable: setAvailable, setBadge: setBadge,
     current: function () { return NAV.current; }, onView: function (fn) { NAV.listeners.push(fn); },
     clock: clock, ring: ring, gauge: gauge, spark: spark, animateIn: animateIn, art: art, phone: phone,

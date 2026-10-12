@@ -345,7 +345,7 @@
   function publishedThisWeek() { return S.cal.map(calItem).filter(function (c) { return c.w === 0 && c.s === 'published'; }); }
 
   /* ---------- Renderers (device UI kit: assets/device.js) ---------- */
-  var QLOGO = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23" fill="#C8853B"/><circle cx="24" cy="24" r="19.5" fill="none" stroke="#2A1910" stroke-width="1.2" stroke-dasharray="2 2.4"/><path d="M14 20h16v6a7 7 0 01-7 7h-2a7 7 0 01-7-7z" fill="#2A1910"/><path d="M30 22h2a3 3 0 010 6h-2.4" fill="none" stroke="#2A1910" stroke-width="2"/><path d="M19 12c0 2 1.6 2 1.6 4M24 11c0 2 1.6 2 1.6 4" fill="none" stroke="#FFF8EE" stroke-width="1.8" stroke-linecap="round"/><path d="M13 35h20" stroke="#2A1910" stroke-width="2" stroke-linecap="round"/></svg>';
+  var QLOGO = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23" fill="#C8853B"/><circle cx="24" cy="24" r="19.5" fill="none" stroke="#2A1910" stroke-width="1.2" stroke-dasharray="2 2.4"/><path d="M14 20h16v6a7 7 0 01-7 7h-2a7 7 0 01-7-7z" fill="#2A1910"/><path d="M30 22h2a3 3 0 010 6h-2.4" fill="none" stroke="#2A1910" stroke-width="2"/><path d="M19 12c0 2 1.6 2 1.6 4M24 11c0 2 1.6 2 1.6 4" fill="none" stroke="#FFF8EE" stroke-width="1.8" stroke-linecap="round"/><path d="M13 35h20" stroke="#2A1910" stroke-width="2" stroke-linecap="round"/></svg>';
   var HANDLE = 'qahwahouse';
   document.querySelectorAll('[data-qlogo]').forEach(function (el) { el.innerHTML = QLOGO; });
   function loc() { return L() === 'ar' ? 'ar-u-nu-latn' : 'en-GB'; }
@@ -592,6 +592,64 @@
         '<button class="rm" type="button" data-action="upload-remove" data-idx="' + i + '" aria-label="' + esc(t('d.up.remove', { name: f.name })) + '">×</button></li>';
     }).join('');
     $('up-count').textContent = S.files.length ? t('d.up.count', { n: S.files.length }) : '';
+  }
+
+  /* ---------- CORE (assets/core.js): Qahwa House's living universe, with a pipeline that keeps moving ---------- */
+  var QLOGO_URL = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(QLOGO);
+  var FLOW = ['draft', 'needs_approval', 'approved', 'scheduled', 'published'];
+  var FAKE_TITLES = [
+    { en: 'Cardamom cold brew', ar: 'كولد برو بالهيل' }, { en: 'Barista hands, slow', ar: 'يدا الباريستا ببطء' }, { en: 'Sunset on the terrace', ar: 'الغروب على التراس' },
+    { en: 'New beans: Yirgacheffe', ar: 'بن جديد: يرغاتشيفي' }, { en: 'Friday brunch board', ar: 'لوح برانش الجمعة' }, { en: 'Rose latte, 10 seconds', ar: 'لاتيه الورد في 10 ثوانٍ' }
+  ];
+  var FAKE_PLAT = ['instagram', 'tiktok', 'instagram', 'youtube', 'facebook', 'instagram'];
+  var FAKE_KIND = ['reel', 'reel', 'post', 'carousel', 'post', 'story'];
+  var fake = [], fakeSeq = 0, fakeWins = 0, coreCtl = null, coreKey = null, coreMounted = false, coreTimer = null;
+  function spawnFake(stage) { var i = fakeSeq++ % FAKE_TITLES.length; fake.push({ id: 'f' + fakeSeq, t: FAKE_TITLES[i], p: FAKE_PLAT[i], k: FAKE_KIND[i], s: stage || 'draft' }); }
+  ['draft', 'draft', 'scheduled', 'approved'].forEach(spawnFake);
+  function stepFake() {
+    if (!fake.length) spawnFake();
+    var x = fake[Math.floor(Math.random() * fake.length)], i = FLOW.indexOf(x.s);
+    if (i >= FLOW.length - 1) return;
+    x.s = FLOW[i + 1];
+    if (x.s === 'published') { setTimeout(function () { fake = fake.filter(function (y) { return y !== x; }); fakeWins++; spawnFake(); renderCore(); }, 2600); }
+    renderCore();
+  }
+  function coreData() {
+    var items = [];
+    S.approvals.forEach(function (a) {
+      var st = a.state === 'pending' ? 'needs_approval' : a.state === 'approved' ? 'approved' : 'changes_requested';
+      items.push({ id: a.id, title: a.title[L()], kind: a.type, status: st, platform: a.platforms[0], when: a.when[L()] });
+    });
+    S.cal.forEach(function (c) { if (c.a) return; items.push({ id: c.id, title: c.title[L()], kind: c.type, status: c.s, platform: c.p, when: t('d.day.' + c.d) + ' ' + c.time }); });
+    fake.forEach(function (f) { items.push({ id: f.id, title: f.t[L()], kind: f.k, status: f.s, platform: f.p, when: '' }); });
+    S.inbox.forEach(function (m) { if (m.state === 'pending') items.push({ id: m.id, title: m.who, kind: 'reply', status: 'needs_approval', platform: m.p === 'whatsapp' ? 'whatsapp' : m.p, when: '' }); });
+    var pub = items.filter(function (x) { return x.status === 'published'; });
+    for (var w = 0; w < fakeWins; w++) pub.push({ id: 'win' + w, title: '', status: 'published' });
+    return { name: t('d.client'), logo: QLOGO_URL, primary: '#C8853B', accent: '#E9B872', covers: [], features: ['inbox', 'ads', 'whatsapp'],
+      channels: ['instagram', 'tiktok', 'facebook', 'youtube', 'x', 'linkedin', 'pinterest', 'whatsapp'], items: items, published: pub, wins: pub.length, kpi: { v: 48200, t: 60000 } };
+  }
+  function renderCore() {
+    var host = $('core-stage'); if (!host || !window.ZCORE) return;
+    var key = 'demo:' + L();
+    if (coreKey !== key) {
+      if (coreCtl) coreCtl.destroy();
+      coreCtl = window.ZCORE.create(host, {
+        mode: 'client', platformName: function (id) { return plat(id)[L()]; },
+        onItem: function (x) {
+          if (appr(x.id)) actions.preview({ getAttribute: function () { return x.id; } });
+          else if (/^c\d/.test(x.id)) actions['cal-item']({ getAttribute: function () { return x.id; } });
+          else if (/^i\d/.test(x.id)) { D.show('inbox', { focus: true }); }
+        }
+      });
+      coreKey = key; coreMounted = false;
+    }
+    coreCtl.update(coreData());
+    var on = D.current() === 'core';
+    if (on && !coreMounted) { coreCtl.mount(); coreMounted = true; }
+    if (!on && coreMounted) { coreCtl.unmount(); coreMounted = false; }
+    clearInterval(coreTimer);
+    if (on && !D.reduce) coreTimer = setInterval(function () { if (!document.hidden) stepFake(); }, 3200);
+    window.__zkjCore = coreCtl;
   }
 
   function renderAll() {
@@ -936,8 +994,8 @@
 
   function inboxItem(id) { return S.inbox.filter(function (m) { return m.id === id; })[0]; }
   function adItem(id) { return S.ads.filter(function (a) { return a.id === id; })[0]; }
-  function refreshInbox() { renderInbox(); renderTools(); renderKpis(); }
-  function refreshAfterApproval() { renderKpis(); renderTools(); renderCalendar(); renderApprovals(); }
+  function refreshInbox() { renderInbox(); renderTools(); renderKpis(); renderCore(); }
+  function refreshAfterApproval() { renderKpis(); renderTools(); renderCalendar(); renderApprovals(); renderCore(); }
   // approve with the device animation: the phone lifts away (desktop) or flies off the stack (mobile)
   var busy = {};
   function approveAnimated(a, flown) {
@@ -1001,6 +1059,7 @@
   D.buildNav({
     items: [
       { id: 'today', key: 'dv.today', icon: 'today', tone: 'gold' },
+      { id: 'core', key: 'dv.core', icon: 'core', tone: 'core' },
       { id: 'approvals', key: 'dv.approvals', icon: 'approvals' },
       { id: 'calendar', key: 'dv.calendar', icon: 'calendar', tone: 'cal' },
       { id: 'inbox', key: 'dv.inbox', icon: 'inbox' },
@@ -1008,7 +1067,7 @@
       { id: 'insights', key: 'dv.insights', icon: 'insights', tone: 'steel' },
       { id: 'tools', key: 'dv.tools', icon: 'tools', sep: true }
     ],
-    tabs: ['today', 'approvals', 'calendar', 'more']
+    tabs: ['today', 'core', 'approvals', 'calendar', 'more']
   });
   D.clock($('mb-clock'), 'menubar');
   // living background: mood A ("Neon lines") with the Frequency art
@@ -1020,6 +1079,7 @@
     if (id === 'approvals' && rowUpd) setTimeout(rowUpd, 0);
     if (id === 'calendar') setTimeout(function () { D.revealNow($('cal')); }, 0);
     if (id === 'today') D.animateIn($('kpi-row'));
+    renderCore();
   });
 
   var savedTheme = Z.store(THEME_KEY);

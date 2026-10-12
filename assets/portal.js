@@ -115,9 +115,18 @@
   function canReview(x) { return !S.isAdmin || clientOf(x).internal === true; }
 
   // Client logo (or initials). A broken logo URL falls back to initials (see the error listener below).
+  // clients.brand, with the older primary_color / accent_color as fallbacks
+  function brandOf(c) {
+    if (!c) return null;
+    var b = c.brand && typeof c.brand === 'object' ? c.brand : {};
+    var pc = hex(c.primary_color), ac = hex(c.accent_color);
+    var dark = function (h) { return h && D.contrast(h, '#000000') < 3.5; };
+    return { b: b, fb: { bg: dark(pc) ? pc : '#0B0B0F', primary: ac || '#D4AF37', accent: ac } };
+  }
+  function brandColor(c, k) { var r = brandOf(c); return r ? D.resolveBrand(r.b, r.fb).vars[k] : null; }
   function initials(c) {
     var n = (c && c.name ? c.name : '?').replace(/[^A-Za-z0-9 ]/g, '').trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 3) || '?';
-    var bg = hex(c && c.primary_color) || '#15151B', fg = hex(c && c.accent_color) || '#D4AF37';
+    var bg = (c && brandColor(c, '--b-primary')) || '#15151B', fg = (c && brandColor(c, '--b-on-primary')) || '#D4AF37';
     return '<span class="logo-initials" style="background:' + bg + ';color:' + fg + ';border-color:' + fg + '" aria-hidden="true">' + esc(n) + '</span>';
   }
   function logoHtml(c) {
@@ -186,6 +195,9 @@
     show($('admin-pill'), S.isAdmin);
     var acc = c && hex(c.accent_color);
     if (acc) dash.style.setProperty('--accent', acc); else dash.style.removeProperty('--accent');
+    // the client's brand in their dashboard (and KJ's workspace view of it); HQ stays ZKJ SYSTEM
+    if (c && S.mode !== 'hq') { var br = brandOf(c); S.brandInfo = D.applyBrand(dash, br.b, br.fb); }
+    else { D.clearBrand(dash); S.brandInfo = null; }
   }
 
   /* ---------- Today ---------- */
@@ -509,17 +521,98 @@
     }
     var c = S.client; if (!c) return;
     var logo = safeUrl(c.logo_url);
-    D.ambient($('ambient'), { covers: coversOf(c).length ? coversOf(c) : SYSTEM_COVERS }); // the client's logo glows once, behind the title
+    // no art yet: KJ's own brands borrow the ZKJ SYSTEM set; a client in a light brand gets a soft wash in its own colours
+    var light = $('dash').getAttribute('data-brand') === 'light';
+    D.ambient($('ambient'), { covers: coversOf(c).length ? coversOf(c) : (c.internal || !light ? SYSTEM_COVERS : []) }); // the client's logo glows once, behind the title
     var hl = $('ws-light'), k = 'logo:' + logo;
     if (hl.getAttribute('data-k') !== k) {
       hl.setAttribute('data-k', k);
       hl.className = 'hero-light ' + (logo ? 'is-logo' : 'is-cube');
-      hl.innerHTML = logo ? D.neonLogo(logo) : D.cubeLight();
+      hl.innerHTML = logo ? D.neonLogo(logo) : (c.internal ? D.cubeLight() : '');
     }
   }
+  var brandDraft = null, brandFor = null;
+  function brandFields() { return ['bg', 'surface', 'text', 'primary', 'accent', 'font_display', 'font_body', 'radius']; }
+  function renderBrandEditor(c) {
+    $('cc-brand-client').textContent = cName(c);
+    if (brandFor !== c.id) {
+      brandFor = c.id;
+      var r = brandOf(c), v = D.resolveBrand(r.b, r.fb).vars;
+      brandDraft = {
+        bg: v['--b-bg'], surface: v['--b-surface'], text: r.b.text || v['--b-text'], primary: v['--b-primary'], accent: v['--b-accent'],
+        font_display: r.b.font_display || 'Cinzel', font_body: r.b.font_body || 'Inter', radius: r.b.radius != null ? r.b.radius : 22
+      };
+    }
+    ['font_display', 'font_body'].forEach(function (k) {
+      var sel = $('br-' + k);
+      if (!sel.options.length) sel.innerHTML = D.FONT_ALLOW.map(function (f) { return '<option>' + esc(f) + '</option>'; }).join('');
+    });
+    brandFields().forEach(function (k) { var el = $('br-' + k); if (document.activeElement !== el) el.value = brandDraft[k]; });
+    previewBrand();
+  }
+  function previewBrand() {
+    var pv = $('brand-preview'), r = D.applyBrand(pv, brandDraft);
+    $('bp-title').textContent = t('p.hello', { name: cName(clientById(brandFor)) });
+    $('brand-notes').textContent = r.notes.length ? t('p.br.fixed', { what: r.notes.map(function (n) { return t('p.br.n.' + n); }).join(', ') }) : t('p.br.ok');
+  }
+  document.addEventListener('input', function (e) {
+    var k = e.target && e.target.getAttribute && e.target.closest('#cc-brand') && e.target.getAttribute('data-k');
+    if (!k || !brandDraft) return;
+    brandDraft[k] = k === 'radius' ? Math.max(0, Math.min(32, parseInt(e.target.value, 10) || 0)) : e.target.value;
+    previewBrand();
+  });
+  document.addEventListener('change', function (e) { if (e.target && e.target.closest && e.target.closest('#cc-brand')) { var k = e.target.getAttribute('data-k'); if (k && brandDraft) { brandDraft[k] = k === 'radius' ? (parseInt(e.target.value, 10) || 0) : e.target.value; previewBrand(); } } });
+
   function renderMood() {
     var m = $('dash').getAttribute('data-mood');
     document.querySelectorAll('[data-action="set-mood"]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mood') === m ? 'true' : 'false'); });
+  }
+
+  /* ---------- CORE (assets/core.js): the client's living universe / KJ's whole system ---------- */
+  var core = { ctl: null, key: null, mounted: false };
+  function coreItem(x) { return { id: x.id, title: pick(x, 'title', 'title_ar'), kind: x.kind, status: x.status, platform: x.platform, when: x.scheduled_at ? fmtWhen(x.scheduled_at) : '' }; }
+  function coreKpi(list) {
+    var by = {}; list.forEach(function (k) { if (!by[k.metric]) by[k.metric] = k; });
+    for (var m in by) if (by['target_' + m]) return { v: Number(by[m].value), t: Number(by['target_' + m].value) };
+    return null;
+  }
+  function coreClientData(c, items, kpis) {
+    var feats = PKG[planKey(c)].features, chans = [];
+    items.forEach(function (x) { if (x.platform && chans.indexOf(x.platform) < 0) chans.push(x.platform); });
+    if (feats.indexOf('whatsapp') > -1 && chans.indexOf('whatsapp') < 0) chans.push('whatsapp');
+    if (!chans.length) chans = ['instagram'];
+    var pub = items.filter(function (x) { return x.status === 'published'; });
+    return { name: cName(c), logo: safeUrl(c.logo_url), primary: brandColor(c, '--b-primary'), accent: brandColor(c, '--b-accent'), covers: coversOf(c), features: feats, channels: chans,
+      items: items.map(coreItem), published: pub.map(coreItem), wins: pub.length, kpi: kpis ? coreKpi(kpis) : null };
+  }
+  function coreUniverseData() {
+    var now = Date.now();
+    return { logo: CUBE, clients: S.clients.map(function (c) {
+      var list = S.all.filter(function (x) { return x.client_id === c.id && x.status !== 'draft'; });
+      return { id: c.id, name: cName(c), logo: safeUrl(c.logo_url), primary: brandColor(c, '--b-primary'), accent: brandColor(c, '--b-accent'), tag: tagOf(c),
+        items: list.map(function (x) { var o = coreItem(x); o.client = cName(c); o.recent = !!x.reviewed_at && now - new Date(x.reviewed_at).getTime() < 48 * 3600000; return o; }),
+        published: list.filter(function (x) { return x.status === 'published'; }).map(coreItem) };
+    }) };
+  }
+  function renderCore() {
+    var host = $('core-stage'); if (!host || !window.ZCORE) return;
+    var uni = S.mode === 'hq', key = (uni ? 'hq' : 'c:' + (S.client && S.client.id)) + ':' + L();
+    if (!uni && !S.client) return;
+    if (core.key !== key) {
+      if (core.ctl) core.ctl.destroy();
+      core.ctl = window.ZCORE.create(host, {
+        mode: uni ? 'universe' : 'client',
+        platformName: function (id) { return plat(id)[L()]; },
+        onItem: function (x) { var it = item(x.id); if (it) itemDetail(it); },
+        onOpenClient: function (id) { openWorkspace(id).then(function () { D.show('core'); }).catch(loadError); }
+      });
+      core.key = key; core.mounted = false;
+    }
+    core.ctl.update(uni ? coreUniverseData() : coreClientData(S.client, S.items, S.kpis));
+    var on = D.current() === 'core' && $('dash').getAttribute('data-state') === 'ready';
+    if (on && !core.mounted) { core.ctl.mount(); core.mounted = true; }
+    if (!on && core.mounted) { core.ctl.unmount(); core.mounted = false; }
+    window.__zkjCore = core.ctl;
   }
 
   /* ---------- ZKJ SYSTEM HQ (admin overview across all clients) ---------- */
@@ -586,7 +679,7 @@
       var art = '<div class="card-art" aria-hidden="true">' + (cov ? '<img src="' + esc(cov) + '" alt="" loading="lazy" decoding="async">' : D.neonLogo(lg || CUBE)) + '</div>';
       return '<li><article class="client-card' + (c.internal ? ' is-own' : '') + (cov ? ' has-cover' : ' has-logo-art') + '" id="hqc-' + esc(c.id) + '" aria-labelledby="hqc-n-' + esc(c.id) + '">' + art +
         '<header class="cc-head"><span class="cc-logo">' + logoHtml(c) + '</span><div class="cc-id"><h3 id="hqc-n-' + esc(c.id) + '">' + esc(cName(c)) + '</h3>' +
-        '<span class="cc-handle">' + esc(c.instagram ? '@' + handle(c) : '—') + '</span></div>' +
+        '<span class="cc-handle">' + esc(c.instagram ? '@' + handle(c) : '—') + '</span><span class="cc-brands" title="' + esc(t('p.br.title')) + '" aria-hidden="true"><i style="background:' + esc(brandColor(c, '--b-bg')) + '"></i><i style="background:' + esc(brandColor(c, '--b-primary')) + '"></i><i style="background:' + esc(brandColor(c, '--b-accent')) + '"></i></span></div>' +
         '</header><div class="cc-badges"><span class="pill pill-demo cc-pkg" title="' + esc(t('p.pkg', { name: planName(c) })) + '">' + esc(planName(c)) + '</span>' +
         '<span class="cc-tag' + (c.internal ? ' own' : '') + '">' + esc(tagOf(c)) + '</span></div>' +
         '<div class="cc-stats">' + stat('waiting', st.waiting, t(c.internal ? 'p.st.wait.own' : 'p.st.wait'), false) + stat('changes', st.changes, t('p.st.changes'), true) +
@@ -664,6 +757,7 @@
     $('cc-covers-client').textContent = cName(target);
     if (document.activeElement !== $('cc-covers-input')) $('cc-covers-input').value = coversOf(target).join(',\n');
     renderMood();
+    renderBrandEditor(target);
     $('client-switch').innerHTML = S.clients.map(function (c) {
       var on = c.id === target.id;
       return '<button class="cc-client" type="button" data-action="cc-target" data-id="' + esc(c.id) + '" aria-pressed="' + on + '">' +
@@ -700,11 +794,10 @@
   });
 
   function renderBoard() {
-    if (S.mode === 'hq') { renderHeader(); renderNotifs(); renderHQ(); renderAmbient(); return; }
+    if (S.mode === 'hq') { renderHeader(); renderNotifs(); renderHQ(); renderAmbient(); renderCore(); return; }
     if (!S.client) return;
-    renderAmbient();
-    renderHeader(); renderHello(); renderKpis(); renderNext(); renderApprovals();
-    renderFilters(); renderCalendar(); renderPackage(); renderReports(); renderNotifs();
+    renderHeader(); renderAmbient(); renderHello(); renderKpis(); renderNext(); renderApprovals();
+    renderFilters(); renderCalendar(); renderPackage(); renderReports(); renderNotifs(); renderCore();
   }
 
   /* ---------- Data ---------- */
@@ -749,6 +842,7 @@
   // Navigation sets: a client (or KJ inside a workspace) sees the client sections; KJ at HQ sees HQ sections.
   var CLIENT_NAV = [
     { id: 'today', key: 'dv.today', icon: 'today', tone: 'gold' },
+    { id: 'core', key: 'dv.core', icon: 'core', tone: 'core' },
     { id: 'approvals', key: 'dv.approvals', icon: 'approvals' },
     { id: 'calendar', key: 'dv.calendar', icon: 'calendar', tone: 'cal' },
     { id: 'inbox', key: 'dv.inbox', icon: 'inbox' },
@@ -758,15 +852,16 @@
   ];
   var HQ_NAV = [
     { id: 'hq', key: 'dv.hq', icon: 'box', tone: 'gold' },
+    { id: 'core', key: 'dv.core', icon: 'core', tone: 'core' },
     { id: 'todo', key: 'dv.todo', icon: 'pencil' },
     { id: 'week', key: 'dv.week', icon: 'calendar', tone: 'cal' },
     { id: 'admin', key: 'dv.control', icon: 'control', sep: true }
   ];
   var HQ_VIEWS = ['hq', 'todo', 'week', 'admin'];
   function navFor(mode) {
-    if (mode === 'hq') D.buildNav({ items: HQ_NAV, tabs: ['hq', 'todo', 'week', 'more'] });
-    else if (mode === 'ws') D.buildNav({ items: [{ id: 'hq', key: 'dv.backhq', icon: 'back', tone: 'steel' }].concat(CLIENT_NAV.map(function (it, i) { return i === 0 ? Object.assign({ sep: true }, it) : it; })), tabs: ['today', 'approvals', 'calendar', 'more'] });
-    else D.buildNav({ items: CLIENT_NAV, tabs: ['today', 'approvals', 'calendar', 'more'] });
+    if (mode === 'hq') D.buildNav({ items: HQ_NAV, tabs: ['hq', 'core', 'todo', 'week', 'more'] });
+    else if (mode === 'ws') D.buildNav({ items: [{ id: 'hq', key: 'dv.backhq', icon: 'back', tone: 'steel' }].concat(CLIENT_NAV.map(function (it, i) { return i === 0 ? Object.assign({ sep: true }, it) : it; })), tabs: ['today', 'core', 'approvals', 'calendar', 'more'] });
+    else D.buildNav({ items: CLIENT_NAV, tabs: ['today', 'core', 'approvals', 'calendar', 'more'] });
     document.querySelectorAll('.hq-view').forEach(function (v) { if (v.id !== 'admin') v.hidden = !S.isAdmin; });
   }
 
@@ -1035,6 +1130,20 @@
     },
     'open-ws': function (el) { closeModal(); openWorkspace(el.getAttribute('data-id')).catch(loadError); },
     'back-hq': function () { backToHQ('hq'); },
+    'save-brand': function (el) {
+      var target = clientById(brandFor); if (!S.isAdmin || !target || !brandDraft) return;
+      var row = {}; brandFields().forEach(function (k) { row[k] = brandDraft[k]; });
+      row.radius = Number(row.radius) || 0;
+      ['bg', 'surface', 'text', 'primary', 'accent'].forEach(function (k) { row[k] = String(row[k] || '').toUpperCase(); if (!/^#[0-9A-F]{6}$/.test(row[k])) delete row[k]; });
+      if (D.FONT_ALLOW.indexOf(row.font_display) < 0 || D.FONT_ALLOW.indexOf(row.font_body) < 0) return;
+      var st = $('cc-brand-status'); el.disabled = true;
+      q(sb.from('clients').update({ brand: row }).eq('id', target.id).select()).then(function () {
+        st.className = 'form-status show ok'; st.textContent = t('p.br.saved', { name: cName(target) });
+        brandFor = null;
+        return loadHQ().then(function () { renderBoard(); });
+      }).catch(function (err) { st.className = 'form-status show error'; st.textContent = t('p.f.fail', { msg: (err && err.message) || '?' }); })
+        .then(function () { el.disabled = false; });
+    },
     'set-mood': function (el) { D.setMood(el.getAttribute('data-mood')); renderMood(); },
     'save-covers': function (el) {
       var target = clientById(S.ccClient); if (!S.isAdmin || !target) return;
@@ -1048,7 +1157,8 @@
       }).catch(function (err) { st.className = 'form-status show error'; st.textContent = t('p.f.fail', { msg: (err && err.message) || '?' }); })
         .then(function () { el.disabled = false; });
     },
-    'cc-target': function (el) { S.ccClient = el.getAttribute('data-id'); Z.store(CLIENT_KEY, S.ccClient); renderAdmin(); var b = document.querySelector('#client-switch [data-id="' + S.ccClient + '"]'); if (b) b.focus(); },
+    'cc-target': function (el) {
+      $('cc-brand-status').textContent = ''; $('cc-brand-status').className = 'form-status'; S.ccClient = el.getAttribute('data-id'); Z.store(CLIENT_KEY, S.ccClient); renderAdmin(); var b = document.querySelector('#client-switch [data-id="' + S.ccClient + '"]'); if (b) b.focus(); },
     'hq-prev': function () { S.hqWeek -= 1; renderHQWeek(); },
     'hq-next': function () { S.hqWeek += 1; renderHQWeek(); },
     'cc-open': function (el) { openSheet(el.getAttribute('data-form')); },
@@ -1072,6 +1182,7 @@
     closeNotif();
     if (S.mode === 'ws' && HQ_VIEWS.indexOf(id) > -1) { backToHQ(id); return; }
     if (id === 'week') setTimeout(function () { D.revealNow($('hq-cal')); }, 0);
+    renderCore();
     if (id === 'approvals' && rowUpd) setTimeout(rowUpd, 0);
     if (id === 'calendar') setTimeout(function () { D.revealNow($('cal')); }, 0);
     if (id === 'today') D.animateIn($('kpi-row'));

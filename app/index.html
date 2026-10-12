@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="../assets/style.css">
   <link rel="stylesheet" href="../assets/device.css">
   <link rel="stylesheet" href="../assets/portal.css">
+  <link rel="stylesheet" href="../assets/core.css">
 </head>
 <body data-title-key="p.app.meta">
 <div class="dash portal device no-client" id="dash" data-theme="core" data-state="loading" data-view="today" data-mood="a">
@@ -209,6 +210,12 @@
             </div>
           </section>
 
+          <!-- CORE: the living universe (assets/core.js) -->
+          <section class="view" id="core" data-view-panel="core" aria-labelledby="core-title">
+            <h2 class="sr-only" id="core-title" data-view-title data-i18n="core.name">CORE</h2>
+            <div class="core-stage" id="core-stage"></div>
+          </section>
+
           <!-- APPROVALS -->
           <section class="view" id="approvals" data-view-panel="approvals" aria-labelledby="appr-title">
             <header class="view-head compact">
@@ -338,6 +345,27 @@
                 <div class="row"><button class="btn btn-primary btn-sm" type="button" data-action="save-covers" data-i18n="p.cov.save">Save images</button><p class="form-status" id="cc-covers-status" role="status"></p></div>
                 <small data-i18n="p.cov.help">Comma-separated links. Empty = the client’s logo glows instead.</small>
               </div>
+              <div class="cc-tile cc-wide cc-brand" id="cc-brand">
+                <span class="cc-title"><span data-i18n="p.br.title">Brand</span> · <span id="cc-brand-client"></span></span>
+                <div class="brand-grid">
+                  <label><span data-i18n="p.br.bg">Background</span><input type="color" id="br-bg" data-k="bg"></label>
+                  <label><span data-i18n="p.br.surface">Surface</span><input type="color" id="br-surface" data-k="surface"></label>
+                  <label><span data-i18n="p.br.text">Text</span><input type="color" id="br-text" data-k="text"></label>
+                  <label><span data-i18n="p.br.primary">Primary</span><input type="color" id="br-primary" data-k="primary"></label>
+                  <label><span data-i18n="p.br.accent">Accent</span><input type="color" id="br-accent" data-k="accent"></label>
+                </div>
+                <div class="brand-row">
+                  <label><span data-i18n="p.br.fdisplay">Display font</span><select id="br-font_display" data-k="font_display"></select></label>
+                  <label><span data-i18n="p.br.fbody">Body font</span><select id="br-font_body" data-k="font_body"></select></label>
+                  <label><span data-i18n="p.br.radius">Radius</span><input type="number" id="br-radius" data-k="radius" min="0" max="32" step="1"></label>
+                </div>
+                <div class="brand-preview" id="brand-preview" aria-live="polite">
+                  <div class="bp-card"><span class="bp-eyebrow" data-i18n="p.br.pv.eyebrow">Monday · Dubai</span><span class="bp-title" id="bp-title">Welcome back</span><span class="bp-body" data-i18n="p.br.pv.body">Here’s what’s planned — and what needs you.</span></div>
+                  <span class="bp-btn" data-i18n="p.appr.approve">Approve</span>
+                </div>
+                <p class="brand-notes" id="brand-notes"></p>
+                <div class="row"><button class="btn btn-primary btn-sm" type="button" data-action="save-brand" data-i18n="p.br.save">Save brand</button><p class="form-status" id="cc-brand-status" role="status"></p></div>
+              </div>
               <div class="cc-tile cc-wide cc-mood">
                 <span class="cc-title"><span data-i18n="p.mood.title">Background mood</span></span>
                 <div class="mood-pick" role="group" data-i18n-attr="aria-label:p.mood.title">
@@ -455,6 +483,7 @@
 <script src="../assets/supabase-config.js"></script>
 <script src="../assets/portal-strings.js"></script>
 <script src="../assets/device.js"></script>
+<script src="../assets/core.js"></script>
 <script src="../assets/portal.js"></script>
 </body>
 </html>
