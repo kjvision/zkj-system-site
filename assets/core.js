@@ -98,7 +98,7 @@
     }
     g.stroke(); g.restore();
   }
-  var CHANNEL_COL = { instagram: '#E1306C', tiktok: '#25C2C9', snapchat: '#E8D90C', whatsapp: '#25D366', google: '#34A853', youtube: '#FF3B30', facebook: '#1877F2', x: '#8B95A1', linkedin: '#0A66C2', pinterest: '#D5243A', meta: '#1877F2' };
+  var CHANNEL_COL = { threads: '#E8E8E8', instagram: '#E1306C', tiktok: '#25C2C9', snapchat: '#E8D90C', whatsapp: '#25D366', google: '#34A853', youtube: '#FF3B30', facebook: '#1877F2', x: '#8B95A1', linkedin: '#0A66C2', pinterest: '#D5243A', meta: '#1877F2' };
   var TOOL_ORDER = ['studio', 'publisher', 'inbox', 'insights', 'ads', 'whatsapp', 'brandkit'];
 
   function Core(host, opts) {
@@ -213,7 +213,7 @@
     if (this.mode === 'client') {
       var feats = d.features || [];
       this.tools = TOOL_ORDER.filter(function (id) { return ['studio', 'publisher', 'insights', 'brandkit'].indexOf(id) > -1 || feats.indexOf(id) > -1; });
-      this.channels = (d.channels && d.channels.length ? d.channels : ['instagram']).slice(0, 8);
+      this.channels = (d.channels && d.channels.length ? d.channels : ['instagram']).slice(0, 12);
       ents.sun = { id: 'sun', type: 'sun', r: 46, color: d.primary || COL.gold, accent: d.accent || COL.goldL, label: d.name, logo: d.logo };
       ents.gate = { id: 'gate', type: 'gate', r: 98 };
       this.tools.forEach(function (id, i) {
@@ -221,7 +221,7 @@
         ents['t:' + id] = { id: 't:' + id, type: 'tool', tool: id, r: 19, base: (i + .5) / self.tools.length * TAU - Math.PI / 2, orbit: 205, w: .022, status: self.toolStatus(id), items: items };
       });
       this.channels.forEach(function (ch, i) {
-        ents['c:' + ch] = { id: 'c:' + ch, type: 'channel', ch: ch, r: 12, base: i / self.channels.length * TAU + .4, orbit: 330, w: -.011, color: CHANNEL_COL[ch] || '#9AA0A6' };
+        ents['c:' + ch] = { id: 'c:' + ch, type: 'channel', ch: ch, r: 15, base: i / self.channels.length * TAU + .4, orbit: 330, w: -.011, color: CHANNEL_COL[ch] || '#9AA0A6' };
       });
       // moons: item → its current stage owner
       var counts = {};
@@ -363,10 +363,12 @@
     this.cv.width = Math.round(this.W * dpr); this.cv.height = Math.round(this.H * dpr);
     this.cv.style.width = this.W + 'px'; this.cv.style.height = this.H + 'px';
     var ky = this.ky || .82, sq = ky > 1 ? .58 : 1, ext = (this.extent || 380) * sq;
-    var fit = Math.min(this.W / (2 * ext * 1.08), this.H / (2 * ext * Math.max(.86, ky) * 1.04));
+    /* keep the universe clear of the arc dock that rises over the bottom of the stage */
+    this.inset = (this.W > 700 && document.querySelector('.dock.arc:not([hidden])')) ? 70 : 0;
+    var fit = Math.min(this.W / (2 * ext * 1.08), (this.H - this.inset) / (2 * ext * Math.max(.86, ky) * 1.04));
     var wasHome = Math.abs(this.cam.tz - this.fit) < 1e-6 || !this.fit;
     this.fit = fit;
-    if (wasHome && !this.sel) { this.cam.tz = fit; this.cam.tx = 0; this.cam.ty = 0; if (!this.started) { this.cam.z = fit; } }
+    if (wasHome && !this.sel) { this.cam.tz = fit; this.cam.tx = 0; this.cam.ty = this.homeY(); if (!this.started) { this.cam.z = fit; this.cam.y = this.cam.ty; } }
     this.makeStars();
     this.nebula = null; this.overlay = null;
     this.dirty = true;
@@ -379,7 +381,8 @@
       return { f: L[0], stars: arr };
     });
   };
-  P.home = function () { this.sel = null; this.panel.hidden = true; this.cam.tx = 0; this.cam.ty = 0; this.cam.tz = this.fit; this.dirty = true; if (this.reduce) this.snap(); };
+  P.homeY = function () { return this.inset && this.fit ? this.inset / (2 * this.fit) : 0; };
+  P.home = function () { this.sel = null; this.panel.hidden = true; this.cam.tx = 0; this.cam.ty = this.homeY(); this.cam.tz = this.fit; this.dirty = true; if (this.reduce) this.snap(); };
   P.zoomBy = function (k, sx, sy) {
     var z0 = this.cam.tz, z1 = clamp(z0 * k, this.fit * .6, this.fit * 3.2);
     if (sx !== undefined) { var w = this.toWorld(sx, sy); this.cam.tx = w.x - (sx - this.W / 2) / z1; this.cam.ty = w.y - (sy - this.H / 2) / z1; }
@@ -449,7 +452,7 @@
           return '<li><button type="button" data-core-sel="t:' + id + '"><i style="background:' + COL[e.status] + '"></i><span>' + esc(t('core.t.' + id)) + '</span><small>' + esc(t('core.st.' + e.status)) + ' · ' + esc(t('core.moons', { n: self.itemsFor('t:' + id).length })) + '</small></button></li>';
         }).join('') + '</ul>' +
         '<h3>' + esc(t('core.channels')) + '</h3><ul>' + this.channels.map(function (ch) {
-          return '<li><button type="button" data-core-sel="c:' + ch + '"><i style="background:' + (CHANNEL_COL[ch] || '#999') + '"></i><span>' + esc(self.o.platformName ? self.o.platformName(ch) : ch) + '</span></button></li>';
+          return '<li><button type="button" data-core-sel="c:' + ch + '"><i class="li-pg" style="color:' + (CHANNEL_COL[ch] || '#999') + '">' + (window.ZDEV ? window.ZDEV.pglyph(ch) : '') + '</i><span>' + esc(self.o.platformName ? self.o.platformName(ch) : ch) + '</span></button></li>';
         }).join('') + '</ul><p class="mono">' + esc(t('core.wins.sr', { n: d.wins || 0 })) + '</p>';
     }
     this.list.innerHTML = html;
@@ -694,6 +697,7 @@
   };
   P.drawClient = function (g, T, px) {
     var E = this.ents, self = this, d = this.data;
+    this.glyphs = {};
     // orbits
     this.orbitRing(g, 205, px, .14); this.orbitRing(g, 330, px, .1, true);
     // gate ring
@@ -733,9 +737,17 @@
     this.channels.forEach(function (ch) {
       var e = E['c:' + ch], p = self.pos(e), hov = self.hover === e.id || self.sel === e.id;
       g.globalCompositeOperation = 'lighter'; g.drawImage(glow(e.color, hov ? .8 : .5), p.x - e.r * 3, p.y - e.r * 3, e.r * 6, e.r * 6); g.globalCompositeOperation = 'source-over';
+      // brand-tinted disc, white platform mark, the official colour only as a thin ring
+      var disc = g.createRadialGradient(p.x - e.r * .35, p.y - e.r * .45, 1, p.x, p.y, e.r);
+      disc.addColorStop(0, hexA(d.primary || COL.gold, .38)); disc.addColorStop(1, '#0b0b10');
       g.fillStyle = '#0b0b10'; g.beginPath(); g.arc(p.x, p.y, e.r, 0, TAU); g.fill();
-      g.strokeStyle = e.color; g.lineWidth = 1.6 * px; g.stroke();
-      g.fillStyle = e.color; g.beginPath(); g.arc(p.x, p.y, e.r * .35, 0, TAU); g.fill();
+      g.fillStyle = disc; g.fill();
+      g.strokeStyle = hexA(e.color, hov ? .95 : .6); g.lineWidth = (hov ? 1.8 : 1.2) * px; g.stroke();
+      g.save(); g.translate(p.x, p.y);
+      var drew = window.ZDEV && window.ZDEV.pglyphCanvas(g, ch, e.r * 1.12, 'rgba(255,255,255,.95)');
+      g.restore();
+      if (drew) self.glyphs[ch] = 1;
+      else { g.fillStyle = e.color; g.beginPath(); g.arc(p.x, p.y, e.r * .35, 0, TAU); g.fill(); }
       self.label(g, self.o.platformName ? self.o.platformName(ch) : ch, p.x, p.y + e.r + 7 * px, px, { size: 10, color: 'rgba(255,255,255,.75)' });
       self.addHit(e, p, e.r);
     });
@@ -827,7 +839,7 @@
 
   // debug + tests: screen position of a body
   P.screenOf = function (id) { var e = this.ents[id]; if (!e) return null; var p = this.toScreen(this.pos(e)), r = this.cv.getBoundingClientRect(); return { x: r.left + p.x, y: r.top + p.y }; };
-  P.stats = function () { return { frames: this.frames, fired: this.fired, comets: this.comets.length, running: this.running, mode: this.mode, z: this.cam.z, fit: this.fit, sel: this.sel }; };
+  P.stats = function () { return { glyphs: Object.keys(this.glyphs || {}), frames: this.frames, fired: this.fired, comets: this.comets.length, running: this.running, mode: this.mode, z: this.cam.z, fit: this.fit, sel: this.sel }; };
 
   window.ZCORE = { create: function (host, opts) { return new Core(host, opts); } };
 })();

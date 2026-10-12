@@ -61,7 +61,8 @@
     { id: 'snapchat', en: 'Snapchat', ar: 'سناب شات', color: '#E8D90C' },
     { id: 'whatsapp', en: 'WhatsApp', ar: 'واتساب', color: '#25D366' },
     { id: 'google', en: 'Google', ar: 'جوجل', color: '#34A853' },
-    { id: 'meta', en: 'Meta', ar: 'ميتا', color: '#1877F2' }
+    { id: 'meta', en: 'Meta', ar: 'ميتا', color: '#1877F2' },
+    { id: 'threads', en: 'Threads', ar: 'ثريدز', color: '#E8E8E8' }
   ];
   function allPlatforms() { return Z.PLATFORMS.concat(EXTRA_PLATFORMS); }
   function plat(id) {
@@ -272,7 +273,7 @@
       var d = new Date(x.scheduled_at), p = plat(x.platform);
       return '<li><button type="button" data-action="cal-item" data-id="' + esc(x.id) + '">' +
         '<span class="un-when"><span>' + esc(new Intl.DateTimeFormat(loc(), { weekday: 'short', day: 'numeric' }).format(d)) + '</span><b>' + esc(fmtTime(x.scheduled_at)) + '</b></span>' +
-        '<span class="un-title"><strong>' + esc(pick(x, 'title', 'title_ar')) + '</strong><span><span class="pdot-round" style="background:' + p.color + '"></span>' + esc(p[L()]) + ' · ' + esc(t('p.type.' + x.kind)) + '</span></span>' +
+        '<span class="un-title"><strong>' + esc(pick(x, 'title', 'title_ar')) + '</strong><span>' + '<span class="pmark" style="color:' + p.color + '">' + D.pglyph(p.id) + '</span>' + esc(p[L()]) + ' · ' + esc(t('p.type.' + x.kind)) + '</span></span>' +
         statusTag(x) + '</button></li>';
     }).join('') : '<li class="portal-empty">' + esc(t('p.next.empty')) + '</li>';
     // sidebar
@@ -307,12 +308,12 @@
   }
   function phoneOf(x, sfx) {
     var c = clientOf(x);
-    return D.phone({ kind: x.kind, handle: handle(c), avatar: logoHtml(c), media: media(x, sfx), caption: pick(x, 'caption', 'caption_ar'), when: x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen'), slides: 5 });
+    return D.phone({ kind: x.kind, platform: x.platform, platformName: x.platform ? plat(x.platform)[L()] : '', handle: handle(c), avatar: logoHtml(c), media: media(x, sfx), caption: pick(x, 'caption', 'caption_ar'), when: x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen'), slides: 5 });
   }
   function platChip(id) {
     if (!id) return '';
     var p = plat(id);
-    return '<span class="chip chip-static"><span class="pdot" style="background:' + p.color + '"></span>' + esc(p[L()]) + '</span>';
+    return '<span class="chip chip-static">' + '<span class="pmark" style="color:' + p.color + '">' + D.pglyph(p.id) + '</span>' + esc(p[L()]) + '</span>';
   }
   function phoneCard(x) {
     var dis = S.busy[x.id] ? ' disabled' : '';
@@ -392,7 +393,7 @@
     if (S.filter !== 'all' && !used[S.filter]) S.filter = 'all';
     $('cal-filters').innerHTML = opts.length > 2 ? opts.map(function (o) {
       return '<button class="chip" type="button" data-action="filter" data-platform="' + esc(o.id) + '" aria-pressed="' + (S.filter === o.id) + '">' +
-        (o.color ? '<span class="pdot" style="background:' + o.color + '"></span>' : '') + esc(o.label) + '</button>';
+        (o.color ? '<span class="pmark" style="color:' + o.color + '">' + D.pglyph(o.id) + '</span>' : '') + esc(o.label) + '</button>';
     }).join('') : '';
   }
   function renderCalendar() {
@@ -416,7 +417,7 @@
     items.forEach(function (x) {
       var d = new Date(x.scheduled_at), p = plat(x.platform);
       (byKind[x.kind] = byKind[x.kind] || []).push({ id: x.id, day: dayIndex(start, d), mins: d.getHours() * 60 + d.getMinutes(), time: fmtTime(x.scheduled_at), title: pick(x, 'title', 'title_ar'),
-        kind: p[L()], color: p.color, dot: STATUS_DOT[x.status] || 'off', status: statusLabel(x.status), wave: x.kind === 'reel' || x.kind === 'story' });
+        kind: p[L()], pg: x.platform, color: p.color, dot: STATUS_DOT[x.status] || 'off', status: statusLabel(x.status), wave: x.kind === 'reel' || x.kind === 'story' });
     });
     var tracks = TRACKS.filter(function (k) { return byKind[k[0]]; }).map(function (k) { return { code: k[1], label: t('p.type.' + k[0]), color: '#9AA0A6', clips: byKind[k[0]] }; });
     if (!tracks.length) tracks = [{ code: '—', label: t('p.cal.empty'), color: '#3a3a42', clips: [] }];
@@ -448,7 +449,7 @@
       '<div class="mon-info"><span class="eyebrow">' + esc(t(future ? 'p.mon.next' : 'p.mon.last')) + '</span>' +
       '<h3>' + esc(pick(x, 'title', 'title_ar')) + '</h3>' +
       (future ? '<span class="mon-count mono" dir="ltr">T&minus; ' + esc(countdown(x.scheduled_at)) + '</span>' : '') +
-      '<dl class="kv"><dt>' + esc(t('p.item.platform')) + '</dt><dd><span class="pdot-round" style="background:' + p.color + '"></span> ' + esc(p[L()]) + '</dd>' +
+      '<dl class="kv"><dt>' + esc(t('p.item.platform')) + '</dt><dd>' + '<span class="pmark" style="color:' + p.color + '">' + D.pglyph(p.id) + '</span>' + ' ' + esc(p[L()]) + '</dd>' +
       '<dt>' + esc(t('p.item.type')) + '</dt><dd>' + esc(t('p.type.' + x.kind)) + '</dd>' +
       '<dt>' + esc(t('p.item.when')) + '</dt><dd class="mono">' + esc(fmtWhen(x.scheduled_at)) + '</dd>' +
       '<dt>' + esc(t('p.item.status')) + '</dt><dd>' + statusTag(x) + '</dd></dl>' +
@@ -731,7 +732,7 @@
       var clips = S.all.filter(function (x) { return x.client_id === c.id && x.kind !== 'reply' && inWeek(x, S.hqWeek); }).map(function (x) {
         var dd = new Date(x.scheduled_at), p = plat(x.platform);
         return { id: x.id, day: dayIndex(start, dd), mins: dd.getHours() * 60 + dd.getMinutes(), time: fmtTime(x.scheduled_at), title: pick(x, 'title', 'title_ar'),
-          kind: t('p.type.' + x.kind), color: p.color, dot: STATUS_DOT[x.status] || 'off', status: x.status === 'needs_approval' ? t(c.internal ? 'p.st.wait.own' : 'p.wait.client') : statusLabel(x.status), wave: x.kind === 'reel' || x.kind === 'story', dim: x.status === 'draft' };
+          kind: t('p.type.' + x.kind), pg: x.platform, color: p.color, dot: STATUS_DOT[x.status] || 'off', status: x.status === 'needs_approval' ? t(c.internal ? 'p.st.wait.own' : 'p.wait.client') : statusLabel(x.status), wave: x.kind === 'reel' || x.kind === 'story', dim: x.status === 'draft' };
       });
       var code = (c.name || '?').replace(/[^A-Za-z0-9 ]/g, '').trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 3);
       return { code: code, label: cName(c), clips: clips };
