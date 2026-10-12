@@ -13,6 +13,11 @@ Static marketing site for **ZKJ SYSTEM**, the AI tools sold by **ZKJ VERSE**, pl
 - `assets/media/hero.json` — hero background videos (empty = artwork crossfade)
 - `assets/showcase/showcase.json` — the "Tools at work — KJ VISION" walkthrough steps
 - `assets/brand/` — gold/white ZKJ mark (SVG), favicon (SVG + PNG), apple-touch icon, Open Graph image
+- `app/login.html`, `app/index.html` — live client portal on Supabase (sign-in, client dashboard, admin view for KJ); `noindex`
+- `assets/portal.js`, `assets/login.js`, `assets/portal-strings.js`, `assets/portal.css` — portal logic, EN/AR strings and styles (reuses the demo dashboard's CSS classes)
+- `assets/supabase-config.js` — Supabase project URL + publishable (public) key; never put a secret here
+- `assets/vendor/supabase-js-2.116.0.min.js` — vendored supabase-js UMD build (MIT)
+- `supabase/schema.sql` — tables, row-level security, RPCs, signup trigger and starter data; `supabase/SETUP.md` — one-time setup steps for KJ
 - `CNAME` — custom domain `system.zkjverse.com`
 - `.nojekyll` — serve files as-is (no Jekyll processing)
 

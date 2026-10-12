@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Client login — ZKJ SYSTEM</title>
+  <meta name="theme-color" content="#0B0B0F">
+  <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../assets/brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Kufi+Arabic:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/portal.css">
+</head>
+<body data-title-key="p.login.meta">
+<div class="dash portal" data-theme="core">
+  <a class="skip-link" href="#login-main" data-i18n="skip">Skip to content</a>
+
+  <header class="dash-header">
+    <div class="container">
+      <a class="client-brand portal-home" href="../index.html">
+        <img class="client-logo" src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="38" height="44">
+        <span class="client-name">
+          <strong>ZKJ SYSTEM</strong>
+          <small data-i18n="p.portal">Client portal</small>
+        </span>
+      </a>
+      <div class="dash-actions">
+        <button class="lang-toggle" type="button" data-lang-toggle><span class="lt-ar" lang="ar">العربية</span></button>
+        <a class="btn btn-ghost btn-sm" href="../index.html" data-i18n="p.back">Back to site</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="portal-login container" id="login-main">
+    <section class="plate login-card" aria-labelledby="login-title">
+      <span class="label" data-i18n="p.portal">Client portal</span>
+
+      <form id="login-form" novalidate>
+        <h1 id="login-title" data-i18n="p.login.title">Sign in to your dashboard</h1>
+        <p class="login-sub" data-i18n="p.login.sub">Use the email KJ invited and the password you chose.</p>
+        <div class="field">
+          <label for="login-email" data-i18n="p.email">Email</label>
+          <input class="input" id="login-email" name="email" type="email" autocomplete="username" inputmode="email" required>
+        </div>
+        <div class="field">
+          <label for="login-password" data-i18n="p.password">Password</label>
+          <input class="input" id="login-password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <p class="form-status" id="login-status" role="alert"></p>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-block" type="submit" id="login-submit"><span data-i18n="p.signin">Sign in</span></button>
+        </div>
+        <p class="login-links"><button class="link-btn" type="button" id="to-reset" data-i18n="p.forgot">Forgot your password?</button></p>
+      </form>
+
+      <form id="reset-form" novalidate hidden>
+        <h1 data-i18n="p.reset.title">Reset your password</h1>
+        <p class="login-sub" data-i18n="p.reset.sub">Enter your email. If it belongs to a dashboard, you’ll get a link to choose a new password.</p>
+        <div class="field">
+          <label for="reset-email" data-i18n="p.email">Email</label>
+          <input class="input" id="reset-email" name="email" type="email" autocomplete="username" inputmode="email" required>
+        </div>
+        <p class="form-status" id="reset-status" role="alert"></p>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-block" type="submit" id="reset-submit"><span data-i18n="p.reset.send">Send reset link</span></button>
+        </div>
+        <p class="login-links"><button class="link-btn" type="button" id="to-login" data-i18n="p.reset.back">Back to sign in</button></p>
+      </form>
+
+      <p class="login-note" data-i18n="p.login.note">No account yet? Logins are created by KJ for clients only. Message us on WhatsApp to get started.</p>
+      <a class="btn btn-wa btn-sm" data-wa href="https://wa.me/971541668700" target="_blank" rel="noopener"><span data-i18n="p.wa">Message KJ on WhatsApp</span></a>
+    </section>
+  </main>
+</div>
+
+<script src="../assets/app.js"></script>
+<script src="../assets/vendor/supabase-js-2.116.0.min.js"></script>
+<script src="../assets/supabase-config.js"></script>
+<script src="../assets/portal-strings.js"></script>
+<script src="../assets/login.js"></script>
+</body>
+</html>
