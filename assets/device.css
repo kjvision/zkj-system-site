@@ -1168,3 +1168,56 @@ html[dir="rtl"] .hero-light.is-logo { inset-inline-start: 0; inset-inline-end: a
 .dock-item[data-tone="core"] .dock-icon { background: radial-gradient(circle at 50% 50%, #3a2f12 0%, #0b0b10 70%); color: #F6E7B4; box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(212,175,55,.45), 0 4px 14px rgba(212,175,55,.25); }
 
 .cc-id .cc-brands { margin-top: 4px; }
+
+/* ---------- Platform marks ---------- */
+.pg { display: inline-block; width: 1em; height: 1em; vertical-align: -.14em; flex: none; }
+.pmark { display: inline-grid; place-items: center; width: 15px; height: 15px; font-size: 13px; line-height: 1; flex: none; margin-inline-end: 2px; }
+.chip .pmark { font-size: 12.5px; }
+.ci-kind { display: inline-flex; align-items: center; gap: 4px; }
+.ci-pg { font-size: 11px; opacity: .95; }
+.pv-plat { position: absolute; z-index: 24; top: calc(var(--pw) * .052); inset-inline-start: calc(var(--pw) * .085); width: calc(var(--pw) * .08); height: calc(var(--pw) * .08); display: grid; place-items: center; color: #fff; font-size: calc(var(--pw) * .055); filter: drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+.iphone .sbar span:first-child { padding-inline-start: calc(var(--pw) * .07); }
+.core-list i.li-pg { width: 14px; height: 14px; box-shadow: none; display: grid; place-items: center; font-size: 13px; border-radius: 0; }
+
+/* ---------- Sidebar header: centred, larger logo and name ---------- */
+.sb-id { justify-items: center; text-align: center; gap: 8px; padding: 6px 4px 20px; }
+.sb-logo { width: 88px; height: 88px; border-radius: 24px; margin-bottom: 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1), 0 14px 34px rgba(0,0,0,.45), 0 0 0 6px rgba(212,175,55,.06); }
+.sb-name { font-family: var(--f-display); font-size: 22px; font-weight: 700; letter-spacing: .05em; line-height: 1.2; }
+html[lang="ar"] .sb-name { letter-spacing: 0; font-size: 21px; }
+.sb-handle { font-size: 12.5px; }
+.sb-pkg { margin-top: 2px; }
+/* group titles */
+.sidebar { gap: 22px; }
+.sb-group h3 { font-size: 12.5px; font-weight: 700; letter-spacing: .16em; color: rgba(255,255,255,.72); margin: 0 6px 12px; }
+html[lang="ar"] .sb-group h3 { font-size: 14px; letter-spacing: 0; }
+.device[data-brand="light"] .sb-group h3 { color: var(--b-text); opacity: .8; }
+
+/* ---------- VIP arc dock (desktop) ---------- */
+.device { --dock-h: 96px; }
+.dock.arc { padding: 0; gap: 0; background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; border-radius: 0; bottom: 0; display: block; pointer-events: none; }
+.dock.arc .arc-deco { position: absolute; inset: 0; pointer-events: none; }
+.arc-glass { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(40,38,46,.62), rgba(18,18,24,.7)); backdrop-filter: blur(28px) saturate(170%); -webkit-backdrop-filter: blur(28px) saturate(170%); }
+.arc-svg { position: absolute; inset: 0; overflow: visible; }
+.arc-edge { fill: none; stroke: rgba(255,255,255,.16); stroke-width: 1; }
+.arc-edge.in { stroke: rgba(255,255,255,.08); }
+.arc-sheen { fill: none; stroke: url(#arc-gold); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: .16 .84; animation: arc-sheen 7s linear infinite; filter: drop-shadow(0 0 3px rgba(234,217,166,.8)); }
+.arc-sheen.in { stroke-width: 1; opacity: .6; animation-duration: 9.5s; animation-direction: reverse; }
+@keyframes arc-sheen { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.arc-link { fill: none; stroke: rgba(212,175,55,.32); stroke-width: 1; stroke-dasharray: 2 5; }
+.dock.arc .dock-sep { display: none; }
+.dock.arc .dock-item { --s: 1; --lift: 0px; position: absolute; left: var(--x); top: var(--y); width: 48px; height: 48px; margin: 0; pointer-events: auto;
+  transform: translate(-50%, -50%) translate(calc(var(--nx) * var(--lift)), calc(var(--ny) * var(--lift))) scale(var(--s)); transition: transform .28s var(--spring); transform-origin: 50% 50%; }
+.dock.arc .dock-item:hover, .dock.arc .dock-item:hover + .dock-item, .dock.arc .dock-item:has(+ .dock-item:hover) { margin: 0; transform: translate(-50%, -50%) translate(calc(var(--nx) * var(--lift)), calc(var(--ny) * var(--lift))) scale(var(--s)); }
+.dock.arc .dock-item.mag2 { --s: 1.06; --lift: 3px; }
+.dock.arc .dock-item.mag1 { --s: 1.16; --lift: 8px; }
+.dock.arc .dock-item.mag0 { --s: 1.35; --lift: 16px; z-index: 3; }
+.dock.arc .dock-icon { opacity: .55; filter: blur(.6px); transition: opacity .25s, filter .25s; }
+.dock.arc .dock-item[aria-current="page"] .dock-icon, .dock.arc .dock-item.mag0 .dock-icon, .dock.arc .dock-item:focus-visible .dock-icon { opacity: 1; filter: none; }
+.dock.arc .dock-item.mag1 .dock-icon { opacity: .8; filter: blur(.25px); }
+.dock.arc .dock-label { bottom: calc(100% + 10px); font-size: 11px; transform: translateX(-50%) translateY(4px) scale(.85); }
+.dock.arc .dock-item.mag0 .dock-label, .dock.arc .dock-item:focus-visible .dock-label { opacity: 1; transform: translateX(-50%) translateY(0) scale(.82); }
+.dock.arc .dock-dot { bottom: -8px; }
+.dock.arc .dock-item:focus-visible { outline: none; }
+.dock.arc .dock-item:focus-visible .dock-icon { outline: 2px solid var(--gold-light); outline-offset: 3px; }
+.win-content { padding-bottom: 96px; }
+@media (prefers-reduced-motion: reduce) { .arc-sheen { stroke-dasharray: none; opacity: .35; } .dock.arc .dock-item { transition: none; } }

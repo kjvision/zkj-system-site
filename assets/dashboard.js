@@ -323,7 +323,13 @@
   /* ---------- Helpers ---------- */
   function L() { return Z.getLang(); }
   function $(id) { return document.getElementById(id); }
-  function plat(id) { if (id === 'whatsapp') return WA_PLAT; for (var i = 0; i < Z.PLATFORMS.length; i++) if (Z.PLATFORMS[i].id === id) return Z.PLATFORMS[i]; return { id: id, en: id, ar: id, color: '#999' }; }
+  var EXTRA_PLAT = [
+    { id: 'snapchat', en: 'Snapchat', ar: 'سناب شات', color: '#E8D90C' },
+    { id: 'google', en: 'Google', ar: 'جوجل', color: '#34A853' },
+    { id: 'threads', en: 'Threads', ar: 'ثريدز', color: '#E8E8E8' },
+    { id: 'meta', en: 'Meta', ar: 'ميتا', color: '#1877F2' }
+  ];
+  function plat(id) { if (id === 'whatsapp') return WA_PLAT; var all = Z.PLATFORMS.concat(EXTRA_PLAT); for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i]; return { id: id, en: id, ar: id, color: '#999' }; }
   function appr(id) { for (var i = 0; i < S.approvals.length; i++) if (S.approvals[i].id === id) return S.approvals[i]; return null; }
   function tool(id) { for (var i = 0; i < Z.TOOLS.length; i++) if (Z.TOOLS[i].id === id) return Z.TOOLS[i]; return null; }
   function pendingCount() { return S.approvals.filter(function (a) { return a.state === 'pending'; }).length; }
@@ -414,7 +420,7 @@
     $('next-list').innerHTML = list.slice(0, 4).map(function (c) {
       var p = plat(c.p);
       return '<li><button type="button" data-action="cal-item" data-id="' + c.id + '"><span class="un-when"><span>' + esc(t('d.day.' + c.d)) + '</span><b dir="ltr">' + esc(c.time) + '</b></span>' +
-        '<span class="un-title"><strong>' + esc(c.title[L()]) + '</strong><span><span class="pdot-round" style="background:' + p.color + '"></span>' + esc(p[L()]) + ' · ' + esc(t('d.type.' + c.type)) + '</span></span>' + statusTag(c) + '</button></li>';
+        '<span class="un-title"><strong>' + esc(c.title[L()]) + '</strong><span>' + '<span class="pmark" style="color:' + p.color + '">' + D.pglyph(c.p) + '</span>' + esc(p[L()]) + ' · ' + esc(t('d.type.' + c.type)) + '</span></span>' + statusTag(c) + '</button></li>';
     }).join('');
   }
 
@@ -455,7 +461,7 @@
     var list = $('inbox-list');
     list.innerHTML = S.inbox.map(function (m) {
       var p = plat(m.p);
-      var head = '<div class="ib-head"><span class="chip chip-static"><span class="pdot" style="background:' + p.color + '"></span>' + esc(p[L()]) + ' · ' + esc(t('d.inbox.k.' + m.k)) + '</span><strong dir="ltr">' + esc(m.who) + '</strong></div>';
+      var head = '<div class="ib-head"><span class="chip chip-static">' + '<span class="pmark" style="color:' + p.color + '">' + D.pglyph(m.p) + '</span>' + esc(p[L()]) + ' · ' + esc(t('d.inbox.k.' + m.k)) + '</span><strong dir="ltr">' + esc(m.who) + '</strong></div>';
       var body = '<p class="dm-bubble them inbox-msg">' + esc(m.msg[L()]) + '</p>';
       var actions, reply;
       if (m.state === 'pending') {
@@ -481,7 +487,7 @@
       var stc = a.state === 'active' ? 'ok' : a.state === 'learning' ? 'warn' : 'off';
       var pct = Math.min(100, a.spend / a.budget * 100);
       return '<li><article class="gcard ad-item" id="ad-' + a.id + '">' +
-        '<div class="ad-top"><span class="chip chip-static"><span class="pdot" style="background:' + ap.color + '"></span>' + esc(ap[L()]) + '</span>' +
+        '<div class="ad-top"><span class="chip chip-static">' + '<span class="pmark" style="color:' + ap.color + '">' + D.pglyph(a.p) + '</span>' + esc(ap[L()]) + '</span>' +
         '<span class="status-tag ' + stc + '">' + esc(t('d.ads.st.' + a.state)) + '</span></div>' +
         '<h4>' + esc(a.name[L()]) + '</h4>' +
         '<div class="fuel" role="img" aria-label="' + esc(t('d.ads.spend', { s: money(a.spend), b: money(a.budget) })) + '"><span style="width:' + pct.toFixed(0) + '%"></span><i style="inset-inline-start:25%"></i><i style="inset-inline-start:50%"></i><i style="inset-inline-start:75%"></i></div>' +
@@ -497,7 +503,7 @@
     var opts = [{ id: 'all', label: t('d.cal.all') }].concat(Z.PLATFORMS.map(function (p) { return { id: p.id, label: p[L()], color: p.color }; }));
     $('cal-filters').innerHTML = opts.map(function (o) {
       return '<button class="chip" type="button" data-action="filter" data-platform="' + o.id + '" aria-pressed="' + (S.filter === o.id) + '">' +
-        (o.color ? '<span class="pdot" style="background:' + o.color + '"></span>' : '') + esc(o.label) + '</button>';
+        (o.color ? '<span class="pmark" style="color:' + o.color + '">' + D.pglyph(o.id) + '</span>' : '') + esc(o.label) + '</button>';
     }).join('');
   }
 
@@ -513,7 +519,7 @@
     var byKind = {};
     items.forEach(function (c) {
       var p = plat(c.p), hm = c.time.split(':');
-      (byKind[c.type] = byKind[c.type] || []).push({ id: c.id, day: c.d, mins: +hm[0] * 60 + +hm[1], time: c.time.length < 5 ? '0' + c.time : c.time, title: c.title[L()], kind: p[L()], color: p.color, dot: STATUS_DOT[c.s], status: t('d.s.' + c.s), wave: c.type === 'reel' || c.type === 'story' });
+      (byKind[c.type] = byKind[c.type] || []).push({ id: c.id, day: c.d, mins: +hm[0] * 60 + +hm[1], time: c.time.length < 5 ? '0' + c.time : c.time, title: c.title[L()], kind: p[L()], pg: c.p, color: p.color, dot: STATUS_DOT[c.s], status: t('d.s.' + c.s), wave: c.type === 'reel' || c.type === 'story' });
     });
     var tracks = TRACKS.filter(function (k) { return byKind[k[0]]; }).map(function (k) { return { code: k[1], label: t('d.type.' + k[0]), clips: byKind[k[0]] }; });
     if (!tracks.length) tracks = [{ code: '—', label: t('d.cal.empty'), clips: [] }];
@@ -527,9 +533,9 @@
     return D.art({ a: a.art[0], b: a.art[1], title: a.title[L()], kind: a.type, seed: a.id, sfx: sfx, full: a.type === 'reel', mark: 'Qahwa House · ' + t('d.type.' + a.type) });
   }
   function phoneOf(a, sfx) {
-    return D.phone({ kind: a.type, handle: HANDLE, avatar: QLOGO, media: media(a, sfx), caption: a.caption[L()], when: t('d.appr.when', { w: a.when[L()] }), slides: 5 });
+    return D.phone({ kind: a.type, platform: a.platforms[0], platformName: plat(a.platforms[0])[L()], handle: HANDLE, avatar: QLOGO, media: media(a, sfx), caption: a.caption[L()], when: t('d.appr.when', { w: a.when[L()] }), slides: 5 });
   }
-  function chips(a) { return a.platforms.map(function (p) { return '<span class="chip chip-static"><span class="pdot" style="background:' + plat(p).color + '"></span>' + esc(plat(p)[L()]) + '</span>'; }).join(''); }
+  function chips(a) { return a.platforms.map(function (p) { return '<span class="chip chip-static">' + '<span class="pmark" style="color:' + plat(p).color + '">' + D.pglyph(p) + '</span>' + esc(plat(p)[L()]) + '</span>'; }).join(''); }
   var rowUpd = D.rowNav($('appr-list'), $('row-prev'), $('row-next'), $('row-count'));
   function renderApprovals() {
     var pend = S.approvals.filter(function (a) { return a.state === 'pending'; });
@@ -626,7 +632,7 @@
     var pub = items.filter(function (x) { return x.status === 'published'; });
     for (var w = 0; w < fakeWins; w++) pub.push({ id: 'win' + w, title: '', status: 'published' });
     return { name: t('d.client'), logo: QLOGO_URL, primary: '#C8853B', accent: '#E9B872', covers: [], features: ['inbox', 'ads', 'whatsapp'],
-      channels: ['instagram', 'tiktok', 'facebook', 'youtube', 'x', 'linkedin', 'pinterest', 'whatsapp'], items: items, published: pub, wins: pub.length, kpi: { v: 48200, t: 60000 } };
+      channels: ['instagram', 'tiktok', 'snapchat', 'facebook', 'youtube', 'x', 'threads', 'linkedin', 'pinterest', 'google', 'whatsapp'], items: items, published: pub, wins: pub.length, kpi: { v: 48200, t: 60000 } };
   }
   function renderCore() {
     var host = $('core-stage'); if (!host || !window.ZCORE) return;
