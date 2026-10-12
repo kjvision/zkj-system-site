@@ -46,7 +46,7 @@
       "overlay": "setup",
       "media": {
         "images": [
-          "assets/art/frequency-3-600.webp"
+          "assets/art/kj/kj-028-600.webp"
         ],
         "video": null
       },
@@ -67,8 +67,8 @@
       "overlay": "content",
       "media": {
         "images": [
-          "assets/art/frequency-4-600.webp",
-          "assets/art/frequency-2-600.webp"
+          "assets/art/kj/kj-008-600.webp",
+          "assets/art/kj/kj-006-600.webp"
         ],
         "video": null
       },
@@ -116,9 +116,9 @@
       "overlay": "approval",
       "media": {
         "images": [
-          "assets/art/frequency-2-600.webp",
-          "assets/art/frequency-4-600.webp",
-          "assets/art/frequency-1-600.webp"
+          "assets/art/kj/kj-073-600.webp",
+          "assets/art/kj/kj-019-600.webp",
+          "assets/art/kj/kj-051-600.webp"
         ],
         "video": null
       },
@@ -134,7 +134,7 @@
       "overlay": "publisher",
       "media": {
         "images": [
-          "assets/art/frequency-4-600.webp"
+          "assets/art/kj/kj-053-600.webp"
         ],
         "grid": "assets/showcase/instagram/profile-grid.webp",
         "grid_source": "Real screenshot of the @zkjverse profile grid, 2026-10-11",
@@ -157,7 +157,7 @@
       "overlay": "inbox",
       "media": {
         "images": [
-          "assets/art/frequency-3-600.webp"
+          "assets/art/kj/kj-030-600.webp"
         ],
         "video": null
       },
