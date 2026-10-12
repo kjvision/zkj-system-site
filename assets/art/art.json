@@ -1,11 +1,117 @@
 {
-  "collection_en": "Unknown Presence",
-  "collection_ar": "الحضور المجهول",
+  "collection_en": "Selected works",
+  "collection_ar": "أعمال مختارة",
+  "note": "Working titles — KJ can rename them.",
   "works": [
-    { "id": "frequency-1", "file": "assets/art/frequency-1.webp", "thumb": "assets/art/frequency-1-600.webp", "hero": "assets/art/frequency-1-hero.webp", "title_en": "Unknown Presence — Frequency I", "title_ar": "الحضور المجهول — التردد الأول", "collection": "Unknown Presence", "alt_en": "Symmetrical energy face in neon greens and blues on a yellow and lilac field", "alt_ar": "وجه طاقي متناظر بألوان نيون خضراء وزرقاء على خلفية صفراء وليلكية" },
-    { "id": "frequency-2", "file": "assets/art/frequency-2.webp", "thumb": "assets/art/frequency-2-600.webp", "hero": "assets/art/frequency-2-hero.webp", "title_en": "Unknown Presence — Frequency II", "title_ar": "الحضور المجهول — التردد الثاني", "collection": "Unknown Presence", "alt_en": "Mirrored energy face drawn in fine cyan lines over a magenta field", "alt_ar": "وجه طاقي منعكس مرسوم بخطوط سماوية دقيقة على خلفية أرجوانية" },
-    { "id": "frequency-3", "file": "assets/art/frequency-3.webp", "thumb": "assets/art/frequency-3-600.webp", "hero": "assets/art/frequency-3-hero.webp", "title_en": "Unknown Presence — Frequency III", "title_ar": "الحضور المجهول — التردد الثالث", "collection": "Unknown Presence", "alt_en": "Digital energy face built from glowing cyan pixels on black", "alt_ar": "وجه طاقي رقمي من بكسلات سماوية متوهجة على خلفية سوداء" },
-    { "id": "frequency-4", "file": "assets/art/frequency-4.webp", "thumb": "assets/art/frequency-4-600.webp", "hero": "assets/art/frequency-4-hero.webp", "title_en": "Unknown Presence — Frequency IV", "title_ar": "الحضور المجهول — التردد الرابع", "collection": "Unknown Presence", "alt_en": "Energy face split into four panels of red, violet, blue and olive light", "alt_ar": "وجه طاقي مقسوم إلى أربع لوحات من الضوء الأحمر والبنفسجي والأزرق والزيتوني" },
-    { "id": "frequency-5", "file": "assets/art/frequency-5.webp", "thumb": "assets/art/frequency-5-600.webp", "hero": "assets/art/frequency-5-hero.webp", "title_en": "Unknown Presence — Frequency V", "title_ar": "الحضور المجهول — التردد الخامس", "collection": "Unknown Presence", "alt_en": "Energy face as a fine black sketch on white", "alt_ar": "وجه طاقي كرسم أسود دقيق على خلفية بيضاء" }
+    {
+      "id": "kj-067",
+      "file": "assets/art/kj/kj-067.webp",
+      "thumb": "assets/art/kj/kj-067-600.webp",
+      "hero": "assets/art/kj/kj-067.webp",
+      "title_en": "Burj, Silver Night",
+      "title_ar": "البرج، ليل فضي",
+      "collection": "KJ VISION",
+      "alt_en": "Burj Khalifa at night in black and white, lit against a dark sky",
+      "alt_ar": "برج خليفة ليلًا بالأبيض والأسود، مضاء أمام سماء داكنة"
+    },
+    {
+      "id": "kj-072",
+      "file": "assets/art/kj/kj-072.webp",
+      "thumb": "assets/art/kj/kj-072-600.webp",
+      "hero": "assets/art/kj/kj-072.webp",
+      "title_en": "Moon & Palm",
+      "title_ar": "قمر ونخلة",
+      "collection": "KJ VISION",
+      "alt_en": "A full orange moon beside the silhouette of a palm frond at night",
+      "alt_ar": "قمر برتقالي مكتمل بجانب ظل سعفة نخيل ليلًا"
+    },
+    {
+      "id": "kj-009",
+      "file": "assets/art/kj/kj-009.webp",
+      "thumb": "assets/art/kj/kj-009-600.webp",
+      "hero": "assets/art/kj/kj-009.webp",
+      "title_en": "Burj in Fog",
+      "title_ar": "البرج في الضباب",
+      "collection": "KJ VISION",
+      "alt_en": "The Burj Khalifa disappearing into low grey fog above the trees",
+      "alt_ar": "برج خليفة يختفي في ضباب رمادي منخفض فوق الأشجار"
+    },
+    {
+      "id": "kj-060",
+      "file": "assets/art/kj/kj-060.webp",
+      "thumb": "assets/art/kj/kj-060-600.webp",
+      "hero": "assets/art/kj/kj-060.webp",
+      "title_en": "Beacon",
+      "title_ar": "منارة",
+      "collection": "ZKJ VERSE",
+      "alt_en": "A single point of gold light rising above a dark rooftop",
+      "alt_ar": "نقطة ضوء ذهبية واحدة ترتفع فوق سطح داكن"
+    },
+    {
+      "id": "kj-054",
+      "file": "assets/art/kj/kj-054.webp",
+      "thumb": "assets/art/kj/kj-054-600.webp",
+      "hero": "assets/art/kj/kj-054.webp",
+      "title_en": "Gold Burst",
+      "title_ar": "انفجار ذهبي",
+      "collection": "ZKJ VERSE",
+      "alt_en": "Streaks of gold light bursting from a dark centre",
+      "alt_ar": "خطوط من الضوء الذهبي تنفجر من مركز داكن"
+    },
+    {
+      "id": "kj-026",
+      "file": "assets/art/kj/kj-026.webp",
+      "thumb": "assets/art/kj/kj-026-600.webp",
+      "hero": "assets/art/kj/kj-026.webp",
+      "title_en": "Teal Crown",
+      "title_ar": "التاج الفيروزي",
+      "collection": "ZKJ SYSTEM",
+      "alt_en": "A mirrored crown of teal architectural lines on black",
+      "alt_ar": "تاج متناظر من خطوط معمارية فيروزية على خلفية سوداء"
+    },
+    {
+      "id": "kj-018",
+      "file": "assets/art/kj/kj-018.webp",
+      "thumb": "assets/art/kj/kj-018-600.webp",
+      "hero": "assets/art/kj/kj-018.webp",
+      "title_en": "Twin Rings",
+      "title_ar": "حلقتان",
+      "collection": "ZKJ VERSE",
+      "alt_en": "A kaleidoscope of steel-grey arches forming two rings",
+      "alt_ar": "مشكال من أقواس رمادية فولاذية يشكّل حلقتين"
+    },
+    {
+      "id": "kj-010",
+      "file": "assets/art/kj/kj-010.webp",
+      "thumb": "assets/art/kj/kj-010-600.webp",
+      "hero": "assets/art/kj/kj-010.webp",
+      "title_en": "Blueprint Tunnel",
+      "title_ar": "نفق المخطط",
+      "collection": "ZKJ SYSTEM",
+      "alt_en": "A tunnel of glowing teal structural lines vanishing into black",
+      "alt_ar": "نفق من خطوط إنشائية فيروزية متوهجة تختفي في السواد"
+    },
+    {
+      "id": "kj-016",
+      "file": "assets/art/kj/kj-016.webp",
+      "thumb": "assets/art/kj/kj-016-600.webp",
+      "hero": "assets/art/kj/kj-016.webp",
+      "title_en": "Lotus Arches",
+      "title_ar": "أقواس اللوتس",
+      "collection": "ZKJ VERSE",
+      "alt_en": "Mirrored arches opening like a lotus in silver and violet",
+      "alt_ar": "أقواس متناظرة تتفتح كزهرة اللوتس بالفضي والبنفسجي"
+    },
+    {
+      "id": "kj-059",
+      "file": "assets/art/kj/kj-059.webp",
+      "thumb": "assets/art/kj/kj-059-600.webp",
+      "hero": "assets/art/kj/kj-059.webp",
+      "title_en": "Golden Eye",
+      "title_ar": "العين الذهبية",
+      "collection": "KJ VISION",
+      "alt_en": "A glowing golden ring with a dark centre, like an eye looking back",
+      "alt_ar": "حلقة ذهبية متوهجة بمركز داكن، كعين تنظر إليك"
+    }
   ]
 }
