@@ -84,7 +84,7 @@
       'p.f.add': 'Add item', 'p.f.addkpi': 'Add number', 'p.f.send': 'Send notification', 'p.f.saving': 'Saving…',
       'p.f.need': 'Fill in the required fields.', 'p.f.ok.item': 'Item added for {name}.', 'p.f.ok.kpi': 'Number added for {name}.', 'p.f.ok.notif': 'Notification sent to {name}.',
       'p.f.fail': 'Couldn’t save: {msg}', 'p.close': 'Close',
-      'p.foot': 'Powered by ZKJ SYSTEM · Where Engineering Meets Light'
+      'p.foot': 'Powered by ZKJ SYSTEM · Every project becomes a tool.'
     },
     ar: {
       'p.login.meta': 'دخول العملاء — ZKJ SYSTEM', 'p.app.meta': 'لوحتك — ZKJ SYSTEM',
@@ -167,7 +167,7 @@
       'p.f.add': 'أضف العنصر', 'p.f.addkpi': 'أضف الرقم', 'p.f.send': 'أرسل الإشعار', 'p.f.saving': 'جارٍ الحفظ…',
       'p.f.need': 'عبّئ الحقول المطلوبة.', 'p.f.ok.item': 'تمت إضافة العنصر لـ {name}.', 'p.f.ok.kpi': 'تمت إضافة الرقم لـ {name}.', 'p.f.ok.notif': 'تم إرسال الإشعار إلى {name}.',
       'p.f.fail': 'تعذّر الحفظ: {msg}', 'p.close': 'إغلاق',
-      'p.foot': 'مدعوم من ZKJ SYSTEM · حيث تلتقي الهندسة بالضوء'
+      'p.foot': 'مدعوم من ZKJ SYSTEM · كل مشروع يصبح أداة.'
     }
   });
 })();
