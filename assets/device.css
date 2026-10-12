@@ -98,7 +98,7 @@ body:has(.device) { background: #070709; }
 .tb-btn:hover, .device .tb-actions .lang-toggle:hover, .device .icon-btn:hover { background: rgba(255,255,255,.09); border-color: var(--stroke-gold); color: #fff; }
 .tb-btn:active, .device .icon-btn:active { transform: scale(.95); }
 .device .badge-count { top: -5px; inset-inline-end: -5px; min-width: 17px; height: 17px; border-radius: 9px; font-size: 10px; background: #FF453A; box-shadow: 0 0 0 2px #15151b; font-family: var(--f-body); }
-.pill-admin { color: #0B0B0F !important; background: var(--gold-grad); border: 0 !important; font-size: 9.5px !important; padding: 3px 8px !important; letter-spacing: 2px; }
+.pill-admin, .pill-solid { color: #0B0B0F !important; background: var(--gold-grad); border: 0 !important; font-size: 9.5px !important; padding: 3px 8px !important; letter-spacing: 2px; }
 
 .win-body { display: grid; grid-template-columns: 248px 1fr; min-height: 0; }
 .no-sidebar .win-body, .win-body:not(:has(.sidebar:not([hidden]))) { grid-template-columns: 1fr; }
@@ -887,7 +887,7 @@ html[lang="ar"] .ib-label { letter-spacing: 0; }
   .lp-name { font-size: 11px; }
   .lp-state { display: none; }
   .tb-actions #theme-btn { width: 34px; padding: 0; justify-content: center; border-radius: 50%; }
-  .demo .tb-title .pill-admin { display: none; }
+  .demo .tb-title .pill-solid { display: none; }
 }
 .device[data-theme="brand"] .lp-title, .device[data-theme="brand"] .lp-name { color: #2A1910; }
 .device[data-theme="brand"] .inbox-item .dm-bubble.them { background: #F1E6D6; color: #2A1910; }
@@ -914,3 +914,6 @@ html[lang="ar"] .ib-label { letter-spacing: 0; }
 .device[data-theme="brand"] .win-content .mono, .device[data-theme="brand"] .sb-next .when, .device[data-theme="brand"] .un-when, .device[data-theme="brand"] .inst-foot .mono { color: #9A5426; }
 .device[data-theme="brand"] .sb-stats .sb-v:not(.hot), .device[data-theme="brand"] .un-when b { color: #2A1910; }
 .device[data-theme="brand"] .tl-ruler span, .device[data-theme="brand"] .tl-label { color: #fff; }
+.demo-note .pill { white-space: normal; line-height: 1.5; }
+.demo-note .pill, .menubar .pill-demo { font-family: var(--f-body); text-transform: none; letter-spacing: .02em; font-weight: 600; }
+.demo-note .pill { font-size: 12px; padding: 4px 10px; }

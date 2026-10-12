@@ -200,4 +200,66 @@
       'p.cc.kpi.help': 'معلومة: المقياس باسم target_X يرسم X كحلقة مقابل هدفه؛ والنتيجة من 100 تُرسم كعدّاد.'
     }
   });
+
+  // ZKJ SYSTEM HQ (admin overview) and client workspaces in admin mode
+  window.ZKJ.extend({
+    en: {
+      'p.sb.label': 'Sidebar', 'p.hq.name': 'ZKJ SYSTEM HQ', 'p.hq.owner': 'Owner · KJ', 'p.hq.glance': 'Across all clients',
+      'p.hq.clients': 'Clients', 'p.hq.todo': 'Your to-do', 'p.hq.week': 'This week across clients', 'p.hq.workspaces': 'Client workspaces',
+      'p.hq.sub': 'ZKJ SYSTEM HQ — every client in one place.', 'p.hq.board': 'Clients', 'p.hq.addclient': 'Add a new client',
+      'p.hq.morning': 'Good morning, {name}', 'p.hq.afternoon': 'Good afternoon, {name}', 'p.hq.evening': 'Good evening, {name}',
+      'p.hq.todo.n': '{n} on your to-do', 'p.hq.todo.0': 'Your to-do is clear',
+      'p.hq.t.clients': 'Clients', 'p.hq.t.todo': 'To-do', 'p.hq.t.waiting': 'Approvals', 'p.hq.t.week': 'Week',
+      'p.hq.own': '{n} own brands', 'p.hq.todo.foot': 'Changes, drafts, client activity', 'p.hq.waiting': 'Waiting for approval',
+      'p.hq.waiting.foot': 'Across all clients', 'p.hq.weekc': 'Scheduled this week', 'p.hq.month': '{n} published this month',
+      'p.hq.open': 'Open workspace',
+      'p.st.wait': 'Waiting for client', 'p.st.wait.own': 'Awaiting your OK', 'p.st.changes': 'Changes requested', 'p.st.week': 'This week', 'p.st.month': 'Published this month',
+      'p.tag.own': 'Own brand · Client #{n}', 'p.tag.client': 'Client #{n}',
+      'p.todo.sub': 'What clients asked you to change, your drafts, and client activity — across all clients.',
+      'p.td.activity': 'Client activity', 'p.td.changes': 'Changes requested — your turn', 'p.td.draft': 'Draft',
+      'p.td.draft.sub': 'Draft — the client can’t see it yet.', 'p.td.empty': 'Nothing on your to-do.',
+      'p.week.sub': 'One track per client. Clip colour shows the platform.', 'p.week.platform': 'Clip colour = platform',
+      'p.ws.eye': 'Admin view', 'p.ws.label': 'Admin view', 'p.ws.text': 'this is what the client sees', 'p.ws.back': 'Back to HQ',
+      'p.ws.title': '{name} workspace', 'p.ws.sub': 'Everything below is exactly what the client sees.',
+      'p.sb.glance.c': '{name} at a glance', 'p.pkg.incl': 'What’s included',
+      'p.needs.ext': '{n} waiting for the client', 'p.needs0.ext': 'Nothing waiting for the client',
+      'p.appr.owner': 'Approve as owner', 'p.appr.toast.owner': 'Approved as owner: “{title}”.', 'p.appr.toast.ownerch': 'Changes noted on “{title}” — it’s on your to-do.', 'p.kpi.appr.ext': 'The client decides', 'p.wait.client': 'Waiting for client', 'p.s.changes.admin': 'Changes requested — your turn',
+      'p.appr.theirnote': 'Client’s note: {note}', 'p.item.client': 'Client', 'p.item.theirnote': 'Client’s note',
+      'p.cc.for': 'Add to which client?', 'p.cc.addfor': 'Add for', 'p.adm.sub2': 'Choose a client, then add an item, a key number or a notification. Clients never see this.',
+      'p.new.title': 'Add a new client',
+      'p.new.s1': 'Supabase → Table Editor → clients → Insert row: name, name_ar, logo_url, colours, instagram and plan (Starter, Growth or Full). Leave internal = false for a real client.',
+      'p.new.s2': 'Authentication → Users → Invite user with the client’s email.',
+      'p.new.s3': 'Table Editor → profiles → set their client_id to the new client’s id.',
+      'p.new.more': 'Full steps: supabase/SETUP.md, section 5. The new client then appears as a card on HQ.'
+    },
+    ar: {
+      'p.sb.label': 'الشريط الجانبي', 'p.hq.name': 'مقر ZKJ SYSTEM', 'p.hq.owner': 'المالك · KJ', 'p.hq.glance': 'عبر كل العملاء',
+      'p.hq.clients': 'العملاء', 'p.hq.todo': 'مهامك', 'p.hq.week': 'هذا الأسبوع عبر العملاء', 'p.hq.workspaces': 'مساحات العملاء',
+      'p.hq.sub': 'مقر ZKJ SYSTEM — كل العملاء في مكان واحد.', 'p.hq.board': 'العملاء', 'p.hq.addclient': 'إضافة عميل جديد',
+      'p.hq.morning': 'صباح الخير، {name}', 'p.hq.afternoon': 'نهارك سعيد، {name}', 'p.hq.evening': 'مساء الخير، {name}',
+      'p.hq.todo.n': '{n} في مهامك', 'p.hq.todo.0': 'لا مهام بانتظارك',
+      'p.hq.t.clients': 'العملاء', 'p.hq.t.todo': 'المهام', 'p.hq.t.waiting': 'الموافقات', 'p.hq.t.week': 'الأسبوع',
+      'p.hq.own': '{n} علامات خاصة بك', 'p.hq.todo.foot': 'تعديلات ومسودات ونشاط العملاء', 'p.hq.waiting': 'بانتظار الموافقة',
+      'p.hq.waiting.foot': 'عبر كل العملاء', 'p.hq.weekc': 'مجدول هذا الأسبوع', 'p.hq.month': '{n} منشور هذا الشهر',
+      'p.hq.open': 'افتح المساحة',
+      'p.st.wait': 'بانتظار العميل', 'p.st.wait.own': 'بانتظار موافقتك', 'p.st.changes': 'طلبات تعديل', 'p.st.week': 'هذا الأسبوع', 'p.st.month': 'منشور هذا الشهر',
+      'p.tag.own': 'علامتك · العميل رقم {n}', 'p.tag.client': 'العميل رقم {n}',
+      'p.todo.sub': 'ما طلب العملاء تعديله، ومسوداتك، ونشاط العملاء — عبر كل العملاء.',
+      'p.td.activity': 'نشاط العميل', 'p.td.changes': 'طلب تعديل — دورك', 'p.td.draft': 'مسودة',
+      'p.td.draft.sub': 'مسودة — العميل لا يراها بعد.', 'p.td.empty': 'لا شيء في مهامك.',
+      'p.week.sub': 'مسار لكل عميل. لون المقطع يدل على المنصة.', 'p.week.platform': 'لون المقطع = المنصة',
+      'p.ws.eye': 'عرض المدير', 'p.ws.label': 'عرض المدير', 'p.ws.text': 'هذا ما يراه العميل', 'p.ws.back': 'العودة للمقر',
+      'p.ws.title': 'مساحة {name}', 'p.ws.sub': 'كل ما يلي هو بالضبط ما يراه العميل.',
+      'p.sb.glance.c': '{name} بنظرة سريعة', 'p.pkg.incl': 'ما تشمله الباقة',
+      'p.needs.ext': '{n} بانتظار العميل', 'p.needs0.ext': 'لا شيء بانتظار العميل',
+      'p.appr.owner': 'موافقة كمالك', 'p.appr.toast.owner': 'تمت الموافقة كمالك: «{title}».', 'p.appr.toast.ownerch': 'سُجّل طلب التعديل على «{title}» — أُضيف إلى مهامك.', 'p.kpi.appr.ext': 'القرار للعميل', 'p.wait.client': 'بانتظار العميل', 'p.s.changes.admin': 'طُلب تعديل — دورك',
+      'p.appr.theirnote': 'ملاحظة العميل: {note}', 'p.item.client': 'العميل', 'p.item.theirnote': 'ملاحظة العميل',
+      'p.cc.for': 'لأي عميل؟', 'p.cc.addfor': 'إضافة لـ', 'p.adm.sub2': 'اختر عميلًا، ثم أضف عنصرًا أو رقمًا رئيسيًا أو إشعارًا. العملاء لا يرون هذا.',
+      'p.new.title': 'إضافة عميل جديد',
+      'p.new.s1': 'Supabase ← Table Editor ← clients ← Insert row: الاسم، الاسم العربي، الشعار، الألوان، إنستغرام والباقة (Starter أو Growth أو Full). اترك internal = false للعميل الحقيقي.',
+      'p.new.s2': 'Authentication ← Users ← Invite user ببريد العميل.',
+      'p.new.s3': 'Table Editor ← profiles ← اضبط client_id على معرّف العميل الجديد.',
+      'p.new.more': 'الخطوات كاملة: supabase/SETUP.md، القسم 5. بعدها يظهر العميل كبطاقة في المقر.'
+    }
+  });
 })();

@@ -18,6 +18,7 @@
       'dv.prev': 'Previous post', 'dv.next': 'Next post', 'dv.of': '{i} / {n}',
       'dv.now': 'Now', 'dv.tracks': 'Tracks', 'dv.target': '{p}% of target', 'dv.dubai': 'Dubai',
       'dv.ig.liked': 'Preview · not published yet', 'dv.ig.msg': 'Send message', 'dv.ig.audio': 'Original audio', 'dv.ig.follow': 'Follow',
+      'dv.hq': 'HQ', 'dv.todo': 'To-do', 'dv.week': 'This week', 'dv.backhq': 'Back to HQ',
       'dv.ig.sponsored': 'Sponsored', 'dv.ig.reply': 'Suggested reply', 'dv.ig.reels': 'Reels', 'dv.ig.dm': 'Message…'
     },
     ar: {
@@ -30,6 +31,7 @@
       'dv.prev': 'المنشور السابق', 'dv.next': 'المنشور التالي', 'dv.of': '{i} / {n}',
       'dv.now': 'الآن', 'dv.tracks': 'المسارات', 'dv.target': '{p}% من الهدف', 'dv.dubai': 'دبي',
       'dv.ig.liked': 'معاينة · لم يُنشر بعد', 'dv.ig.msg': 'أرسل رسالة', 'dv.ig.audio': 'صوت أصلي', 'dv.ig.follow': 'متابعة',
+      'dv.hq': 'المقر', 'dv.todo': 'مهامك', 'dv.week': 'هذا الأسبوع', 'dv.backhq': 'العودة للمقر',
       'dv.ig.sponsored': 'مُموَّل', 'dv.ig.reply': 'الرد المقترح', 'dv.ig.reels': 'ريلز', 'dv.ig.dm': 'رسالة…'
     }
   });
@@ -121,7 +123,12 @@
           '<span data-i18n="' + it.key + '">' + esc(t(it.key)) + '</span><span class="rv"><span class="nav-badge-inline" hidden></span></span>' + IC.chev + '</button></li>';
       }).join('');
     }
-    Z.onLang(function () { document.querySelectorAll('[data-dock-icon]').forEach(function (el) { var b = el.closest('[data-nav]'); var it = b && itemById(b.getAttribute('data-nav')); if (it && it.tone === 'cal') el.innerHTML = calIcon(); }); });
+    if (!NAV.langHooked) {
+      NAV.langHooked = true;
+      Z.onLang(function () { document.querySelectorAll('[data-dock-icon]').forEach(function (el) { var b = el.closest('[data-nav]'); var it = b && itemById(b.getAttribute('data-nav')); if (it && it.tone === 'cal') el.innerHTML = calIcon(); }); });
+    }
+    // the nav can be rebuilt (e.g. HQ ↔ client workspace): keep earlier availability decisions
+    Object.keys(NAV.avail).forEach(function (id) { ['dock-' + id, 'more-' + id].forEach(function (x) { var el = $(x); if (el) el.hidden = !NAV.avail[id]; }); });
     paintNav();
   }
   function panel(id) { return document.querySelector('[data-view-panel="' + id + '"]'); }

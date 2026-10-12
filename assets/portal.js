@@ -18,7 +18,9 @@
     user: null, profile: null, isAdmin: false,
     clients: [], client: null,
     items: [], kpis: [], notifs: [], reports: [],
-    week: 0, filter: 'all', busy: {}, keepFlown: false
+    week: 0, filter: 'all', busy: {}, keepFlown: false,
+    mode: 'client', // 'client' (a client's login) · 'hq' (KJ's overview) · 'ws' (KJ inside one client's workspace)
+    all: [], hqWeek: 0, ccClient: null
   };
 
   /* ---------- Packages (plan → panels) ---------- */
@@ -95,12 +97,22 @@
     if (!isFinite(n)) return String(v);
     return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
   }
-  function item(id) { for (var i = 0; i < S.items.length; i++) if (S.items[i].id === id) return S.items[i]; return null; }
+  function item(id) {
+    var lists = S.mode === 'hq' ? [S.all, S.items] : [S.items, S.all];
+    for (var l = 0; l < lists.length; l++) for (var i = 0; i < lists[l].length; i++) if (lists[l][i].id === id) return lists[l][i];
+    return null;
+  }
   function pending() { return S.items.filter(function (x) { return x.status === 'needs_approval'; }); }
   var STATUS_DOT = { draft: 'off', needs_approval: 'bad', approved: 'ok', changes_requested: 'warn', scheduled: 'warn', published: 'ok' };
   function statusLabel(s) { return t('p.s.' + s); }
   function show(el, on) { if (el) el.hidden = !on; }
   function clientById(id) { for (var i = 0; i < S.clients.length; i++) if (S.clients[i].id === id) return S.clients[i]; return null; }
+  function clientOf(x) { return (x && clientById(x.client_id)) || S.client || {}; }
+  function clientNo(c) { return S.clients.indexOf(c) + 1; }
+  function tagOf(c) { return c ? t(c.internal ? 'p.tag.own' : 'p.tag.client', { n: clientNo(c) }) : ''; }
+  // Who may approve: a client always (RLS keeps it to their own items); KJ only for his own (internal) brands.
+  function extView() { return S.isAdmin && S.client && !S.client.internal; }
+  function canReview(x) { return !S.isAdmin || clientOf(x).internal === true; }
 
   // Client logo (or initials). A broken logo URL falls back to initials (see the error listener below).
   function initials(c) {
@@ -128,7 +140,7 @@
 
   /* ---------- Page states ---------- */
   function chrome(on) {
-    show($('dock'), on); show($('tabbar'), on); show($('sidebar'), on && !!S.client);
+    show($('dock'), on); show($('tabbar'), on); show($('sidebar'), on && (!!S.client || S.mode === 'hq'));
   }
   function setState(titleKey, bodyKey, actions) {
     $('dash').setAttribute('data-state', 'message');
@@ -152,14 +164,23 @@
 
   /* ---------- Header + sidebar ---------- */
   function renderHeader() {
-    var c = S.client, dash = $('dash');
-    $('client-name').textContent = c ? cName(c) : 'ZKJ SYSTEM';
+    var c = S.mode === 'hq' ? null : S.client, dash = $('dash');
+    $('client-name').textContent = c ? cName(c) : (S.mode === 'hq' ? t('p.hq.name') : 'ZKJ SYSTEM');
     dash.classList.toggle('no-client', !c);
+    dash.setAttribute('data-mode', S.mode);
+    $('mb-where').innerHTML = S.mode === 'client' ? esc(t('p.portal')) : esc(t('p.hq.name')) + (S.mode === 'ws' && c ? ' <span aria-hidden="true">›</span> ' + esc(cName(c)) : '');
+    show($('sb-hq'), S.mode === 'hq');
+    document.querySelectorAll('.sb-client-only').forEach(function (el) { el.hidden = S.mode === 'hq'; });
+    show($('sb-backhq'), S.mode === 'ws');
+    show($('ws-banner'), S.mode === 'ws');
+    if (S.mode === 'ws' && c) $('ws-text').innerHTML = '<strong>' + esc(cName(c)) + '</strong> — ' + esc(t('p.ws.text')) + ' <span class="ws-tag">' + esc(tagOf(c)) + '</span>';
+    $('sb-glance-title').textContent = c ? t('p.sb.glance.c', { name: cName(c) }) : t('p.sb.glance');
     $('client-logo').innerHTML = logoHtml(c);
     $('sb-logo').innerHTML = logoHtml(c);
     $('sb-name').textContent = c ? cName(c) : '';
     $('sb-handle').textContent = c && c.instagram ? '@' + handle(c) : '';
     var pill = $('pkg-pill');
+    if (c && S.mode === 'ws') $('sb-handle').textContent = (c.instagram ? '@' + handle(c) + ' · ' : '') + tagOf(c);
     if (c) { pill.textContent = planName(c); pill.title = t('p.pkg', { name: planName(c) }); show(pill, true); } else show(pill, false);
     $('more-pkg').textContent = c ? planName(c) : '';
     show($('admin-pill'), S.isAdmin);
@@ -170,11 +191,12 @@
   /* ---------- Today ---------- */
   function renderHello() {
     var c = S.client, n = pending().length;
-    $('hello').textContent = S.isAdmin ? t('p.hello.admin', { name: cName(c) }) : t('p.hello', { name: cName(c) });
-    $('hello-sub').textContent = S.isAdmin ? t('p.hello.admin.sub') : t('p.hello.sub');
+    $('hello').textContent = S.isAdmin ? t('p.ws.title', { name: cName(c) }) : t('p.hello', { name: cName(c) });
+    $('hello-sub').textContent = S.isAdmin ? t('p.ws.sub') : t('p.hello.sub');
     $('today-date').textContent = new Intl.DateTimeFormat(loc(), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Asia/Dubai' }).format(new Date()) + ' · ' + t('dv.dubai');
     var btn = $('needs-you-btn');
-    btn.textContent = n === 0 ? t('p.needs0') : n === 1 ? t('p.needs1') : t('p.needs', { n: n });
+    var ext = S.isAdmin && !c.internal;
+    btn.textContent = n === 0 ? t(ext ? 'p.needs0.ext' : 'p.needs0') : ext ? t('p.needs.ext', { n: n }) : n === 1 ? t('p.needs1') : t('p.needs', { n: n });
     btn.classList.toggle('is-clear', n === 0);
   }
 
@@ -218,7 +240,7 @@
     var pips = ''; for (var i = 0; i < Math.min(n, 12); i++) pips += '<i></i>';
     tiles.push('<button class="inst inst-num inst-need' + (n ? '' : ' is-clear') + '" type="button" data-nav="approvals"><span class="inst-tag">' + esc(t('p.inst.queue')) + '</span>' +
       '<span class="big">' + n + '</span>' + (n ? '<span class="need-pips" aria-hidden="true">' + pips + '</span>' : '<div class="inst-ruler" aria-hidden="true"></div>') +
-      '<span class="inst-label">' + esc(t('p.kpi.appr')) + '</span><span class="inst-foot"><span class="' + (n ? 'status-bad' : 'status-ok') + '">' + esc(t(n ? 'p.kpi.appr.bad' : 'p.kpi.appr.ok')) + '</span></span></button>');
+      '<span class="inst-label">' + esc(t(extView() ? 'p.st.wait' : 'p.kpi.appr')) + '</span><span class="inst-foot"><span class="' + (n ? 'status-bad' : 'status-ok') + '">' + esc(t(n ? (extView() ? 'p.kpi.appr.ext' : 'p.kpi.appr.bad') : 'p.kpi.appr.ok')) + '</span></span></button>');
     if (!latest.length) tiles.unshift('<div class="inst inst-empty kpi-empty"><span class="inst-tag">' + esc(t('p.kpi.title')) + '</span><p>' + esc(t('p.kpi.empty')) + '</p><div class="inst-ruler" aria-hidden="true"></div></div>');
     $('kpi-row').innerHTML = tiles.join('');
     D.animateIn($('kpi-row'));
@@ -243,6 +265,8 @@
     }).join('') : '<li class="portal-empty">' + esc(t('p.next.empty')) + '</li>';
     // sidebar
     var n = pending().length;
+    var ext = S.isAdmin && S.client && !S.client.internal;
+    $('sb-need-label').textContent = t(ext ? 'p.st.wait' : 'p.kpi.appr');
     $('sb-need').textContent = n; $('sb-need').classList.toggle('hot', n > 0);
     var ws = weekStart(0), we = new Date(ws); we.setDate(we.getDate() + 7);
     $('sb-week').textContent = S.items.filter(function (x) { var d = x.scheduled_at && new Date(x.scheduled_at); return d && d >= ws && d < we && x.kind !== 'reply'; }).length;
@@ -257,24 +281,20 @@
   function renderPkgCard() {
     var key = planKey(S.client), feats = PKG[key].features;
     var rows = [['p.pkg.core', true], ['p.addon.inbox', feats.indexOf('inbox') > -1], ['p.addon.ads', feats.indexOf('ads') > -1], ['p.addon.wa', feats.indexOf('whatsapp') > -1]];
-    $('pkg-card').innerHTML = '<span class="pkg-name">' + esc(planName(S.client)) + '</span><ul class="pkg-feats">' + rows.map(function (r) {
+    $('pkg-card').innerHTML = '<ul class="pkg-feats">' + rows.map(function (r) {
       return '<li class="' + (r[1] ? 'on' : 'off') + '"><span class="pf-ic" aria-hidden="true">' + (r[1] ? D.icon('check') : D.icon('plus')) + '</span><span>' + esc(t(r[0])) + '</span>' +
         (r[1] ? '' : '<span class="sr-only"> — ' + esc(t('p.pkg.notincl')) + '</span>') + '</li>';
     }).join('') + '</ul>';
-    var pct = { starter: .34, growth: .67, full: 1 }[key];
-    $('cc-pkg-label').textContent = t('p.pkg.title');
-    $('cc-pkg').textContent = planName(S.client);
-    $('cc-pkg-bar').style.width = (pct * 100) + '%';
   }
 
   /* ---------- Approvals: iPhone previews ---------- */
   function media(x, sfx) {
-    var m = safeUrl(x.media_url), c = S.client || {};
+    var m = safeUrl(x.media_url), c = clientOf(x);
     if (m && isImage(m)) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
     return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#D4AF37', title: pick(x, 'title', 'title_ar'), kind: x.kind, seed: x.id, sfx: sfx, full: x.kind === 'reel' || x.kind === 'story', mark: 'ZKJ SYSTEM · ' + t('p.type.' + x.kind) });
   }
   function phoneOf(x, sfx) {
-    var c = S.client;
+    var c = clientOf(x);
     return D.phone({ kind: x.kind, handle: handle(c), avatar: logoHtml(c), media: media(x, sfx), caption: pick(x, 'caption', 'caption_ar'), when: x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen'), slides: 5 });
   }
   function platChip(id) {
@@ -285,32 +305,38 @@
   function phoneCard(x) {
     var dis = S.busy[x.id] ? ' disabled' : '';
     var title = pick(x, 'title', 'title_ar');
-    return '<li class="appr-slot"><article class="appr phone-card" id="appr-' + esc(x.id) + '" data-id="' + esc(x.id) + '" data-pending="1" aria-label="' + esc(title) + '">' +
+    var can = canReview(x);
+    var acts = can
+      ? '<div class="pc-actions">' +
+        '<button class="tactile yes" type="button" data-action="approve" data-id="' + esc(x.id) + '"' + dis + '>' + D.icon('check') + '<span>' + esc(t(S.isAdmin ? 'p.appr.owner' : 'p.appr.approve')) + '</span><span class="sr-only"> — ' + esc(title) + '</span></button>' +
+        '<button class="tactile no" type="button" data-action="changes" data-id="' + esc(x.id) + '"' + dis + '>' + D.icon('pencil') + '<span>' + esc(t('p.appr.changes')) + '</span><span class="sr-only"> — ' + esc(title) + '</span></button></div>'
+      : '<div class="pc-wait"><span class="status-tag warn"><span class="dot warn"></span> ' + esc(t('p.wait.client')) + '</span></div>';
+    return '<li class="appr-slot"><article class="appr phone-card' + (can ? '' : ' is-readonly') + '" id="appr-' + esc(x.id) + '" data-id="' + esc(x.id) + '" data-pending="' + (can ? '1' : '0') + '" aria-label="' + esc(title) + '">' +
       phoneOf(x) +
       '<div class="pc-meta"><h3>' + esc(title) + '</h3><p>' + platChip(x.platform) + '<span class="mono">' + esc(x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen')) + '</span></p></div>' +
-      '<div class="pc-actions">' +
-      '<button class="tactile yes" type="button" data-action="approve" data-id="' + esc(x.id) + '"' + dis + '>' + D.icon('check') + '<span>' + esc(t('p.appr.approve')) + '</span><span class="sr-only"> — ' + esc(title) + '</span></button>' +
-      '<button class="tactile no" type="button" data-action="changes" data-id="' + esc(x.id) + '"' + dis + '>' + D.icon('pencil') + '<span>' + esc(t('p.appr.changes')) + '</span><span class="sr-only"> — ' + esc(title) + '</span></button>' +
-      '</div><button class="link-btn pc-more" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '<span class="sr-only"> — ' + esc(title) + '</span></button>' +
+      acts + '<button class="link-btn pc-more" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '<span class="sr-only"> — ' + esc(title) + '</span></button>' +
       '</article></li>';
   }
   function thumb(x) {
-    var m = safeUrl(x.media_url), c = S.client || {};
+    var m = safeUrl(x.media_url), c = clientOf(x);
     if (m && isImage(m)) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
     return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#D4AF37', kind: x.kind, seed: x.id, sfx: '-t' });
   }
   // compact card: reviewed items, inbox replies, ads
   function rowCard(x, prefix) {
     var title = pick(x, 'title', 'title_ar'), actions;
-    if (x.status === 'needs_approval') {
+    if (x.status === 'needs_approval' && !canReview(x)) {
+      actions = '<span class="status-tag warn">' + esc(t('p.wait.client')) + '</span>';
+    } else if (x.status === 'needs_approval') {
       var dis = S.busy[x.id] ? ' disabled' : '';
-      actions = '<button class="btn btn-approve btn-sm" type="button" data-action="approve" data-id="' + esc(x.id) + '"' + dis + '>' + esc(t('p.appr.approve')) + '</button>' +
+      actions = '<button class="btn btn-approve btn-sm" type="button" data-action="approve" data-id="' + esc(x.id) + '"' + dis + '>' + esc(t(S.isAdmin ? 'p.appr.owner' : 'p.appr.approve')) + '</button>' +
         '<button class="btn btn-ghost btn-sm" type="button" data-action="changes" data-id="' + esc(x.id) + '"' + dis + '>' + esc(t('p.appr.changes')) + '</button>';
     } else {
       var ok = x.status === 'approved' || x.status === 'scheduled' || x.status === 'published';
-      actions = '<span class="appr-state status-' + (ok ? 'ok' : 'warn') + '"><span class="dot ' + (ok ? 'ok' : 'warn') + '"></span>' + esc(statusLabel(x.status)) + '</span>';
+      var lab = S.isAdmin && x.status === 'changes_requested' ? t('p.s.changes.admin') : statusLabel(x.status);
+      actions = '<span class="appr-state status-' + (ok ? 'ok' : 'warn') + '"><span class="dot ' + (ok ? 'ok' : 'warn') + '"></span>' + esc(lab) + '</span>';
     }
-    var note = x.client_note ? '<p class="appr-note">' + esc(t('p.appr.yournote', { note: x.client_note })) + '</p>' : '';
+    var note = x.client_note ? '<p class="appr-note">' + esc(t(S.isAdmin ? 'p.appr.theirnote' : 'p.appr.yournote', { note: x.client_note })) + '</p>' : '';
     return '<li><article class="appr row-card' + (x.status !== 'needs_approval' ? ' is-done' : '') + '" id="' + (prefix || 'appr-') + esc(x.id) + '">' +
       '<div class="rc-thumb">' + thumb(x) + '</div><div class="rc-body"><h3>' + esc(title) + '</h3>' +
       '<div class="rc-line">' + platChip(x.platform) + '<span class="mono" style="font-size:12px;color:var(--muted)">' + esc(x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen')) + '</span></div>' +
@@ -328,8 +354,9 @@
     $('appr-done').innerHTML = reviewed.map(function (x) { return rowCard(x); }).join('');
     show($('done-wrap'), reviewed.length > 0);
     $('stack-ghosts').setAttribute('data-n', Math.min(pend.length, 3));
+    var can = pend.length > 0 && canReview(pend[0]);
     show($('stack-ghosts'), pend.length > 1);
-    show($('stack-hint'), pend.length > 0);
+    show($('stack-hint'), can);
     show($('row-nav'), pend.length > 1);
     $('stack-count').textContent = pend.length ? t('p.stack.left', { n: pend.length }) : '';
     D.setBadge('approvals', pend.length);
@@ -469,19 +496,148 @@
   }
 
   /* ---------- Control Center (admin) ---------- */
+  /* ---------- ZKJ SYSTEM HQ (admin overview across all clients) ---------- */
+  function inWeek(x, off) {
+    if (!x.scheduled_at) return false;
+    var a = weekStart(off), e = new Date(a); e.setDate(e.getDate() + 7);
+    var d = new Date(x.scheduled_at); return d >= a && d < e;
+  }
+  function inThisMonth(iso) { var d = new Date(iso), n = new Date(); return !!iso && d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth(); }
+  function statsOf(c) {
+    var list = S.all.filter(function (x) { return x.client_id === c.id; });
+    var now = Date.now();
+    var next = list.filter(function (x) { return x.scheduled_at && x.kind !== 'reply' && x.status !== 'draft' && new Date(x.scheduled_at).getTime() >= now; })
+      .sort(function (a, b) { return new Date(a.scheduled_at) - new Date(b.scheduled_at); })[0];
+    return {
+      waiting: list.filter(function (x) { return x.status === 'needs_approval'; }).length,
+      changes: list.filter(function (x) { return x.status === 'changes_requested'; }).length,
+      week: list.filter(function (x) { return inWeek(x, 0) && x.status !== 'draft' && x.kind !== 'reply'; }).length,
+      month: list.filter(function (x) { return x.status === 'published' && inThisMonth(x.scheduled_at); }).length,
+      next: next
+    };
+  }
+  function todoRows() {
+    var rows = [];
+    S.all.filter(function (x) { return x.status === 'changes_requested'; })
+      .sort(function (a, b) { return String(b.reviewed_at).localeCompare(String(a.reviewed_at)); })
+      .forEach(function (x) { rows.push({ type: 'changes', x: x, c: clientOf(x), when: x.reviewed_at }); });
+    S.all.filter(function (x) { return x.status === 'draft'; })
+      .forEach(function (x) { rows.push({ type: 'draft', x: x, c: clientOf(x), when: x.scheduled_at || x.created_at }); });
+    S.notifs.forEach(function (n) { rows.push({ type: 'activity', n: n, c: clientById(n.client_id), when: n.created_at }); });
+    return rows;
+  }
+  function todoCount() { return todoRows().filter(function (r) { return r.type !== 'activity' || !r.n.read; }).length; }
+  function greeting() {
+    var h = +new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hourCycle: 'h23', timeZone: 'Asia/Dubai' }).format(new Date());
+    return h < 12 ? 'p.hq.morning' : h < 17 ? 'p.hq.afternoon' : 'p.hq.evening';
+  }
+  function ownerName() { var n = S.profile && (S.profile.full_name || '').trim(); return n || 'KJ'; }
+  function miniLogo(c) { return '<span class="mini-logo">' + logoHtml(c) + '</span>'; }
+
+  function renderHQ() {
+    var d = new Date();
+    $('hq-date').textContent = new Intl.DateTimeFormat(loc(), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Asia/Dubai' }).format(d) + ' · ' +
+      new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dubai' }).format(d) + ' ' + t('dv.dubai');
+    $('hq-hello').textContent = t(greeting(), { name: ownerName() });
+    var todo = todoCount(), stats = S.clients.map(statsOf);
+    var sum = function (k) { return stats.reduce(function (a, s2) { return a + s2[k]; }, 0); };
+    $('hq-todo-btn').textContent = todo ? t('p.hq.todo.n', { n: todo }) : t('p.hq.todo.0');
+    $('hq-todo-btn').classList.toggle('is-clear', !todo);
+    var own = S.clients.filter(function (c) { return c.internal; }).length;
+    var tile = function (tag, v, label, foot, nav) {
+      return '<' + (nav ? 'button type="button" data-nav="' + nav + '"' : 'div') + ' class="inst inst-num' + (nav ? ' inst-need' : '') + '"><span class="inst-tag">' + esc(t(tag)) + '</span><span class="big">' + v + '</span>' +
+        '<div class="inst-ruler" aria-hidden="true"></div><span class="inst-label">' + esc(label) + '</span><span class="inst-foot"><span>' + esc(foot) + '</span></span></' + (nav ? 'button' : 'div') + '>';
+    };
+    $('hq-sum').innerHTML = tile('p.hq.t.clients', S.clients.length, t('p.hq.clients'), t('p.hq.own', { n: own }), null) +
+      tile('p.hq.t.todo', todo, t('p.hq.todo'), t('p.hq.todo.foot'), 'todo') +
+      tile('p.hq.t.waiting', sum('waiting'), t('p.hq.waiting'), t('p.hq.waiting.foot'), null) +
+      tile('p.hq.t.week', sum('week'), t('p.hq.weekc'), t('p.hq.month', { n: sum('month') }), 'week');
+
+    $('hq-clients').innerHTML = S.clients.map(function (c, i) {
+      var st = stats[i], nx = st.next;
+      var stat = function (k, v, label, hot) { return '<div class="cs' + (hot && v ? ' hot' : '') + '" data-stat="' + k + '"><b class="mono">' + v + '</b><span>' + esc(label) + '</span></div>'; };
+      return '<li><article class="client-card' + (c.internal ? ' is-own' : '') + '" id="hqc-' + esc(c.id) + '" aria-labelledby="hqc-n-' + esc(c.id) + '">' +
+        '<header class="cc-head"><span class="cc-logo">' + logoHtml(c) + '</span><div class="cc-id"><h3 id="hqc-n-' + esc(c.id) + '">' + esc(cName(c)) + '</h3>' +
+        '<span class="cc-handle">' + esc(c.instagram ? '@' + handle(c) : '—') + '</span></div>' +
+        '</header><div class="cc-badges"><span class="pill pill-demo cc-pkg" title="' + esc(t('p.pkg', { name: planName(c) })) + '">' + esc(planName(c)) + '</span>' +
+        '<span class="cc-tag' + (c.internal ? ' own' : '') + '">' + esc(tagOf(c)) + '</span></div>' +
+        '<div class="cc-stats">' + stat('waiting', st.waiting, t(c.internal ? 'p.st.wait.own' : 'p.st.wait'), false) + stat('changes', st.changes, t('p.st.changes'), true) +
+        stat('week', st.week, t('p.st.week'), false) + stat('month', st.month, t('p.st.month'), false) + '</div>' +
+        '<div class="cc-next">' + (nx ? '<span class="eyebrow">' + esc(t('p.sb.next')) + '</span><button type="button" class="cc-next-btn" data-action="cal-item" data-id="' + esc(nx.id) + '"><span class="mono">' + esc(fmtWhen(nx.scheduled_at)) + '</span> <strong>' + esc(pick(nx, 'title', 'title_ar')) + '</strong></button>'
+          : '<span class="eyebrow">' + esc(t('p.sb.next')) + '</span><span class="cc-none">' + esc(t('p.next.empty')) + '</span>') + '</div>' +
+        '<button class="btn btn-primary cc-open" type="button" data-action="open-ws" data-id="' + esc(c.id) + '">' + esc(t('p.hq.open')) + '<span class="sr-only"> — ' + esc(cName(c)) + '</span></button>' +
+        '</article></li>';
+    }).join('');
+
+    var rows = todoRows();
+    $('hq-todo').innerHTML = rows.length ? rows.map(function (r) {
+      var c = r.c, who = c ? '<span class="td-client">' + miniLogo(c) + esc(cName(c)) + '</span>' : '';
+      var when = r.when ? '<span class="td-when">' + esc(ago(r.when)) + '</span>' : '';
+      if (r.type === 'activity') {
+        var body = pick(r.n, 'body', 'body_ar');
+        return '<li class="td td-activity' + (r.n.read ? ' is-read' : '') + '"><span class="td-ic" data-kind="activity">' + D.icon('bell') + '</span><div class="td-main"><div class="td-top">' + who + '<span class="td-type">' + esc(t('p.td.activity')) + '</span>' + when + '</div>' +
+          '<strong>' + (r.n.read ? '' : '<span class="nb-unread" aria-hidden="true"></span>') + esc(pick(r.n, 'title', 'title_ar')) + '</strong>' + (body ? '<p>' + esc(body) + '</p>' : '') + '</div></li>';
+      }
+      var x = r.x;
+      return '<li class="td td-' + r.type + '"><span class="td-ic" data-kind="' + r.type + '">' + D.icon(r.type === 'changes' ? 'pencil' : 'reports') + '</span><div class="td-main"><div class="td-top">' + who +
+        '<span class="td-type">' + esc(t(r.type === 'changes' ? 'p.td.changes' : 'p.td.draft')) + '</span>' + when + '</div>' +
+        '<strong>' + esc(pick(x, 'title', 'title_ar')) + '</strong>' +
+        (r.type === 'changes' && x.client_note ? '<p class="td-note">“' + esc(x.client_note) + '”</p>' : '') +
+        (r.type === 'draft' ? '<p>' + esc(t('p.td.draft.sub')) + '</p>' : '') + '</div>' +
+        '<div class="td-acts"><button class="btn btn-ghost btn-sm" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '</button>' +
+        '<button class="btn btn-ghost btn-sm" type="button" data-action="open-ws" data-id="' + esc(x.client_id) + '">' + esc(t('p.hq.open')) + '</button></div></li>';
+    }).join('') : '<li class="gcard portal-empty">' + esc(t('p.td.empty')) + '</li>';
+
+    renderHQWeek();
+    // sidebar
+    $('sbh-clients').textContent = S.clients.length;
+    $('sbh-todo').textContent = todo; $('sbh-todo').classList.toggle('hot', todo > 0);
+    $('sbh-week').textContent = sum('week');
+    $('sbh-list').innerHTML = S.clients.map(function (c) {
+      return '<li><button type="button" data-action="open-ws" data-id="' + esc(c.id) + '">' + miniLogo(c) + '<span>' + esc(cName(c)) + '</span><span class="sb-v">' + statsOf(c).waiting + '</span></button></li>';
+    }).join('');
+    D.setBadge('todo', todo);
+    renderAdmin();
+  }
+  function renderHQWeek() {
+    var start = weekStart(S.hqWeek), last = new Date(start); last.setDate(last.getDate() + 6);
+    var f = new Intl.DateTimeFormat(loc(), { day: 'numeric', month: 'short' });
+    $('hq-week-label').textContent = (S.hqWeek === 0 ? t('p.cal.today') + ' · ' : '') + f.format(start) + ' – ' + f.format(last);
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var days = [];
+    for (var i = 0; i < 7; i++) { var day = new Date(start); day.setDate(day.getDate() + i); days.push({ name: t('p.day.' + day.getDay()), num: String(day.getDate()), today: day.getTime() === today.getTime() }); }
+    var tracks = S.clients.map(function (c) {
+      var clips = S.all.filter(function (x) { return x.client_id === c.id && x.kind !== 'reply' && inWeek(x, S.hqWeek); }).map(function (x) {
+        var dd = new Date(x.scheduled_at), p = plat(x.platform);
+        return { id: x.id, day: dayIndex(start, dd), mins: dd.getHours() * 60 + dd.getMinutes(), time: fmtTime(x.scheduled_at), title: pick(x, 'title', 'title_ar'),
+          kind: t('p.type.' + x.kind), color: p.color, dot: STATUS_DOT[x.status] || 'off', status: x.status === 'needs_approval' ? t(c.internal ? 'p.st.wait.own' : 'p.wait.client') : statusLabel(x.status), wave: x.kind === 'reel' || x.kind === 'story', dim: x.status === 'draft' };
+      });
+      var code = (c.name || '?').replace(/[^A-Za-z0-9 ]/g, '').trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 3);
+      return { code: code, label: cName(c), clips: clips };
+    });
+    var now = S.hqWeek === 0 ? (Date.now() - start.getTime()) / (7 * 86400000) : null;
+    $('hq-cal').innerHTML = D.timeline({ days: days, tracks: tracks, now: now, nowLabel: t('dv.now') + ' ' + fmtTime(new Date().toISOString()) });
+    $('hq-legend').innerHTML = ['needs_approval', 'changes_requested', 'approved', 'scheduled', 'published', 'draft'].map(function (s2) {
+      return '<span><span class="dot ' + STATUS_DOT[s2] + '"></span>' + esc(s2 === 'needs_approval' ? t('p.hq.waiting') : statusLabel(s2)) + '</span>';
+    }).join('') + '<span>' + esc(t('p.week.platform')) + '</span>';
+    if (D.current() === 'week') D.revealNow($('hq-cal'));
+  }
+
   function renderAdmin() {
     D.setAvailable('admin', S.isAdmin);
     show($('admin'), S.isAdmin);
     if (!S.isAdmin) return;
-    $('adm-sub').textContent = t('p.adm.sub', { name: cName(S.client) });
-    $('cc-sheet-client').textContent = cName(S.client);
+    var target = clientById(S.ccClient) || S.clients[0];
+    if (!target) return;
+    S.ccClient = target.id;
+    $('adm-sub').textContent = t('p.adm.sub2');
+    $('cc-sheet-client').textContent = cName(target);
     $('cc-client-count').textContent = S.clients.length;
     $('client-switch').innerHTML = S.clients.map(function (c) {
-      var on = S.client && c.id === S.client.id;
-      return '<button class="cc-client" type="button" data-action="switch-client" data-id="' + esc(c.id) + '" aria-pressed="' + on + '">' +
-        '<span class="cc-logo">' + logoHtml(c) + '</span><b>' + esc(cName(c)) + (c.active === false ? ' (—)' : '') + '</b><small>' + esc(planName(c)) + '</small></button>';
+      var on = c.id === target.id;
+      return '<button class="cc-client" type="button" data-action="cc-target" data-id="' + esc(c.id) + '" aria-pressed="' + on + '">' +
+        '<span class="cc-logo">' + logoHtml(c) + '</span><b>' + esc(cName(c)) + (c.active === false ? ' (—)' : '') + '</b><small>' + esc(tagOf(c)) + '</small></button>';
     }).join('');
-    $('cc-need').textContent = pending().length;
     var kinds = ['post', 'reel', 'story', 'carousel', 'reply', 'ad'];
     var keep = function (sel) { return sel.value; };
     var k = $('fi-kind'), kv = keep(k);
@@ -513,9 +669,10 @@
   });
 
   function renderBoard() {
+    if (S.mode === 'hq') { renderHeader(); renderNotifs(); renderHQ(); return; }
     if (!S.client) return;
     renderHeader(); renderHello(); renderKpis(); renderNext(); renderApprovals();
-    renderFilters(); renderCalendar(); renderPackage(); renderReports(); renderNotifs(); renderAdmin();
+    renderFilters(); renderCalendar(); renderPackage(); renderReports(); renderNotifs();
   }
 
   /* ---------- Data ---------- */
@@ -548,13 +705,61 @@
     if (future) S.week = Math.min(52, Math.floor((future - start) / (7 * 86400000)));
   }
 
-  function showBoard() {
+  function showBoard(view) {
     $('dash').setAttribute('data-state', 'ready');
     show($('state'), false); show($('pw-panel'), false); show($('board'), true);
     show($('notif-wrap'), true);
     renderBoard();
     chrome(true);
-    D.show(D.current(), { bounce: false });
+    D.show(view || D.current(), { bounce: false, force: !!view });
+  }
+
+  // Navigation sets: a client (or KJ inside a workspace) sees the client sections; KJ at HQ sees HQ sections.
+  var CLIENT_NAV = [
+    { id: 'today', key: 'dv.today', icon: 'today', tone: 'gold' },
+    { id: 'approvals', key: 'dv.approvals', icon: 'approvals' },
+    { id: 'calendar', key: 'dv.calendar', icon: 'calendar', tone: 'cal' },
+    { id: 'inbox', key: 'dv.inbox', icon: 'inbox' },
+    { id: 'ads', key: 'dv.ads', icon: 'ads' },
+    { id: 'whatsapp', key: 'dv.whatsapp', icon: 'whatsapp', tone: 'wa' },
+    { id: 'reports', key: 'dv.reports', icon: 'reports', tone: 'steel' }
+  ];
+  var HQ_NAV = [
+    { id: 'hq', key: 'dv.hq', icon: 'box', tone: 'gold' },
+    { id: 'todo', key: 'dv.todo', icon: 'pencil' },
+    { id: 'week', key: 'dv.week', icon: 'calendar', tone: 'cal' },
+    { id: 'admin', key: 'dv.control', icon: 'control', sep: true }
+  ];
+  var HQ_VIEWS = ['hq', 'todo', 'week', 'admin'];
+  function navFor(mode) {
+    if (mode === 'hq') D.buildNav({ items: HQ_NAV, tabs: ['hq', 'todo', 'week', 'more'] });
+    else if (mode === 'ws') D.buildNav({ items: [{ id: 'hq', key: 'dv.backhq', icon: 'back', tone: 'steel' }].concat(CLIENT_NAV.map(function (it, i) { return i === 0 ? Object.assign({ sep: true }, it) : it; })), tabs: ['today', 'approvals', 'calendar', 'more'] });
+    else D.buildNav({ items: CLIENT_NAV, tabs: ['today', 'approvals', 'calendar', 'more'] });
+    document.querySelectorAll('.hq-view').forEach(function (v) { if (v.id !== 'admin') v.hidden = !S.isAdmin; });
+  }
+
+  function loadHQ() {
+    return Promise.all([
+      q(sb.from('clients').select('*').order('created_at', { ascending: true })),
+      q(sb.from('items').select('*').order('scheduled_at', { ascending: true, nullsFirst: false })),
+      loadNotifs()
+    ]).then(function (r) { S.clients = r[0] || []; S.all = r[1] || []; });
+  }
+  function showHQ(view) {
+    S.mode = 'hq'; S.client = null;
+    navFor('hq');
+    showBoard(view || 'hq');
+  }
+  function openWorkspace(id) {
+    var c = clientById(id); if (!c) return Promise.resolve();
+    S.client = c; S.filter = 'all'; S.mode = 'ws';
+    Z.store(CLIENT_KEY, c.id);
+    $('dash').setAttribute('data-state', 'loading');
+    return loadClientData().then(function () { pickInitialWeek(); navFor('ws'); showBoard('today'); });
+  }
+  function backToHQ(view) {
+    $('dash').setAttribute('data-state', 'loading');
+    return loadHQ().then(function () { showHQ(view); }).catch(loadError);
   }
 
   function loadError(err) {
@@ -562,12 +767,6 @@
     setState('p.st.error.t', 'p.st.error.b', [{ action: 'retry', key: 'p.retry', cls: 'btn-primary' }, WA_ACTION]);
   }
 
-  function selectClient(id) {
-    var c = S.clients.filter(function (x) { return x.id === id; })[0] || S.clients[0];
-    S.client = c; S.filter = 'all';
-    Z.store(CLIENT_KEY, c.id);
-    return loadClientData().then(function () { pickInitialWeek(); showBoard(); });
-  }
 
   function boot() {
     if (!sb) { setState('p.st.error.t', 'p.e.config', [WA_ACTION]); return; }
@@ -592,19 +791,19 @@
       S.profile = p; S.isAdmin = p.role === 'admin';
       if (p.lang && !Z.store('zkj-lang') && p.lang !== L()) Z.setLang(p.lang);
       if (S.isAdmin) {
-        return q(sb.from('clients').select('*').order('created_at', { ascending: true })).then(function (list) {
-          S.clients = list || [];
+        // KJ lands on ZKJ SYSTEM HQ, never inside a client's screen
+        return loadHQ().then(function () {
           if (!S.clients.length) { setState('p.st.noclients.t', 'p.st.noclients.b'); return; }
           var stored = Z.store(CLIENT_KEY);
-          var has = function (id) { return S.clients.some(function (c) { return c.id === id; }); };
-          return selectClient(has(stored) ? stored : has(DEFAULT_CLIENT) ? DEFAULT_CLIENT : S.clients[0].id);
+          S.ccClient = clientById(stored) ? stored : clientById(DEFAULT_CLIENT) ? DEFAULT_CLIENT : S.clients[0].id;
+          showHQ('hq');
         });
       }
       if (!p.client_id) { setState('p.st.unlinked.t', 'p.st.unlinked.b', [WA_ACTION]); return; }
       return q(sb.from('clients').select('*').eq('id', p.client_id).maybeSingle()).then(function (c) {
         if (!c || c.active === false) { setState('p.st.noclient.t', 'p.st.noclient.b', [WA_ACTION]); return; }
-        S.clients = [c]; S.client = c;
-        return loadClientData().then(function () { pickInitialWeek(); showBoard(); });
+        S.clients = [c]; S.client = c; S.mode = 'client';
+        return loadClientData().then(function () { pickInitialWeek(); navFor('client'); showBoard('today'); });
       });
     }).catch(loadError);
   }
@@ -668,8 +867,8 @@
   function itemDetail(x) {
     var m = safeUrl(x.media_url);
     var acts = [];
-    if (x.status === 'needs_approval') {
-      acts.push({ action: 'approve', id: x.id, label: t('p.appr.approve'), cls: 'btn-primary' });
+    if (x.status === 'needs_approval' && canReview(x)) {
+      acts.push({ action: 'approve', id: x.id, label: t(S.isAdmin ? 'p.appr.owner' : 'p.appr.approve'), cls: 'btn-primary' });
       acts.push({ action: 'changes', id: x.id, label: t('p.appr.changes') });
     }
     if (m) acts.push({ href: m, label: t('p.item.media') });
@@ -681,8 +880,9 @@
         '<dl class="kv"><dt>' + esc(t('p.item.platform')) + '</dt><dd>' + esc(x.platform ? plat(x.platform)[L()] : '—') + '</dd>' +
         '<dt>' + esc(t('p.item.type')) + '</dt><dd>' + esc(t('p.type.' + x.kind)) + '</dd>' +
         '<dt>' + esc(t('p.item.when')) + '</dt><dd>' + esc(fmtWhen(x.scheduled_at)) + '</dd>' +
-        '<dt>' + esc(t('p.item.status')) + '</dt><dd><span class="status-' + dot + '" style="font-weight:700">' + esc(statusLabel(x.status)) + '</span></dd>' +
-        (x.client_note ? '<dt>' + esc(t('p.item.note')) + '</dt><dd>' + esc(x.client_note) + '</dd>' : '') + '</dl>',
+        (S.isAdmin ? '<dt>' + esc(t('p.item.client')) + '</dt><dd>' + esc(cName(clientOf(x))) + '</dd>' : '') +
+        '<dt>' + esc(t('p.item.status')) + '</dt><dd><span class="status-' + dot + '" style="font-weight:700">' + esc(x.status === 'needs_approval' && !canReview(x) ? t('p.wait.client') : statusLabel(x.status)) + '</span></dd>' +
+        (x.client_note ? '<dt>' + esc(t(S.isAdmin ? 'p.item.theirnote' : 'p.item.note')) + '</dt><dd>' + esc(x.client_note) + '</dd>' : '') + '</dl>',
       actions: acts
     });
   }
@@ -699,7 +899,8 @@
       var row = Array.isArray(r.data) ? r.data[0] : r.data;
       if (row && row.id) { for (var k in row) if (Object.prototype.hasOwnProperty.call(row, k)) x[k] = row[k]; }
       else { x.status = decision; x.client_note = note || null; x.reviewed_at = new Date().toISOString(); }
-      Z.toast(t(decision === 'approved' ? 'p.appr.toast.ok' : 'p.appr.toast.changes', { title: pick(x, 'title', 'title_ar') }), decision === 'approved' ? 'ok' : 'warn');
+      var tk = decision === 'approved' ? (S.isAdmin ? 'p.appr.toast.owner' : 'p.appr.toast.ok') : (S.isAdmin ? 'p.appr.toast.ownerch' : 'p.appr.toast.changes');
+      Z.toast(t(tk, { title: pick(x, 'title', 'title_ar') }), decision === 'approved' ? 'ok' : 'warn');
       if (S.isAdmin) return loadNotifs();
     }).catch(function (err) {
       if (err && /no longer waiting/i.test(err.message || '')) {
@@ -800,12 +1001,11 @@
         review(x, 'changes_requested', note, D.wait(isPhone ? 650 : 0));
       }
     },
-    'switch-client': function (el) {
-      var id = el.getAttribute('data-id');
-      if (S.client && id === S.client.id) return;
-      $('dash').setAttribute('data-state', 'loading');
-      selectClient(id).catch(loadError);
-    },
+    'open-ws': function (el) { closeModal(); openWorkspace(el.getAttribute('data-id')).catch(loadError); },
+    'back-hq': function () { backToHQ('hq'); },
+    'cc-target': function (el) { S.ccClient = el.getAttribute('data-id'); Z.store(CLIENT_KEY, S.ccClient); renderAdmin(); var b = document.querySelector('#client-switch [data-id="' + S.ccClient + '"]'); if (b) b.focus(); },
+    'hq-prev': function () { S.hqWeek -= 1; renderHQWeek(); },
+    'hq-next': function () { S.hqWeek += 1; renderHQWeek(); },
     'cc-open': function (el) { openSheet(el.getAttribute('data-form')); },
     'cc-close': function () { closeSheet(); }
   };
@@ -825,6 +1025,8 @@
   });
   D.onView(function (id) {
     closeNotif();
+    if (S.mode === 'ws' && HQ_VIEWS.indexOf(id) > -1) { backToHQ(id); return; }
+    if (id === 'week') setTimeout(function () { D.revealNow($('hq-cal')); }, 0);
     if (id === 'approvals' && rowUpd) setTimeout(rowUpd, 0);
     if (id === 'calendar') setTimeout(function () { D.revealNow($('cal')); }, 0);
     if (id === 'today') D.animateIn($('kpi-row'));
@@ -840,7 +1042,8 @@
     var form = $(formId);
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (!S.isAdmin || !S.client) return;
+      var target = clientById(S.ccClient);
+      if (!S.isAdmin || !target) return;
       var bad = null;
       form.querySelectorAll('[required]').forEach(function (inp) {
         var ok = !!inp.value.trim();
@@ -849,15 +1052,15 @@
       });
       if (bad) { formStatus(form, 'error', t('p.f.need')); bad.focus(); return; }
       var row = build(form);
-      row.client_id = S.client.id;
+      row.client_id = target.id;
       var btn = form.querySelector('[type="submit"]'), label = btn.textContent;
       btn.disabled = true; btn.textContent = t('p.f.saving');
-      var name = cName(S.client);
+      var name = cName(target);
       q(sb.from(table).insert(row).select()).then(function () {
         form.reset(); renderAdmin();
         formStatus(form, 'ok', t(okKey, { name: name }));
         Z.toast(t(okKey, { name: name }), 'ok');
-        return loadClientData().then(function () { renderBoard(); });
+        return loadHQ().then(function () { renderBoard(); });
       }).catch(function (err) {
         formStatus(form, 'error', t('p.f.fail', { msg: (err && err.message) || '?' }));
       }).then(function () { btn.disabled = false; btn.textContent = label; });
@@ -885,19 +1088,7 @@
   }, 'notifications', 'p.f.ok.notif');
 
   /* ---------- Shell ---------- */
-  D.buildNav({
-    items: [
-      { id: 'today', key: 'dv.today', icon: 'today', tone: 'gold' },
-      { id: 'approvals', key: 'dv.approvals', icon: 'approvals' },
-      { id: 'calendar', key: 'dv.calendar', icon: 'calendar', tone: 'cal' },
-      { id: 'inbox', key: 'dv.inbox', icon: 'inbox' },
-      { id: 'ads', key: 'dv.ads', icon: 'ads' },
-      { id: 'whatsapp', key: 'dv.whatsapp', icon: 'whatsapp', tone: 'wa' },
-      { id: 'reports', key: 'dv.reports', icon: 'reports', tone: 'steel' },
-      { id: 'admin', key: 'dv.control', icon: 'control', sep: true }
-    ],
-    tabs: ['today', 'approvals', 'calendar', 'more']
-  });
+  navFor('client');
   D.setAvailable('admin', false);
   D.clock($('mb-clock'), 'menubar');
 

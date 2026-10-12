@@ -26,7 +26,7 @@
 
   <div class="menubar desk-only">
     <a class="mb-brand" href="../index.html"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span>ZKJ SYSTEM</span></a>
-    <span class="mb-item" data-i18n="p.portal">Client portal</span>
+    <span class="mb-item" id="mb-where">Client portal</span>
     <span class="mb-spacer"></span>
     <a class="mb-link" href="../index.html" data-i18n="p.back">Back to site</a>
     <span class="mb-clock" id="mb-clock"></span>
@@ -60,26 +60,46 @@
     </header>
 
     <div class="win-body">
-      <aside class="sidebar" id="sidebar" hidden aria-label="Client">
-        <div class="sb-id">
+      <aside class="sidebar" id="sidebar" hidden data-i18n-attr="aria-label:p.sb.label" aria-label="Sidebar">
+        <div class="sb-hq" id="sb-hq" hidden>
+          <div class="sb-id">
+            <span class="sb-logo"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="34" height="39"></span>
+            <span class="sb-name" data-i18n="p.hq.name">ZKJ SYSTEM HQ</span>
+            <span class="sb-handle" data-i18n="p.hq.owner">Owner · KJ</span>
+          </div>
+          <div class="sb-group">
+            <h3 data-i18n="p.hq.glance">Across all clients</h3>
+            <ul class="sb-stats">
+              <li><button type="button" data-nav="hq"><span class="sb-ic" data-icon="box"></span><span data-i18n="p.hq.clients">Clients</span><span class="sb-v" id="sbh-clients">0</span></button></li>
+              <li><button type="button" data-nav="todo"><span class="sb-ic" data-icon="pencil"></span><span data-i18n="p.hq.todo">Your to-do</span><span class="sb-v" id="sbh-todo">0</span></button></li>
+              <li><button type="button" data-nav="week"><span class="sb-ic" data-icon="calendar"></span><span data-i18n="p.hq.week">This week across clients</span><span class="sb-v" id="sbh-week">0</span></button></li>
+            </ul>
+          </div>
+          <div class="sb-group">
+            <h3 data-i18n="p.hq.workspaces">Client workspaces</h3>
+            <ul class="sb-clients" id="sbh-list"></ul>
+          </div>
+        </div>
+        <div class="sb-id sb-client-only">
           <span class="sb-logo" id="sb-logo"></span>
           <span class="sb-name" id="sb-name"></span>
           <span class="sb-handle" id="sb-handle"></span>
           <span class="pill pill-demo sb-pkg pkg-pill" id="pkg-pill" hidden></span>
         </div>
-        <div class="sb-group">
-          <h3 data-i18n="p.sb.glance">At a glance</h3>
+        <div class="sb-group sb-client-only">
+          <h3 id="sb-glance-title">At a glance</h3>
           <ul class="sb-stats">
-            <li><button type="button" data-nav="approvals"><span class="sb-ic" data-icon="approvals"></span><span data-i18n="p.kpi.appr">Awaiting your approval</span><span class="sb-v" id="sb-need">0</span></button></li>
+            <li><button type="button" data-nav="approvals"><span class="sb-ic" data-icon="approvals"></span><span id="sb-need-label">Awaiting your approval</span><span class="sb-v" id="sb-need">0</span></button></li>
             <li><button type="button" data-nav="calendar"><span class="sb-ic" data-icon="calendar"></span><span data-i18n="p.sb.week">Planned this week</span><span class="sb-v" id="sb-week">0</span></button></li>
             <li><button type="button" data-nav="reports"><span class="sb-ic" data-icon="reports"></span><span data-i18n="p.rep.title">Reports</span><span class="sb-v" id="sb-reps">0</span></button></li>
           </ul>
         </div>
-        <div class="sb-group" id="sb-next-wrap" hidden>
+        <div class="sb-group sb-client-only" id="sb-next-wrap" hidden>
           <h3 data-i18n="p.sb.next">Next to publish</h3>
           <button class="sb-next" type="button" data-action="cal-item" id="sb-next"></button>
         </div>
         <div class="sb-foot">
+          <button class="sb-backhq" type="button" data-action="back-hq" id="sb-backhq" hidden><span data-icon="back"></span><span data-i18n="p.ws.back">Back to HQ</span></button>
           <a href="../index.html"><span data-icon="site"></span><span data-i18n="p.back">Back to site</span></a>
           <a data-wa href="https://wa.me/971541668700" target="_blank" rel="noopener"><span data-icon="whatsapp"></span><span data-i18n="p.wa">Message KJ on WhatsApp</span></a>
         </div>
@@ -109,7 +129,57 @@
           </form>
         </section>
 
+        <div class="ws-banner" id="ws-banner" hidden role="region" data-i18n-attr="aria-label:p.ws.label" aria-label="Admin view">
+          <span class="ws-eye" data-i18n="p.ws.eye">Admin view</span>
+          <span class="ws-text" id="ws-text"></span>
+          <button class="ws-back" type="button" data-action="back-hq" id="ws-back"><span class="flip-rtl" aria-hidden="true">←</span> <span data-i18n="p.ws.back">Back to HQ</span></button>
+        </div>
+
         <div id="board" hidden>
+          <!-- ZKJ SYSTEM HQ (admin only) -->
+          <section class="view hq-view" id="hq" data-view-panel="hq" aria-labelledby="hq-hello" hidden>
+            <header class="view-head">
+              <div>
+                <span class="eyebrow" id="hq-date"></span>
+                <h1 id="hq-hello" data-view-title>Good morning, KJ</h1>
+                <p data-i18n="p.hq.sub">ZKJ SYSTEM HQ — every client in one place.</p>
+              </div>
+              <button class="hello-cta" type="button" data-nav="todo" id="hq-todo-btn">…</button>
+            </header>
+            <div class="instruments hq-sum" id="hq-sum"></div>
+            <div class="sub-head"><h3 data-i18n="p.hq.board">Clients</h3><button class="link-btn" type="button" data-nav="admin" data-i18n="p.hq.addclient">Add a new client</button></div>
+            <ul class="client-board" id="hq-clients"></ul>
+          </section>
+
+          <section class="view hq-view" id="todo" data-view-panel="todo" aria-labelledby="todo-title" hidden>
+            <header class="view-head">
+              <div>
+                <span class="eyebrow" data-i18n="p.hq.name">ZKJ SYSTEM HQ</span>
+                <h2 id="todo-title" data-i18n="p.hq.todo" data-view-title>Your to-do</h2>
+                <p data-i18n="p.todo.sub">Changes clients asked for, your drafts, and client activity — across all clients.</p>
+              </div>
+              <button class="btn btn-ghost btn-sm" type="button" data-action="notif-read-all" data-i18n="p.notif.readall">Mark all as read</button>
+            </header>
+            <ul class="todo-list" id="hq-todo"></ul>
+          </section>
+
+          <section class="view hq-view" id="week" data-view-panel="week" aria-labelledby="week-title" hidden>
+            <header class="view-head compact">
+              <div>
+                <span class="eyebrow" data-i18n="p.hq.name">ZKJ SYSTEM HQ</span>
+                <h2 id="week-title" data-i18n="p.hq.week" data-view-title>This week across clients</h2>
+                <p data-i18n="p.week.sub">One track per client.</p>
+              </div>
+              <div class="transport">
+                <button class="round-btn" type="button" data-action="hq-prev" data-i18n-attr="aria-label:p.cal.prev" aria-label="Previous week"><svg class="flip" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 6v12L3 12zM20 6v12l-8-6z"/></svg></button>
+                <strong class="tc" id="hq-week-label" aria-live="polite"></strong>
+                <button class="round-btn" type="button" data-action="hq-next" data-i18n-attr="aria-label:p.cal.next" aria-label="Next week"><svg class="flip" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 6v12l8-6zM13 6v12l8-6z"/></svg></button>
+              </div>
+            </header>
+            <div class="timeline" id="hq-cal"></div>
+            <div class="cal-legend" id="hq-legend"></div>
+          </section>
+
           <!-- TODAY -->
           <section class="view is-active" id="today" data-view-panel="today" aria-labelledby="hello">
             <header class="view-head">
@@ -130,7 +200,7 @@
                 <ul class="upnext" id="next-list"></ul>
               </section>
               <section aria-labelledby="pkg-title">
-                <div class="sub-head"><h3 id="pkg-title" data-i18n="p.pkg.title">Your package</h3></div>
+                <div class="sub-head"><h3 id="pkg-title" data-i18n="p.pkg.incl">What’s included</h3></div>
                 <div class="gcard pkg-card" id="pkg-card"></div>
               </section>
             </div>
@@ -242,25 +312,31 @@
             </section>
           </section>
 
-          <!-- CONTROL CENTER (admin only) -->
-          <section class="view admin-tools" id="admin" data-view-panel="admin" aria-labelledby="adm-title" hidden>
+          <!-- CONTROL CENTER (admin only, lives in HQ) -->
+          <section class="view admin-tools hq-view" id="admin" data-view-panel="admin" aria-labelledby="adm-title" hidden>
             <header class="view-head"><div>
-              <span class="eyebrow"><span data-i18n="p.admin">ADMIN</span></span>
+              <span class="eyebrow" data-i18n="p.hq.name">ZKJ SYSTEM HQ</span>
               <h2 id="adm-title" data-i18n="p.adm.title" data-view-title>Control Center</h2>
               <p id="adm-sub"></p>
             </div></header>
             <div class="cc">
               <div class="cc-tile cc-clients">
-                <div class="cc-title"><span data-i18n="p.cc.clients">Clients</span><span class="mono" id="cc-client-count"></span></div>
-                <div class="cc-client-grid" id="client-switch" role="group" data-i18n-attr="aria-label:p.switch"></div>
-                <p class="cc-note" data-i18n="p.cc.newclient">New clients are added in Supabase → clients.</p>
+                <div class="cc-title"><span data-i18n="p.cc.for">Add to which client?</span><span class="mono" id="cc-client-count"></span></div>
+                <div class="cc-client-grid" id="client-switch" role="group" data-i18n-attr="aria-label:p.cc.for"></div>
               </div>
               <button class="cc-tile" type="button" data-action="cc-open" data-form="f-item"><span class="cc-ic gold" data-icon="plus"></span><span><strong data-i18n="p.adm.item">Add an item</strong><small data-i18n="p.cc.item.sub">Post, reel, story, ad…</small></span></button>
               <button class="cc-tile" type="button" data-action="cc-open" data-form="f-kpi"><span class="cc-ic" data-icon="number"></span><span><strong data-i18n="p.adm.kpi">Add a key number</strong><small data-i18n="p.cc.kpi.sub">Shows as an instrument</small></span></button>
               <button class="cc-tile" type="button" data-action="cc-open" data-form="f-notif"><span class="cc-ic" data-icon="bell"></span><span><strong data-i18n="p.adm.notif">Send a notification</strong><small data-i18n="p.cc.notif.sub">Lands on their bell</small></span></button>
-              <div class="cc-tile"><small data-i18n="p.kpi.appr">Awaiting your approval</small><span class="cc-big" id="cc-need">0</span></div>
-              <div class="cc-tile cc-wide"><small id="cc-pkg-label"></small><strong id="cc-pkg"></strong><div class="cc-slider" aria-hidden="true"><span id="cc-pkg-bar"></span></div></div>
-              <div class="cc-tile cc-wide"><small data-i18n="p.cc.activity">Client activity · unread</small><span class="cc-big" id="cc-unread">0</span></div>
+              <div class="cc-tile"><small data-i18n="p.cc.activity">Client activity · unread</small><span class="cc-big" id="cc-unread">0</span></div>
+              <div class="cc-tile cc-wide cc-new" id="cc-new">
+                <span class="cc-title"><span data-i18n="p.new.title">Add a new client</span></span>
+                <ol class="cc-steps">
+                  <li data-i18n="p.new.s1">Supabase → Table Editor → clients → Insert row: name, name_ar, logo_url, colours, instagram, plan (Starter, Growth or Full). Leave internal = false for a real client.</li>
+                  <li data-i18n="p.new.s2">Authentication → Users → Invite user with the client’s email.</li>
+                  <li data-i18n="p.new.s3">Table Editor → profiles → set their client_id to the new client’s id.</li>
+                </ol>
+                <small data-i18n="p.new.more">Full steps: supabase/SETUP.md, section 5. The new client appears as a card on HQ.</small>
+              </div>
             </div>
           </section>
 
@@ -300,7 +376,7 @@
 
   <dialog class="slideover" id="cc-sheet" aria-labelledby="cc-sheet-title">
     <div class="so-head">
-      <h2 id="cc-sheet-title"><span data-i18n="p.adm.title">Control Center</span> · <span id="cc-sheet-client"></span></h2>
+      <h2 id="cc-sheet-title"><span data-i18n="p.cc.addfor">Add for</span> <span id="cc-sheet-client"></span></h2>
       <button class="icon-btn" type="button" data-action="cc-close" data-i18n-attr="aria-label:p.close" aria-label="Close">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
