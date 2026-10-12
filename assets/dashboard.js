@@ -1011,6 +1011,10 @@
     tabs: ['today', 'approvals', 'calendar', 'more']
   });
   D.clock($('mb-clock'), 'menubar');
+  // living background: mood A ("Neon lines") with the Frequency art
+  var amb = $('ambient');
+  D.ambient(amb, { covers: (amb.getAttribute('data-covers') || '').split(',').filter(Boolean) });
+  $('demo-light').innerHTML = D.cubeLight();
   D.onView(function (id) {
     closeNotif();
     if (id === 'approvals' && rowUpd) setTimeout(rowUpd, 0);

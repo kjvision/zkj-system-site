@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="assets/device.css">
 </head>
 <body data-title-key="d.meta.title">
-<div class="dash device demo" id="dash" data-theme="core" data-view="today">
+<div class="dash device demo" id="dash" data-theme="core" data-view="today" data-mood="a">
   <a class="skip-link" href="#dash-main" data-i18n="skip">Skip to content</a>
   <div class="stage-fx" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
@@ -69,6 +69,8 @@
         </div>
       </div>
     </header>
+    <!-- background art: ZKJ SYSTEM teal neon architecture (swap freely) -->
+    <div class="ambient" id="ambient" aria-hidden="true" data-covers="assets/art/kj/kj-010.webp,assets/art/kj/kj-026.webp,assets/art/kj/kj-041.webp,assets/art/kj/kj-027.webp,assets/art/kj/kj-025.webp,assets/art/kj/kj-042.webp,assets/art/kj/kj-030.webp,assets/art/kj/kj-028.webp,assets/art/kj/kj-033.webp,assets/art/kj/kj-062.webp"></div>
 
     <div class="win-body">
       <aside class="sidebar" aria-label="Qahwa House">
@@ -106,6 +108,7 @@
             <button class="btn btn-primary btn-sm" type="button" data-action="enquire" data-i18n="d.enquire.long">Get a dashboard like this</button>
           </div>
           <header class="view-head">
+            <div class="hero-light is-cube" id="demo-light" aria-hidden="true"></div>
             <div>
               <span class="eyebrow" id="today-date"></span>
               <h1 data-i18n="d.hello" data-view-title>Welcome back, Qahwa House</h1>
