@@ -25,7 +25,7 @@
       'p.loading': 'Loading your dashboard…', 'p.signout': 'Sign out', 'p.signedout': 'You’ve signed out.',
       'p.sub': 'Client dashboard · ZKJ SYSTEM', 'p.admin': 'ADMIN', 'p.switch': 'Client',
       'p.hello': 'Welcome back, {name}', 'p.hello.sub': 'Here’s what’s planned — and what needs you.',
-      'p.hello.admin': 'Viewing {name}', 'p.hello.admin.sub': 'You see exactly what this client sees, plus admin tools at the bottom.',
+      'p.hello.admin': 'Viewing {name}', 'p.hello.admin.sub': 'You see exactly what this client sees. Your admin tools live in the Control Center.',
       'p.needs': '{n} items need you', 'p.needs1': '1 item needs you', 'p.needs0': 'All clear — nothing needs you',
       'p.pkg': 'Package: {name}',
 
@@ -75,7 +75,7 @@
 
       'p.rep.title': 'Reports', 'p.rep.sub': 'Audits, strategies and monthly reports.', 'p.rep.open': 'Open', 'p.rep.soon': 'File coming soon', 'p.rep.empty': 'No reports yet. Your first report will appear here.',
 
-      'p.adm.title': 'Admin tools', 'p.adm.sub': 'Add content, numbers and messages for {name}. Clients never see this section.',
+      'p.adm.title': 'Control Center', 'p.adm.sub': 'Add content, numbers and messages for {name}. Clients never see this section.',
       'p.adm.item': 'Add an item', 'p.adm.kpi': 'Add a key number', 'p.adm.notif': 'Send a notification',
       'p.f.kind': 'Type', 'p.f.title': 'Title (EN)', 'p.f.title_ar': 'Title (AR)', 'p.f.caption': 'Caption (EN)', 'p.f.caption_ar': 'Caption (AR)',
       'p.f.media': 'Media URL', 'p.f.platform': 'Platform', 'p.f.when': 'Scheduled date & time', 'p.f.status': 'Status',
@@ -108,7 +108,7 @@
       'p.loading': 'جارٍ تحميل لوحتك…', 'p.signout': 'تسجيل الخروج', 'p.signedout': 'تم تسجيل الخروج.',
       'p.sub': 'لوحة العميل · ZKJ SYSTEM', 'p.admin': 'مدير', 'p.switch': 'العميل',
       'p.hello': 'أهلًا بعودتك، {name}', 'p.hello.sub': 'هذا المخطط له — وما الذي يحتاجك.',
-      'p.hello.admin': 'تعرض لوحة {name}', 'p.hello.admin.sub': 'تشوف بالضبط ما يشوفه العميل، مع أدوات المدير في الأسفل.',
+      'p.hello.admin': 'تعرض لوحة {name}', 'p.hello.admin.sub': 'تشوف بالضبط ما يشوفه العميل. أدوات المدير في مركز التحكم.',
       'p.needs': '{n} عناصر تحتاجك', 'p.needs1': 'عنصر واحد يحتاجك', 'p.needs0': 'كل شيء تمام — لا شيء يحتاجك',
       'p.pkg': 'الباقة: {name}',
 
@@ -158,7 +158,7 @@
 
       'p.rep.title': 'التقارير', 'p.rep.sub': 'التدقيقات والاستراتيجيات والتقارير الشهرية.', 'p.rep.open': 'افتح', 'p.rep.soon': 'الملف قريبًا', 'p.rep.empty': 'لا تقارير بعد. أول تقرير بيظهر هنا.',
 
-      'p.adm.title': 'أدوات المدير', 'p.adm.sub': 'أضف محتوى وأرقامًا ورسائل لـ {name}. العملاء لا يرون هذا القسم.',
+      'p.adm.title': 'مركز التحكم', 'p.adm.sub': 'أضف محتوى وأرقامًا ورسائل لـ {name}. العملاء لا يرون هذا القسم.',
       'p.adm.item': 'إضافة عنصر', 'p.adm.kpi': 'إضافة رقم رئيسي', 'p.adm.notif': 'إرسال إشعار',
       'p.f.kind': 'النوع', 'p.f.title': 'العنوان (EN)', 'p.f.title_ar': 'العنوان (AR)', 'p.f.caption': 'التعليق (EN)', 'p.f.caption_ar': 'التعليق (AR)',
       'p.f.media': 'رابط الملف', 'p.f.platform': 'المنصة', 'p.f.when': 'تاريخ ووقت النشر', 'p.f.status': 'الحالة',
@@ -168,6 +168,36 @@
       'p.f.need': 'عبّئ الحقول المطلوبة.', 'p.f.ok.item': 'تمت إضافة العنصر لـ {name}.', 'p.f.ok.kpi': 'تمت إضافة الرقم لـ {name}.', 'p.f.ok.notif': 'تم إرسال الإشعار إلى {name}.',
       'p.f.fail': 'تعذّر الحفظ: {msg}', 'p.close': 'إغلاق',
       'p.foot': 'مدعوم من ZKJ SYSTEM · كل مشروع يصبح أداة.'
+    }
+  });
+
+  // Device redesign (assets/device.js views, instruments, Control Center)
+  window.ZKJ.extend({
+    en: {
+      'p.sb.glance': 'At a glance', 'p.sb.week': 'Planned this week', 'p.sb.next': 'Next to publish',
+      'p.next.title': 'Up next', 'p.next.all': 'Open calendar', 'p.next.empty': 'Nothing scheduled yet.',
+      'p.pkg.title': 'Your package', 'p.pkg.core': 'Approvals, calendar & reports', 'p.pkg.notincl': 'not included',
+      'p.inst.target': 'Progress', 'p.inst.score': 'Score', 'p.inst.reading': 'Reading', 'p.inst.trend': 'Trend', 'p.inst.queue': 'Queue',
+      'p.appr.done': 'Recently reviewed', 'p.stack.left': '{n} waiting',
+      'p.notif.unread': 'unread',
+      'p.mon.next': 'Next on air', 'p.mon.last': 'Last on the timeline', 'p.mon.review': 'Review in Approvals',
+      'p.cc.clients': 'Clients', 'p.cc.newclient': 'New clients are added in Supabase → Table Editor → clients.', 'p.cc.item.sub': 'Post, reel, story, carousel, ad', 'p.cc.kpi.sub': 'Shows as an instrument on Today',
+      'p.cc.notif.sub': 'Lands on the client’s bell', 'p.cc.activity': 'Client activity · unread',
+      'p.cc.tab.item': 'Item', 'p.cc.tab.kpi': 'Number', 'p.cc.tab.notif': 'Notification',
+      'p.cc.kpi.help': 'Tip: a metric called target_X draws X as a ring against its target; a score out of 100 draws a dial.'
+    },
+    ar: {
+      'p.sb.glance': 'نظرة سريعة', 'p.sb.week': 'مخطط هذا الأسبوع', 'p.sb.next': 'التالي للنشر',
+      'p.next.title': 'التالي', 'p.next.all': 'افتح التقويم', 'p.next.empty': 'لا شيء مجدول بعد.',
+      'p.pkg.title': 'باقتك', 'p.pkg.core': 'الموافقات والتقويم والتقارير', 'p.pkg.notincl': 'غير مشمولة',
+      'p.inst.target': 'التقدّم', 'p.inst.score': 'النتيجة', 'p.inst.reading': 'القراءة', 'p.inst.trend': 'الاتجاه', 'p.inst.queue': 'الطابور',
+      'p.appr.done': 'تمت مراجعتها مؤخرًا', 'p.stack.left': '{n} بالانتظار',
+      'p.notif.unread': 'غير مقروء',
+      'p.mon.next': 'التالي على الهواء', 'p.mon.last': 'آخر عنصر في الخط الزمني', 'p.mon.review': 'راجعه في الموافقات',
+      'p.cc.clients': 'العملاء', 'p.cc.newclient': 'يُضاف العملاء الجدد من Supabase ← Table Editor ← clients.', 'p.cc.item.sub': 'منشور، ريل، ستوري، كاروسيل، إعلان', 'p.cc.kpi.sub': 'يظهر كمؤشر في صفحة اليوم',
+      'p.cc.notif.sub': 'يصل إلى جرس العميل', 'p.cc.activity': 'نشاط العملاء · غير مقروء',
+      'p.cc.tab.item': 'عنصر', 'p.cc.tab.kpi': 'رقم', 'p.cc.tab.notif': 'إشعار',
+      'p.cc.kpi.help': 'معلومة: المقياس باسم target_X يرسم X كحلقة مقابل هدفه؛ والنتيجة من 100 تُرسم كعدّاد.'
     }
   });
 })();

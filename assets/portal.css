@@ -1,79 +1,104 @@
-/* ZKJ SYSTEM — client portal (/app/). Builds on the demo dashboard styles in style.css. */
+/* ZKJ SYSTEM — client portal (/app/). Device design language lives in device.css; this file holds portal-only pieces. */
 .portal [hidden] { display: none !important; }
-.portal .client-brand { text-decoration: none; color: var(--text); }
 .portal-logo { display: grid; place-items: center; overflow: hidden; }
 .portal-logo img { width: 100%; height: 100%; object-fit: contain; }
 .logo-initials { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid; font-family: var(--f-display); font-weight: 700; font-size: 14px; letter-spacing: 1px; }
-.portal .client-name strong { font-family: var(--f-display); letter-spacing: .04em; }
-.pkg-pill { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.pkg-pill { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 html[lang="ar"] .pkg-pill { font-family: var(--f-body); letter-spacing: 0; }
-.client-switch .input { min-height: 40px; padding: 6px 10px; width: auto; max-width: 220px; background: var(--panel); }
 
-/* sign-in */
-.portal-login { display: grid; place-items: center; min-height: calc(100vh - 90px); padding-block: 40px 80px; }
-.login-card { width: min(440px, 100%); display: grid; gap: 14px; }
-.login-card form { display: grid; gap: 16px; }
-.login-card form[hidden] { display: none; }
-.login-card h1 { font-size: clamp(22px, 5vw, 28px); margin: 6px 0 0; }
-.login-sub { margin: 0; color: var(--text-2); font-size: 15px; }
-.login-card .form-actions { margin-top: 0; }
-.login-card .form-status { margin: 0; }
-.login-links { margin: 0; }
-.login-note { margin: 8px 0 0; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
-.login-card .btn-wa { justify-self: start; }
-
-/* states */
-.portal-state { max-width: 640px; margin: 24px auto; display: grid; gap: 12px; }
+/* states (loading / messages / set password) */
+.portal-state { display: grid; gap: 14px; }
 .portal-state[hidden], #board[hidden] { display: none; }
-.portal-state h1 { font-size: clamp(22px, 4vw, 28px); margin: 0; }
+.portal-state h1 { font-size: clamp(22px, 3vw, 28px); margin: 0; }
 .portal-state p { margin: 0; color: var(--text-2); }
 .portal-state form { display: grid; gap: 14px; }
+.portal-state .field { display: grid; gap: 6px; }
+.portal-state .field label { font-size: 13px; color: var(--text-2); }
+.portal-state .input { width: 100%; padding: 12px 14px; }
 .portal-state .row { display: flex; gap: 8px; flex-wrap: wrap; }
 .portal-state .row:empty { display: none; }
-.dash[data-state="loading"] #state h1::after { content: ""; display: inline-block; width: 10px; height: 10px; margin-inline-start: 12px; background: var(--accent); transform: rotate(45deg); animation: portal-pulse 1s ease-in-out infinite alternate; }
+.dash[data-state="loading"] #state h1::after { content: ""; display: inline-block; width: 10px; height: 10px; margin-inline-start: 12px; background: var(--gold); transform: rotate(45deg); animation: portal-pulse 1s ease-in-out infinite alternate; }
 @keyframes portal-pulse { from { opacity: .2; } to { opacity: 1; } }
 
 .portal-empty { list-style: none; color: var(--muted); font-size: 14px; padding: 18px; }
 .portal-muted { margin: 0; color: var(--text-2); font-size: 14px; }
-.kpi-empty p { margin: 6px 0 0; font-size: 13px; color: var(--text-2); }
-.kpi .k-delta.muted { color: var(--muted); font-weight: 500; }
-.chip-static { min-height: 24px; padding: 0 8px; cursor: default; }
-.appr-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.appr-caption { white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-.appr-note { margin: 0; font-size: 13px; color: var(--warn); }
-.modal-thumb { width: 100%; height: 200px; }
+.portal-muted.small { font-size: 12px; color: var(--muted); }
+.inst.kpi-empty p { margin: 0; font-size: 13.5px; color: var(--text-2); }
+.chip-static { min-height: 24px !important; padding: 0 9px !important; cursor: default; font-size: 11.5px !important; }
 .modal-caption { white-space: pre-line; }
-.cal-date { color: var(--text-2); font-weight: 600; }
-.notif-item { cursor: default; }
-.notif-item .notif-body { font-weight: 400; color: var(--muted); font-size: 13px; }
 
-.reports-list { grid-template-columns: 1fr; }
-.report-item { padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.report-item h3 { font-size: 16px; margin: 0; }
-.report-period, .report-soon { color: var(--muted); font-size: 13px; }
-
-.addon { display: grid; gap: 14px; }
-.addon-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; color: var(--text-2); }
-.addon-list li { display: flex; gap: 10px; align-items: center; }
+/* package card (Today) */
+.pkg-card { gap: 14px; }
+.pkg-name { font-family: var(--f-display); font-size: 20px; letter-spacing: .06em; color: var(--gold-light); font-weight: 600; }
+html[lang="ar"] .pkg-name { letter-spacing: 0; font-family: var(--f-body); }
+.pkg-feats, .addon-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pkg-feats li, .addon-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-2); }
+.pf-ic { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: none; background: rgba(255,255,255,.07); color: var(--muted); }
+.pf-ic svg { width: 13px; height: 13px; }
+.pkg-feats li.on .pf-ic { background: var(--gold-grad); color: #0B0B0F; }
+.pkg-feats li.off { color: var(--muted); }
+.addon { gap: 14px; }
 .addon .btn { justify-self: start; }
-#pkg-cols { grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); }
-#pkg-cols > [hidden] { display: none; }
 
-/* admin */
-.admin-tools { border-top: 1px solid var(--hair); padding-top: 24px; margin-top: 40px; }
-.admin-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; }
-.admin-stack { display: grid; gap: 16px; }
-.admin-form { display: grid; gap: 14px; }
-.admin-form h3 { font-size: 17px; margin: 0; }
-.admin-form .form-status { margin: 0; }
-.admin-form .btn { justify-self: start; }
-.admin-form .field textarea { min-height: 76px; background: var(--obsidian); }
+/* WhatsApp feature */
+.wa-hero { max-width: 560px; gap: 16px; padding: 24px; }
+.wa-badge { width: 56px; height: 56px; border-radius: 15px; display: grid; place-items: center; background: linear-gradient(160deg, #3ee07f, #128c4a); color: #fff; box-shadow: 0 12px 30px rgba(37,211,102,.25); }
+.wa-badge svg { width: 30px; height: 30px; }
+.wa-hero .btn { justify-self: start; }
+
+/* reports */
+.report-item .btn { justify-self: start; }
+.report-period bdi { unicode-bidi: isolate; }
+.report-soon { font-style: italic; }
+
+/* sidebar icons */
+.sb-foot [data-icon] { display: inline-grid; }
+
+/* admin forms */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 select.input { appearance: auto; }
-@media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; } }
-@media (max-width: 420px) { .form-row { grid-template-columns: 1fr; } .client-switch, .client-switch .input { max-width: 100%; width: 100%; } }
-@media (max-width: 760px) {
-  .portal .client-brand { flex-wrap: wrap; row-gap: 6px; }
-  .pkg-pill { max-width: 100%; }
+.req { color: var(--gold); }
+@media (max-width: 420px) { .form-row { grid-template-columns: 1fr; } }
+
+/* ---------- Sign-in: lock screen ---------- */
+.lock { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; overflow: hidden; }
+.lock-sweep { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(105deg, transparent 38%, rgba(234,217,166,.07) 47%, rgba(255,246,214,.12) 50%, rgba(234,217,166,.07) 53%, transparent 62%); background-size: 260% 100%; animation: lock-sweep 9s cubic-bezier(.45,0,.2,1) infinite; mix-blend-mode: screen; }
+@keyframes lock-sweep { 0% { background-position: 130% 0; } 55%, 100% { background-position: -30% 0; } }
+.lock-top { position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(env(safe-area-inset-top, 0px) + 18px) 24px 0; color: #fff; }
+.lock-top .mb-brand { color: #fff; text-decoration: none; font-size: 12px; }
+.lock-top-r { display: flex; gap: 8px; }
+.lock-top .tb-btn { border-radius: 999px; height: 34px; background: rgba(255,255,255,.06); backdrop-filter: blur(20px); }
+.lock-main { position: relative; z-index: 2; flex: 1; display: grid; justify-items: center; align-content: center; gap: 26px; padding: 20px 16px calc(env(safe-area-inset-bottom, 0px) + 28px); }
+.lock-clock { text-align: center; display: grid; gap: 2px; animation: view-in .8s var(--ease) both; }
+.lock-clock p { margin: 0; }
+.lock-date { font-size: 18px; font-weight: 500; color: rgba(255,255,255,.82); letter-spacing: .01em; }
+.lock-time { font-family: var(--f-display); font-weight: 600; font-size: clamp(84px, 11vw, 132px); line-height: .95; letter-spacing: .02em; direction: ltr; background: linear-gradient(180deg, #FFF8E2 0%, #EAD9A6 45%, #B8932A 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 10px 40px rgba(212,175,55,.25)); }
+.lock-zone { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+html[lang="ar"] .lock-zone { letter-spacing: .05em; }
+.device .lock-card { position: relative; width: min(420px, 100%); padding: 26px 26px 22px; border-radius: 30px; background: rgba(20, 20, 26, .58); backdrop-filter: blur(36px) saturate(170%); -webkit-backdrop-filter: blur(36px) saturate(170%); box-shadow: 0 0 0 1px rgba(255,255,255,.1), inset 0 1px 0 rgba(255,255,255,.08), 0 40px 90px rgba(0,0,0,.6); display: grid; gap: 16px; overflow: hidden; animation: view-in .8s var(--ease) .12s both; }
+.lock-card::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(140deg, rgba(234,217,166,.55), transparent 35%, transparent 65%, rgba(212,175,55,.35)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.lock-id { display: flex; align-items: center; gap: 12px; }
+.lock-avatar { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: radial-gradient(circle at 30% 20%, #2a2a31, #0b0b0f); box-shadow: inset 0 0 0 1px rgba(212,175,55,.4), 0 10px 30px rgba(0,0,0,.4); }
+.lock-id .label { font-family: var(--f-body); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+html[lang="ar"] .lock-id .label { letter-spacing: 0; font-size: 13px; }
+.lock-card form { display: grid; gap: 14px; }
+.lock-card form[hidden] { display: none; }
+.lock-card h1 { font-size: clamp(21px, 4.6vw, 25px); margin: 0; letter-spacing: .03em; }
+.login-sub { margin: -4px 0 0; color: var(--text-2); font-size: 14.5px; }
+.lock-card .field label { font-family: var(--f-body); text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 500; color: var(--text-2); }
+.lock-card .input { min-height: 50px; border-radius: 14px; background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.12); padding: 12px 15px; font-size: 16px; }
+.lock-card .btn-primary { min-height: 52px; border-radius: 16px; font-size: 15.5px; }
+.lock-card .form-actions { margin-top: 2px; }
+.lock-card .form-status { margin: 0; }
+.login-links { margin: 0; text-align: center; }
+.lock-foot { width: min(420px, 100%); display: grid; justify-items: center; gap: 10px; text-align: center; animation: view-in .8s var(--ease) .24s both; }
+.login-note { margin: 0; color: rgba(255,255,255,.55); font-size: 13px; }
+@media (max-width: 699px) {
+  .lock-main { align-content: start; padding-top: 6vh; gap: 22px; }
+  .lock-top { padding-inline: 16px; }
+  .device .lock-card { padding: 22px 18px 18px; border-radius: 26px; }
 }
-.report-period bdi { unicode-bidi: isolate; }
+@media (max-height: 760px) and (min-width: 700px) { .lock-time { font-size: 84px; } .lock-main { gap: 18px; } }
+@media (max-height: 940px) and (min-width: 700px) { .lock-time { font-size: 96px; } .lock-main { gap: 18px; padding-top: 8px; } .lock-date { font-size: 16px; } }
+.device .lock-card { width: min(440px, 100%); }
+.lock-card h1 { font-size: clamp(20px, 4.4vw, 23px); }

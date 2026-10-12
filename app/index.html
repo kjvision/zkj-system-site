@@ -2,46 +2,52 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
   <title>Your dashboard — ZKJ SYSTEM</title>
-  <meta name="theme-color" content="#0B0B0F">
+  <meta name="theme-color" content="#070709">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="../assets/brand/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="../assets/brand/apple-touch-icon-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Kufi+Arabic:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/device.css">
   <link rel="stylesheet" href="../assets/portal.css">
 </head>
 <body data-title-key="p.app.meta">
-<div class="dash portal" id="dash" data-theme="core" data-state="loading">
+<div class="dash portal device no-client" id="dash" data-theme="core" data-state="loading" data-view="today">
   <a class="skip-link" href="#dash-main" data-i18n="skip">Skip to content</a>
+  <div class="stage-fx" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-  <header class="dash-header">
-    <div class="container">
-      <div class="client-brand">
-        <span class="client-logo portal-logo" id="client-logo"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="38" height="44"></span>
-        <div class="client-name">
-          <strong id="client-name">ZKJ SYSTEM</strong>
-          <small class="powered"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span data-i18n="p.sub">Client dashboard · ZKJ SYSTEM</span></small>
-        </div>
-        <span class="pill pill-demo pkg-pill" id="pkg-pill" hidden></span>
-        <span class="pill pill-demo" id="admin-pill" data-i18n="p.admin" hidden>ADMIN</span>
+  <div class="menubar desk-only">
+    <a class="mb-brand" href="../index.html"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span>ZKJ SYSTEM</span></a>
+    <span class="mb-item" data-i18n="p.portal">Client portal</span>
+    <span class="mb-spacer"></span>
+    <a class="mb-link" href="../index.html" data-i18n="p.back">Back to site</a>
+    <span class="mb-clock" id="mb-clock"></span>
+  </div>
+
+  <div class="mac-window" id="win">
+    <header class="titlebar dash-header">
+      <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="tb-title client-brand">
+        <span class="client-logo portal-logo" id="client-logo"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="19" height="22"></span>
+        <span class="tb-name"><span class="tb-sys">ZKJ SYSTEM —</span> <strong id="client-name">ZKJ SYSTEM</strong></span>
+        <span class="pill pill-admin" id="admin-pill" data-i18n="p.admin" hidden>ADMIN</span>
       </div>
-      <div class="dash-actions">
-        <label class="client-switch" id="client-switch-wrap" hidden>
-          <span class="sr-only" data-i18n="p.switch">Client</span>
-          <select class="input" id="client-switch"></select>
-        </label>
+      <div class="tb-actions dash-actions">
         <button class="lang-toggle" type="button" data-lang-toggle><span class="lt-ar" lang="ar">العربية</span></button>
         <div class="notif" id="notif-wrap" hidden>
           <button class="icon-btn" type="button" data-action="notif-toggle" id="bell" aria-expanded="false" aria-controls="notif-panel" aria-label="Notifications">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 004 0"/></svg>
             <span class="badge-count" id="bell-count" hidden>0</span>
           </button>
-          <div class="notif-panel" id="notif-panel" hidden>
+          <div class="notif-panel" id="notif-panel" hidden role="region" aria-labelledby="notif-head-title">
             <div class="notif-head">
               <strong id="notif-head-title" data-i18n="p.notif.title">Notifications</strong>
               <button class="link-btn" type="button" data-action="notif-read-all" data-i18n="p.notif.readall">Mark all as read</button>
@@ -49,184 +55,237 @@
             <ul class="notif-list" id="notif-list"></ul>
           </div>
         </div>
-        <button class="btn btn-ghost btn-sm" type="button" data-action="signout" id="signout-btn" data-i18n="p.signout" hidden>Sign out</button>
+        <button class="tb-btn" type="button" data-action="signout" id="signout-btn" data-i18n="p.signout" hidden>Sign out</button>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="dash-main container" id="dash-main">
-    <section class="plate portal-state" id="state" aria-live="polite">
-      <h1 id="state-title" data-i18n="p.loading">Loading your dashboard…</h1>
-      <p id="state-body"></p>
-      <div class="row" id="state-actions"></div>
-    </section>
-
-    <section class="plate portal-state" id="pw-panel" hidden aria-labelledby="pw-title">
-      <form id="pw-form" novalidate>
-        <h1 id="pw-title" data-i18n="p.pw.title">Choose your password</h1>
-        <p id="pw-sub"></p>
-        <div class="field">
-          <label for="pw-new" data-i18n="p.pw.new">New password</label>
-          <input class="input" id="pw-new" type="password" autocomplete="new-password" minlength="8" required>
+    <div class="win-body">
+      <aside class="sidebar" id="sidebar" hidden aria-label="Client">
+        <div class="sb-id">
+          <span class="sb-logo" id="sb-logo"></span>
+          <span class="sb-name" id="sb-name"></span>
+          <span class="sb-handle" id="sb-handle"></span>
+          <span class="pill pill-demo sb-pkg pkg-pill" id="pkg-pill" hidden></span>
         </div>
-        <div class="field">
-          <label for="pw-confirm" data-i18n="p.pw.confirm">Repeat password</label>
-          <input class="input" id="pw-confirm" type="password" autocomplete="new-password" minlength="8" required>
+        <div class="sb-group">
+          <h3 data-i18n="p.sb.glance">At a glance</h3>
+          <ul class="sb-stats">
+            <li><button type="button" data-nav="approvals"><span class="sb-ic" data-icon="approvals"></span><span data-i18n="p.kpi.appr">Awaiting your approval</span><span class="sb-v" id="sb-need">0</span></button></li>
+            <li><button type="button" data-nav="calendar"><span class="sb-ic" data-icon="calendar"></span><span data-i18n="p.sb.week">Planned this week</span><span class="sb-v" id="sb-week">0</span></button></li>
+            <li><button type="button" data-nav="reports"><span class="sb-ic" data-icon="reports"></span><span data-i18n="p.rep.title">Reports</span><span class="sb-v" id="sb-reps">0</span></button></li>
+          </ul>
         </div>
-        <p class="form-status" id="pw-status" role="alert"></p>
-        <div class="form-actions"><button class="btn btn-primary" type="submit" id="pw-submit" data-i18n="p.pw.save">Save password</button></div>
-      </form>
-    </section>
-
-    <div id="board" hidden>
-      <div class="dash-title">
-        <div>
-          <h1 id="hello">Welcome back</h1>
-          <p id="hello-sub"></p>
+        <div class="sb-group" id="sb-next-wrap" hidden>
+          <h3 data-i18n="p.sb.next">Next to publish</h3>
+          <button class="sb-next" type="button" data-action="cal-item" id="sb-next"></button>
         </div>
-        <button class="btn btn-ghost btn-sm" type="button" data-action="go" data-target="approvals" id="needs-you-btn">…</button>
-      </div>
-
-      <section class="dash-section" id="kpis" aria-labelledby="kpi-title">
-        <h2 class="sr-only" id="kpi-title" data-i18n="p.kpi.title">Key numbers</h2>
-        <div class="kpis" id="kpi-row"></div>
-      </section>
-
-      <section class="dash-section" id="approvals" aria-labelledby="appr-title">
-        <div class="sec-head">
-          <div>
-            <h2 id="appr-title" data-i18n="p.appr.title">Approvals queue</h2>
-            <p data-i18n="p.appr.sub">Nothing is published until you approve it.</p>
-          </div>
+        <div class="sb-foot">
+          <a href="../index.html"><span data-icon="site"></span><span data-i18n="p.back">Back to site</span></a>
+          <a data-wa href="https://wa.me/971541668700" target="_blank" rel="noopener"><span data-icon="whatsapp"></span><span data-i18n="p.wa">Message KJ on WhatsApp</span></a>
         </div>
-        <ul class="approvals" id="appr-list"></ul>
-      </section>
+      </aside>
 
-      <section class="dash-section" id="calendar" aria-labelledby="cal-title">
-        <div class="sec-head">
-          <div>
-            <h2 id="cal-title" data-i18n="p.cal.title">Content calendar</h2>
-            <p data-i18n="p.cal.sub">Posts, carousels, reels and stories per platform.</p>
-          </div>
-          <div class="toolbar" id="cal-filters" role="group" data-i18n-attr="aria-label:p.cal.filter"></div>
-        </div>
-        <div class="plate cal-wrap">
-          <div class="cal-nav">
-            <button class="btn btn-ghost btn-sm" type="button" data-action="cal-prev"><span aria-hidden="true" class="dir-arrow">‹</span> <span data-i18n="p.cal.prev">Previous week</span></button>
-            <strong id="cal-label" aria-live="polite"></strong>
-            <button class="btn btn-ghost btn-sm" type="button" data-action="cal-next"><span data-i18n="p.cal.next">Next week</span> <span aria-hidden="true" class="dir-arrow">›</span></button>
-          </div>
-          <div class="cal" id="cal"></div>
-          <p class="upload-note" id="cal-none" hidden data-i18n="p.cal.none"></p>
-        </div>
-      </section>
-
-      <div class="dash-cols" id="pkg-cols">
-        <section class="dash-section" id="inbox" aria-labelledby="inbox-title" data-feature="inbox">
-          <div class="sec-head"><div>
-            <h2 id="inbox-title" data-i18n="p.inbox.title">Inbox replies</h2>
-            <p data-i18n="p.inbox.sub"></p>
-          </div></div>
-          <ul class="approvals inbox-list" id="inbox-list"></ul>
+      <main class="win-content dash-main" id="dash-main" tabindex="-1">
+        <section class="portal-state" id="state" aria-live="polite">
+          <h1 id="state-title" data-i18n="p.loading">Loading your dashboard…</h1>
+          <p id="state-body"></p>
+          <div class="row" id="state-actions"></div>
         </section>
 
-        <section class="dash-section" id="ads" aria-labelledby="ads-title" data-feature="ads">
-          <div class="sec-head"><div>
-            <h2 id="ads-title" data-i18n="p.ads.title">Ads</h2>
-            <p data-i18n="p.ads.sub"></p>
-          </div></div>
-          <ul class="approvals ads-list" id="ads-list"></ul>
-          <p class="upload-note" data-i18n="p.ads.note"></p>
-        </section>
-
-        <section class="dash-section" id="whatsapp" aria-labelledby="wa-title" data-feature="whatsapp">
-          <div class="sec-head"><div>
-            <h2 id="wa-title" data-i18n="p.wa.title">WhatsApp AI Assistant</h2>
-            <p data-i18n="p.wa.sub"></p>
-          </div></div>
-          <div class="plate"><p class="portal-muted" data-i18n="p.wa.body"></p></div>
-        </section>
-
-        <section class="dash-section" id="addons" aria-labelledby="addon-title" hidden>
-          <div class="sec-head"><div>
-            <h2 id="addon-title" data-i18n="p.addon.title">Add to your package</h2>
-            <p id="addon-sub"></p>
-          </div></div>
-          <div class="plate addon">
-            <ul class="addon-list" id="addon-list"></ul>
-            <a class="btn btn-wa btn-sm" id="addon-wa" href="https://wa.me/971541668700" target="_blank" rel="noopener"><span data-i18n="p.addon.ask">Ask KJ on WhatsApp</span></a>
-          </div>
-        </section>
-
-        <section class="dash-section" id="reports" aria-labelledby="rep-title">
-          <div class="sec-head"><div>
-            <h2 id="rep-title" data-i18n="p.rep.title">Reports</h2>
-            <p data-i18n="p.rep.sub"></p>
-          </div></div>
-          <ul class="approvals reports-list" id="rep-list"></ul>
-        </section>
-      </div>
-
-      <section class="dash-section admin-tools" id="admin" aria-labelledby="adm-title" hidden>
-        <div class="sec-head"><div>
-          <h2 id="adm-title" data-i18n="p.adm.title">Admin tools</h2>
-          <p id="adm-sub"></p>
-        </div></div>
-        <div class="admin-grid">
-          <form class="plate admin-form" id="f-item" novalidate>
-            <h3 data-i18n="p.adm.item">Add an item</h3>
-            <div class="field"><label for="fi-kind" data-i18n="p.f.kind">Type</label><select class="input" id="fi-kind" name="kind"></select></div>
-            <div class="field"><label for="fi-title"><span data-i18n="p.f.title">Title (EN)</span> <span class="req">*</span></label><input class="input" id="fi-title" name="title" required maxlength="200"></div>
-            <div class="field"><label for="fi-title-ar" data-i18n="p.f.title_ar">Title (AR)</label><input class="input" id="fi-title-ar" name="title_ar" dir="rtl" lang="ar" maxlength="200"></div>
-            <div class="field"><label for="fi-caption" data-i18n="p.f.caption">Caption (EN)</label><textarea id="fi-caption" name="caption" rows="3"></textarea></div>
-            <div class="field"><label for="fi-caption-ar" data-i18n="p.f.caption_ar">Caption (AR)</label><textarea id="fi-caption-ar" name="caption_ar" rows="3" dir="rtl" lang="ar"></textarea></div>
-            <div class="field"><label for="fi-media" data-i18n="p.f.media">Media URL</label><input class="input" id="fi-media" name="media_url" type="url" inputmode="url" placeholder="https://"></div>
-            <div class="field"><label for="fi-platform" data-i18n="p.f.platform">Platform</label><select class="input" id="fi-platform" name="platform"></select></div>
-            <div class="field"><label for="fi-when" data-i18n="p.f.when">Scheduled date &amp; time</label><input class="input" id="fi-when" name="scheduled_at" type="datetime-local"></div>
-            <div class="field"><label for="fi-status" data-i18n="p.f.status">Status</label><select class="input" id="fi-status" name="status"></select></div>
-            <p class="form-status" role="alert"></p>
-            <button class="btn btn-primary btn-sm" type="submit" data-i18n="p.f.add">Add item</button>
+        <section class="portal-state" id="pw-panel" hidden aria-labelledby="pw-title">
+          <form id="pw-form" novalidate>
+            <h1 id="pw-title" data-i18n="p.pw.title">Choose your password</h1>
+            <p id="pw-sub"></p>
+            <div class="field">
+              <label for="pw-new" data-i18n="p.pw.new">New password</label>
+              <input class="input" id="pw-new" type="password" autocomplete="new-password" minlength="8" required>
+            </div>
+            <div class="field">
+              <label for="pw-confirm" data-i18n="p.pw.confirm">Repeat password</label>
+              <input class="input" id="pw-confirm" type="password" autocomplete="new-password" minlength="8" required>
+            </div>
+            <p class="form-status" id="pw-status" role="alert"></p>
+            <div class="form-actions"><button class="btn btn-primary btn-block" type="submit" id="pw-submit" data-i18n="p.pw.save">Save password</button></div>
           </form>
+        </section>
 
-          <div class="admin-stack">
-            <form class="plate admin-form" id="f-kpi" novalidate>
-              <h3 data-i18n="p.adm.kpi">Add a key number</h3>
-              <div class="field"><label for="fk-label"><span data-i18n="p.f.label">Label (EN)</span> <span class="req">*</span></label><input class="input" id="fk-label" name="label" required maxlength="120"></div>
-              <div class="field"><label for="fk-label-ar" data-i18n="p.f.label_ar">Label (AR)</label><input class="input" id="fk-label-ar" name="label_ar" dir="rtl" lang="ar" maxlength="120"></div>
-              <div class="form-row">
-                <div class="field"><label for="fk-value"><span data-i18n="p.f.value">Value</span> <span class="req">*</span></label><input class="input" id="fk-value" name="value" type="number" step="any" inputmode="decimal" required></div>
-                <div class="field"><label for="fk-period" data-i18n="p.f.period">As of date</label><input class="input" id="fk-period" name="period_start" type="date"></div>
+        <div id="board" hidden>
+          <!-- TODAY -->
+          <section class="view is-active" id="today" data-view-panel="today" aria-labelledby="hello">
+            <header class="view-head">
+              <div>
+                <span class="eyebrow" id="today-date"></span>
+                <h1 id="hello" data-view-title>Welcome back</h1>
+                <p id="hello-sub"></p>
               </div>
-              <div class="field"><label for="fk-metric" data-i18n="p.f.metric">Metric ID</label><input class="input" id="fk-metric" name="metric" maxlength="60" data-i18n-attr="placeholder:p.f.metric.ph"></div>
-              <p class="form-status" role="alert"></p>
-              <button class="btn btn-primary btn-sm" type="submit" data-i18n="p.f.addkpi">Add number</button>
-            </form>
+              <button class="hello-cta" type="button" data-action="go" data-target="approvals" id="needs-you-btn">…</button>
+            </header>
+            <section id="kpis" aria-labelledby="kpi-title">
+              <h2 class="sr-only" id="kpi-title" data-i18n="p.kpi.title">Key numbers</h2>
+              <div class="instruments" id="kpi-row"></div>
+            </section>
+            <div class="today-grid">
+              <section aria-labelledby="next-title">
+                <div class="sub-head"><h3 id="next-title" data-i18n="p.next.title">Up next</h3><button class="link-btn" type="button" data-nav="calendar" data-i18n="p.next.all">Open calendar</button></div>
+                <ul class="upnext" id="next-list"></ul>
+              </section>
+              <section aria-labelledby="pkg-title">
+                <div class="sub-head"><h3 id="pkg-title" data-i18n="p.pkg.title">Your package</h3></div>
+                <div class="gcard pkg-card" id="pkg-card"></div>
+              </section>
+            </div>
+          </section>
 
-            <form class="plate admin-form" id="f-notif" novalidate>
-              <h3 data-i18n="p.adm.notif">Send a notification</h3>
-              <div class="field"><label for="fn-title"><span data-i18n="p.f.ntitle">Title (EN)</span> <span class="req">*</span></label><input class="input" id="fn-title" name="title" required maxlength="200"></div>
-              <div class="field"><label for="fn-title-ar" data-i18n="p.f.ntitle_ar">Title (AR)</label><input class="input" id="fn-title-ar" name="title_ar" dir="rtl" lang="ar" maxlength="200"></div>
-              <div class="field"><label for="fn-body" data-i18n="p.f.body">Message (EN)</label><textarea id="fn-body" name="body" rows="2"></textarea></div>
-              <div class="field"><label for="fn-body-ar" data-i18n="p.f.body_ar">Message (AR)</label><textarea id="fn-body-ar" name="body_ar" rows="2" dir="rtl" lang="ar"></textarea></div>
-              <p class="form-status" role="alert"></p>
-              <button class="btn btn-primary btn-sm" type="submit" data-i18n="p.f.send">Send notification</button>
-            </form>
-          </div>
+          <!-- APPROVALS -->
+          <section class="view" id="approvals" data-view-panel="approvals" aria-labelledby="appr-title">
+            <header class="view-head compact">
+              <div>
+                <span class="eyebrow" data-i18n="dv.approvals">Approvals</span>
+                <h2 id="appr-title" data-i18n="p.appr.title" data-view-title>Approvals queue</h2>
+                <p data-i18n="p.appr.sub">Nothing is published until you approve it.</p>
+              </div>
+              <div class="row-nav" id="row-nav">
+                <span class="swipe-hint desk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 12h15M15 8l4 4-4 4"/></svg><span data-i18n="dv.swipe.row">Swipe through your posts</span></span>
+                <button class="round-btn" type="button" id="row-prev" data-i18n-attr="aria-label:dv.prev" aria-label="Previous post"><svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+                <span class="count" id="row-count" aria-live="polite"></span>
+                <button class="round-btn" type="button" id="row-next" data-i18n-attr="aria-label:dv.next" aria-label="Next post"><svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+              </div>
+            </header>
+            <div class="stack-hint" id="stack-hint" aria-hidden="true">
+              <span class="to-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 12H5M9 8l-4 4 4 4"/></svg><span data-i18n="dv.swipe.no">Changes</span></span>
+              <span class="to-yes"><span data-i18n="dv.swipe.yes">Approve</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 12h15M15 8l4 4-4 4"/></svg></span>
+            </div>
+            <div class="phone-row-wrap" role="region" aria-roledescription="carousel" data-i18n-attr="aria-label:dv.stack.label" aria-label="Posts waiting for approval">
+              <span class="stack-ghosts" id="stack-ghosts" aria-hidden="true"><i></i><i></i></span>
+              <ul class="phone-row approvals" id="appr-list"></ul>
+            </div>
+            <p class="stack-count" id="stack-count" aria-live="polite"></p>
+            <div id="done-wrap" hidden>
+              <div class="sub-head"><h3 data-i18n="p.appr.done">Recently reviewed</h3></div>
+              <ul class="done-list" id="appr-done"></ul>
+            </div>
+          </section>
+
+          <!-- CALENDAR -->
+          <section class="view" id="calendar" data-view-panel="calendar" aria-labelledby="cal-title">
+            <header class="view-head compact">
+              <div>
+                <span class="eyebrow" data-i18n="dv.calendar">Calendar</span>
+                <h2 id="cal-title" data-i18n="p.cal.title" data-view-title>Content calendar</h2>
+                <p data-i18n="p.cal.sub">Posts, carousels, reels and stories per platform.</p>
+              </div>
+              <div class="transport">
+                <button class="round-btn" type="button" data-action="cal-prev" data-i18n-attr="aria-label:p.cal.prev" aria-label="Previous week"><svg class="flip" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 6v12L3 12zM20 6v12l-8-6z"/></svg></button>
+                <strong class="tc" id="cal-label" aria-live="polite"></strong>
+                <button class="round-btn" type="button" data-action="cal-next" data-i18n-attr="aria-label:p.cal.next" aria-label="Next week"><svg class="flip" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 6v12l8-6zM13 6v12l8-6z"/></svg></button>
+              </div>
+            </header>
+            <div class="toolbar" id="cal-filters" role="group" data-i18n-attr="aria-label:p.cal.filter"></div>
+            <div class="timeline" id="cal"></div>
+            <p class="upload-note" id="cal-none" hidden data-i18n="p.cal.none"></p>
+            <div class="cal-legend" id="cal-legend"></div>
+            <div class="monitor" id="cal-monitor" hidden></div>
+          </section>
+
+          <!-- INBOX (package feature) -->
+          <section class="view" id="inbox" data-view-panel="inbox" data-gated aria-labelledby="inbox-title" data-feature="inbox">
+            <header class="view-head"><div>
+              <span class="eyebrow" data-i18n="dv.inbox">Inbox</span>
+              <h2 id="inbox-title" data-i18n="p.inbox.title" data-view-title>Inbox replies</h2>
+              <p data-i18n="p.inbox.sub"></p>
+            </div></header>
+            <ul class="glass-list" id="inbox-list"></ul>
+          </section>
+
+          <!-- ADS (package feature) -->
+          <section class="view" id="ads" data-view-panel="ads" data-gated aria-labelledby="ads-title" data-feature="ads">
+            <header class="view-head"><div>
+              <span class="eyebrow" data-i18n="dv.ads">Ads</span>
+              <h2 id="ads-title" data-i18n="p.ads.title" data-view-title>Ads</h2>
+              <p data-i18n="p.ads.sub"></p>
+            </div></header>
+            <ul class="glass-list" id="ads-list"></ul>
+            <p class="upload-note" data-i18n="p.ads.note"></p>
+          </section>
+
+          <!-- WHATSAPP (package feature) -->
+          <section class="view" id="whatsapp" data-view-panel="whatsapp" data-gated aria-labelledby="wa-title" data-feature="whatsapp">
+            <header class="view-head"><div>
+              <span class="eyebrow" data-i18n="dv.whatsapp">WhatsApp</span>
+              <h2 id="wa-title" data-i18n="p.wa.title" data-view-title>WhatsApp AI Assistant</h2>
+              <p data-i18n="p.wa.sub"></p>
+            </div></header>
+            <div class="wa-hero gcard">
+              <span class="wa-badge" data-icon="whatsapp"></span>
+              <p class="portal-muted" data-i18n="p.wa.body"></p>
+              <a class="btn btn-wa btn-sm" data-wa href="https://wa.me/971541668700" target="_blank" rel="noopener" data-i18n="p.wa">Message KJ on WhatsApp</a>
+            </div>
+          </section>
+
+          <!-- REPORTS -->
+          <section class="view" id="v-reports" data-view-panel="reports" aria-labelledby="rep-title">
+            <header class="view-head"><div>
+              <span class="eyebrow" data-i18n="dv.reports">Reports</span>
+              <h2 id="rep-title" data-i18n="p.rep.title" data-view-title>Reports</h2>
+              <p data-i18n="p.rep.sub"></p>
+            </div></header>
+            <section id="reports" aria-labelledby="rep-title">
+              <ul class="files reports-list" id="rep-list"></ul>
+            </section>
+            <section id="addons" aria-labelledby="addon-title" hidden>
+              <div class="sub-head"><h3 id="addon-title" data-i18n="p.addon.title">Add to your package</h3></div>
+              <div class="gcard addon">
+                <p class="portal-muted" id="addon-sub"></p>
+                <ul class="addon-list" id="addon-list"></ul>
+                <a class="btn btn-wa btn-sm" id="addon-wa" href="https://wa.me/971541668700" target="_blank" rel="noopener"><span data-i18n="p.addon.ask">Ask KJ on WhatsApp</span></a>
+              </div>
+            </section>
+          </section>
+
+          <!-- CONTROL CENTER (admin only) -->
+          <section class="view admin-tools" id="admin" data-view-panel="admin" aria-labelledby="adm-title" hidden>
+            <header class="view-head"><div>
+              <span class="eyebrow"><span data-i18n="p.admin">ADMIN</span></span>
+              <h2 id="adm-title" data-i18n="p.adm.title" data-view-title>Control Center</h2>
+              <p id="adm-sub"></p>
+            </div></header>
+            <div class="cc">
+              <div class="cc-tile cc-clients">
+                <div class="cc-title"><span data-i18n="p.cc.clients">Clients</span><span class="mono" id="cc-client-count"></span></div>
+                <div class="cc-client-grid" id="client-switch" role="group" data-i18n-attr="aria-label:p.switch"></div>
+                <p class="cc-note" data-i18n="p.cc.newclient">New clients are added in Supabase → clients.</p>
+              </div>
+              <button class="cc-tile" type="button" data-action="cc-open" data-form="f-item"><span class="cc-ic gold" data-icon="plus"></span><span><strong data-i18n="p.adm.item">Add an item</strong><small data-i18n="p.cc.item.sub">Post, reel, story, ad…</small></span></button>
+              <button class="cc-tile" type="button" data-action="cc-open" data-form="f-kpi"><span class="cc-ic" data-icon="number"></span><span><strong data-i18n="p.adm.kpi">Add a key number</strong><small data-i18n="p.cc.kpi.sub">Shows as an instrument</small></span></button>
+              <button class="cc-tile" type="button" data-action="cc-open" data-form="f-notif"><span class="cc-ic" data-icon="bell"></span><span><strong data-i18n="p.adm.notif">Send a notification</strong><small data-i18n="p.cc.notif.sub">Lands on their bell</small></span></button>
+              <div class="cc-tile"><small data-i18n="p.kpi.appr">Awaiting your approval</small><span class="cc-big" id="cc-need">0</span></div>
+              <div class="cc-tile cc-wide"><small id="cc-pkg-label"></small><strong id="cc-pkg"></strong><div class="cc-slider" aria-hidden="true"><span id="cc-pkg-bar"></span></div></div>
+              <div class="cc-tile cc-wide"><small data-i18n="p.cc.activity">Client activity · unread</small><span class="cc-big" id="cc-unread">0</span></div>
+            </div>
+          </section>
+
+          <!-- MORE (mobile) -->
+          <section class="view" id="more" data-view-panel="more" aria-labelledby="more-title">
+            <header class="view-head"><div>
+              <h2 id="more-title" data-i18n="dv.more" data-view-title>More</h2>
+            </div></header>
+            <ul class="ios-group" id="more-nav"></ul>
+            <ul class="ios-group">
+              <li><span class="ios-row"><span class="ri" data-icon="box"></span><span data-i18n="p.pkg.title">Your package</span><span class="rv" id="more-pkg"></span></span></li>
+              <li><a class="ios-row" href="../index.html"><span class="ri" data-icon="site"></span><span data-i18n="p.back">Back to site</span><svg class="chev" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M1.5 1.5l5 5-5 5"/></svg></a></li>
+              <li><a class="ios-row" data-wa href="https://wa.me/971541668700" target="_blank" rel="noopener"><span class="ri" data-icon="whatsapp"></span><span data-i18n="p.wa">Message KJ on WhatsApp</span><svg class="chev" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M1.5 1.5l5 5-5 5"/></svg></a></li>
+            </ul>
+            <ul class="ios-group">
+              <li><button class="ios-row danger" type="button" data-action="signout" id="more-signout"><span class="ri" data-icon="signout"></span><span data-i18n="p.signout">Sign out</span></button></li>
+            </ul>
+          </section>
         </div>
-      </section>
+      </main>
     </div>
-  </main>
+  </div>
 
-  <footer class="dash-footer">
-    <div class="container">
-      <a class="brand-lockup" href="../index.html" aria-label="ZKJ SYSTEM — home"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="28" height="32"><span>ZKJ SYSTEM</span></a>
-      <span data-i18n="p.foot">Powered by ZKJ SYSTEM · Every project becomes a tool.</span>
-      <div class="row">
-        <a class="btn btn-ghost btn-sm" href="../index.html" data-i18n="p.back">Back to site</a>
-        <a class="btn btn-wa btn-sm" data-wa href="https://wa.me/971541668700" target="_blank" rel="noopener" data-i18n="p.wa">Message KJ on WhatsApp</a>
-      </div>
-    </div>
-  </footer>
+  <nav class="dock" id="dock" data-i18n-attr="aria-label:dv.sections" aria-label="Sections" hidden></nav>
+  <nav class="tabbar" id="tabbar" data-i18n-attr="aria-label:dv.sections" aria-label="Sections" hidden></nav>
 
   <dialog class="modal" id="modal" aria-labelledby="modal-title">
     <div class="modal-head">
@@ -238,12 +297,69 @@
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-actions" id="modal-actions"></div>
   </dialog>
+
+  <dialog class="slideover" id="cc-sheet" aria-labelledby="cc-sheet-title">
+    <div class="so-head">
+      <h2 id="cc-sheet-title"><span data-i18n="p.adm.title">Control Center</span> · <span id="cc-sheet-client"></span></h2>
+      <button class="icon-btn" type="button" data-action="cc-close" data-i18n-attr="aria-label:p.close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="segmented" role="tablist" data-i18n-attr="aria-label:p.adm.title">
+      <button type="button" role="tab" data-form-tab="f-item" aria-controls="f-item" data-i18n="p.cc.tab.item">Item</button>
+      <button type="button" role="tab" data-form-tab="f-kpi" aria-controls="f-kpi" data-i18n="p.cc.tab.kpi">Number</button>
+      <button type="button" role="tab" data-form-tab="f-notif" aria-controls="f-notif" data-i18n="p.cc.tab.notif">Notification</button>
+    </div>
+    <div class="so-body">
+      <form class="admin-form" id="f-item" novalidate role="tabpanel">
+        <h3 data-i18n="p.adm.item">Add an item</h3>
+        <div class="field"><label for="fi-kind" data-i18n="p.f.kind">Type</label><select class="input" id="fi-kind" name="kind"></select></div>
+        <div class="field"><label for="fi-title"><span data-i18n="p.f.title">Title (EN)</span> <span class="req">*</span></label><input class="input" id="fi-title" name="title" required maxlength="200"></div>
+        <div class="field"><label for="fi-title-ar" data-i18n="p.f.title_ar">Title (AR)</label><input class="input" id="fi-title-ar" name="title_ar" dir="rtl" lang="ar" maxlength="200"></div>
+        <div class="field"><label for="fi-caption" data-i18n="p.f.caption">Caption (EN)</label><textarea id="fi-caption" name="caption" rows="3"></textarea></div>
+        <div class="field"><label for="fi-caption-ar" data-i18n="p.f.caption_ar">Caption (AR)</label><textarea id="fi-caption-ar" name="caption_ar" rows="3" dir="rtl" lang="ar"></textarea></div>
+        <div class="field"><label for="fi-media" data-i18n="p.f.media">Media URL</label><input class="input" id="fi-media" name="media_url" type="url" inputmode="url" placeholder="https://"></div>
+        <div class="form-row">
+          <div class="field"><label for="fi-platform" data-i18n="p.f.platform">Platform</label><select class="input" id="fi-platform" name="platform"></select></div>
+          <div class="field"><label for="fi-status" data-i18n="p.f.status">Status</label><select class="input" id="fi-status" name="status"></select></div>
+        </div>
+        <div class="field"><label for="fi-when" data-i18n="p.f.when">Scheduled date &amp; time</label><input class="input" id="fi-when" name="scheduled_at" type="datetime-local"></div>
+        <p class="form-status" role="alert"></p>
+        <button class="btn btn-primary" type="submit" data-i18n="p.f.add">Add item</button>
+      </form>
+
+      <form class="admin-form" id="f-kpi" novalidate role="tabpanel" hidden>
+        <h3 data-i18n="p.adm.kpi">Add a key number</h3>
+        <div class="field"><label for="fk-label"><span data-i18n="p.f.label">Label (EN)</span> <span class="req">*</span></label><input class="input" id="fk-label" name="label" required maxlength="120"></div>
+        <div class="field"><label for="fk-label-ar" data-i18n="p.f.label_ar">Label (AR)</label><input class="input" id="fk-label-ar" name="label_ar" dir="rtl" lang="ar" maxlength="120"></div>
+        <div class="form-row">
+          <div class="field"><label for="fk-value"><span data-i18n="p.f.value">Value</span> <span class="req">*</span></label><input class="input" id="fk-value" name="value" type="number" step="any" inputmode="decimal" required></div>
+          <div class="field"><label for="fk-period" data-i18n="p.f.period">As of date</label><input class="input" id="fk-period" name="period_start" type="date"></div>
+        </div>
+        <div class="field"><label for="fk-metric" data-i18n="p.f.metric">Metric ID</label><input class="input" id="fk-metric" name="metric" maxlength="60" data-i18n-attr="placeholder:p.f.metric.ph"></div>
+        <p class="portal-muted small" data-i18n="p.cc.kpi.help"></p>
+        <p class="form-status" role="alert"></p>
+        <button class="btn btn-primary" type="submit" data-i18n="p.f.addkpi">Add number</button>
+      </form>
+
+      <form class="admin-form" id="f-notif" novalidate role="tabpanel" hidden>
+        <h3 data-i18n="p.adm.notif">Send a notification</h3>
+        <div class="field"><label for="fn-title"><span data-i18n="p.f.ntitle">Title (EN)</span> <span class="req">*</span></label><input class="input" id="fn-title" name="title" required maxlength="200"></div>
+        <div class="field"><label for="fn-title-ar" data-i18n="p.f.ntitle_ar">Title (AR)</label><input class="input" id="fn-title-ar" name="title_ar" dir="rtl" lang="ar" maxlength="200"></div>
+        <div class="field"><label for="fn-body" data-i18n="p.f.body">Message (EN)</label><textarea id="fn-body" name="body" rows="2"></textarea></div>
+        <div class="field"><label for="fn-body-ar" data-i18n="p.f.body_ar">Message (AR)</label><textarea id="fn-body-ar" name="body_ar" rows="2" dir="rtl" lang="ar"></textarea></div>
+        <p class="form-status" role="alert"></p>
+        <button class="btn btn-primary" type="submit" data-i18n="p.f.send">Send notification</button>
+      </form>
+    </div>
+  </dialog>
 </div>
 
 <script src="../assets/app.js"></script>
 <script src="../assets/vendor/supabase-js-2.116.0.min.js"></script>
 <script src="../assets/supabase-config.js"></script>
 <script src="../assets/portal-strings.js"></script>
+<script src="../assets/device.js"></script>
 <script src="../assets/portal.js"></script>
 </body>
 </html>

@@ -8,6 +8,14 @@
 
   var loginForm = $('login-form'), resetForm = $('reset-form');
 
+  // Lock-screen clock: always Dubai time, whatever the visitor's own time zone.
+  function lockClock() {
+    var d = new Date(), ar = Z.getLang() === 'ar';
+    $('lock-time').textContent = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Dubai' }).format(d);
+    $('lock-date').textContent = new Intl.DateTimeFormat(ar ? 'ar-u-nu-latn' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Asia/Dubai' }).format(d);
+  }
+  lockClock(); setInterval(lockClock, 10000); Z.onLang(lockClock);
+
   function status(el, kind, key) {
     el.className = 'form-status' + (key ? ' show ' + kind : '');
     el.setAttribute('data-msg', key || '');
