@@ -25,23 +25,23 @@
   <div class="stage-fx" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
-  <div class="menubar desk-only">
-    <a class="mb-brand" href="../index.html"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span>ZKJ SYSTEM</span></a>
-    <span class="mb-item" id="mb-where">Client portal</span>
-    <span class="mb-spacer"></span>
-    <a class="mb-link" href="../index.html" data-i18n="p.back">Back to site</a>
-    <span class="mb-clock" id="mb-clock"></span>
-  </div>
-
   <div class="mac-window" id="win">
     <header class="titlebar dash-header">
-      <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="tb-left">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <nav class="tb-crumb desk-only" aria-label="Breadcrumb">
+          <a class="mb-brand" href="../index.html"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span>ZKJ SYSTEM</span></a>
+          <span class="mb-item" id="mb-where">Client portal</span>
+        </nav>
+      </div>
       <div class="tb-title client-brand">
         <span class="client-logo portal-logo" id="client-logo"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="19" height="22"></span>
         <span class="tb-name"><span class="tb-sys">ZKJ SYSTEM —</span> <strong id="client-name">ZKJ SYSTEM</strong></span>
         <span class="pill pill-admin" id="admin-pill" data-i18n="p.admin" hidden>ADMIN</span>
       </div>
       <div class="tb-actions dash-actions">
+        <a class="mb-link tb-back desk-only" href="../index.html" data-i18n="p.back">Back to site</a>
+        <span class="mb-clock tb-clock" id="mb-clock"></span>
         <button class="lang-toggle" type="button" data-lang-toggle><span class="lt-ar" lang="ar">العربية</span></button>
         <div class="notif" id="notif-wrap" hidden>
           <button class="icon-btn" type="button" data-action="notif-toggle" id="bell" aria-expanded="false" aria-controls="notif-panel" aria-label="Notifications">

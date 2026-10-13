@@ -19,6 +19,7 @@
       'p.e.rate': 'Too many attempts. Wait a minute and try again.',
       'p.e.network': 'Can’t reach the server. Check your connection and try again.',
       'p.e.generic': 'Something went wrong. Please try again, or message KJ on WhatsApp.',
+      'p.e.expired': 'This link has expired. Ask KJ for a new invite, or use “Forgot your password?” below.',
       'p.e.link': 'That email link has expired or was already used. Use “Forgot your password?” to get a new one.',
       'p.e.config': 'The portal isn’t configured on this page. Please message KJ.',
 
@@ -102,6 +103,7 @@
       'p.e.rate': 'محاولات كثيرة. انتظر دقيقة وحاول مرة أخرى.',
       'p.e.network': 'تعذّر الوصول إلى الخادم. تحقّق من اتصالك وحاول مرة أخرى.',
       'p.e.generic': 'حدث خطأ. حاول مرة أخرى، أو راسل KJ على واتساب.',
+      'p.e.expired': 'انتهت صلاحية هذا الرابط. اطلب من KJ دعوة جديدة، أو استخدم «نسيت كلمة المرور؟» في الأسفل.',
       'p.e.link': 'رابط البريد انتهت صلاحيته أو استُخدم من قبل. استخدم «نسيت كلمة المرور؟» لتحصل على رابط جديد.',
       'p.e.config': 'البوابة غير مهيأة في هذه الصفحة. راسل KJ.',
 

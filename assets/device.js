@@ -9,7 +9,7 @@
 
   Z.extend({
     en: {
-      'dv.sections': 'Sections', 'dv.today': 'Today', 'dv.approvals': 'Approvals', 'dv.approve': 'Approve', 'dv.calendar': 'Calendar',
+      'dv.sections': 'Sections', 'dv.dockshow': 'Show sections', 'dv.today': 'Today', 'dv.approvals': 'Approvals', 'dv.approve': 'Approve', 'dv.calendar': 'Calendar',
       'dv.inbox': 'Inbox', 'dv.ads': 'Ads', 'dv.whatsapp': 'WhatsApp', 'dv.reports': 'Reports', 'dv.control': 'Control Center',
       'dv.more': 'More', 'dv.tools': 'Tools', 'dv.insights': 'Insights',
       'dv.swipe.row': 'Swipe through your posts', 'dv.swipe.yes': 'Approve', 'dv.swipe.no': 'Changes',
@@ -22,7 +22,7 @@
       'dv.ig.sponsored': 'Sponsored', 'dv.ig.reply': 'Suggested reply', 'dv.ig.reels': 'Reels', 'dv.ig.dm': 'Message…'
     },
     ar: {
-      'dv.sections': 'الأقسام', 'dv.today': 'اليوم', 'dv.approvals': 'الموافقات', 'dv.approve': 'موافقة', 'dv.calendar': 'التقويم',
+      'dv.sections': 'الأقسام', 'dv.dockshow': 'إظهار الأقسام', 'dv.today': 'اليوم', 'dv.approvals': 'الموافقات', 'dv.approve': 'موافقة', 'dv.calendar': 'التقويم',
       'dv.inbox': 'الرسائل', 'dv.ads': 'الإعلانات', 'dv.whatsapp': 'واتساب', 'dv.reports': 'التقارير', 'dv.control': 'مركز التحكم',
       'dv.more': 'المزيد', 'dv.tools': 'الأدوات', 'dv.insights': 'التحليلات',
       'dv.swipe.row': 'تصفّح منشوراتك بالسحب', 'dv.swipe.yes': 'موافقة', 'dv.swipe.no': 'تعديل',
@@ -141,6 +141,7 @@
   function layoutDock() {
     var dock = $('dock');
     if (dock && !dockObs && window.MutationObserver) { dockObs = new MutationObserver(function () { if (!dock.hidden) layoutDock(); }); dockObs.observe(dock, { attributes: true, attributeFilter: ['hidden'] }); }
+    syncDockChrome();
     if (!dock || dock.hidden || mobileMQ.matches) return;
     dock.classList.add('arc');
     var kids = Array.prototype.slice.call(dock.children).filter(function (el) { return !el.hidden && (el.classList.contains('dock-item') || el.classList.contains('dock-sep')); });
@@ -203,6 +204,87 @@
     var k = items.indexOf(b), dir = (e.key === 'ArrowRight' ? 1 : -1) * (document.documentElement.dir === 'rtl' ? -1 : 1);
     var nx = items[(k + dir + items.length) % items.length]; if (nx) { e.preventDefault(); nx.focus(); }
   });
+  /* ---------- auto-hide: a glowing line at rest; the arc rises when the pointer nears the bottom ---------- */
+  var DOCK = { open: false, timer: 0, ptr: 'mouse', NEAR: 70, HIDE_MS: 400 };
+  function dockLine() { return $('dock-line'); }
+  function syncDockChrome() {
+    var dock = $('dock'); if (!dock) return;
+    var line = dockLine(), scrim = document.querySelector('.dock-scrim');
+    if (!line) {
+      scrim = document.createElement('div'); scrim.className = 'dock-scrim'; scrim.setAttribute('aria-hidden', 'true');
+      line = document.createElement('button'); line.type = 'button'; line.id = 'dock-line'; line.className = 'dock-line';
+      line.setAttribute('aria-controls', 'dock'); line.setAttribute('aria-expanded', 'false');
+      dock.parentNode.insertBefore(scrim, dock); dock.parentNode.insertBefore(line, dock);
+      line.addEventListener('pointerdown', function (e) { DOCK.ptr = e.pointerType || 'mouse'; });
+      line.addEventListener('click', function () {
+        if (DOCK.ptr === 'mouse' && !DOCK.open) { setDock(true); return; }
+        if (DOCK.ptr === 'mouse') return;
+        setDock(!DOCK.open); // touch / pen: tap toggles
+      });
+      line.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowUp') {
+          e.preventDefault(); setDock(true);
+          var cur = dock.querySelector('.dock-item[aria-current="page"]:not([hidden])') || dock.querySelector('.dock-item:not([hidden])');
+          if (cur) cur.focus();
+        }
+      });
+    }
+    line.setAttribute('aria-label', t('dv.dockshow'));
+    var off = dock.hidden || mobileMQ.matches;
+    line.hidden = off;
+    if (off && DOCK.open) setDock(false, true);
+  }
+  function setDock(open, now) {
+    var dock = $('dock'); if (!dock) return;
+    clearTimeout(DOCK.timer); DOCK.timer = 0;
+    if (open && (dock.hidden || mobileMQ.matches)) open = false;
+    if (DOCK.open === open && !now) return;
+    DOCK.open = open;
+    dock.classList.toggle('is-open', open);
+    var root = $('dash') || document.body; root.classList.toggle('dock-open', open);
+    var line = dockLine(); if (line) line.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (!open) magnify(null);
+  }
+  function hideDockSoon() {
+    if (!DOCK.open || DOCK.timer) return;
+    DOCK.timer = setTimeout(function () {
+      DOCK.timer = 0;
+      var dock = $('dock');
+      if (dock && dock.contains(document.activeElement)) return; // keyboard users keep it until focus leaves
+      setDock(false);
+    }, DOCK.HIDE_MS);
+  }
+  function dockZoneTop() {
+    var dock = $('dock'); if (!dock) return innerHeight;
+    return innerHeight - dock.offsetHeight - 10;
+  }
+  document.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'touch') return;
+    var dock = $('dock'); if (!dock || dock.hidden || mobileMQ.matches || !dock.classList.contains('arc')) return;
+    if (document.querySelector('dialog[open]')) return;
+    var y = e.clientY; DOCK.lastY = y;
+    if (y >= innerHeight - DOCK.NEAR) { setDock(true); return; }
+    if (DOCK.open) {
+      var r = dock.getBoundingClientRect(), overDock = y >= dockZoneTop() && e.clientX >= r.left - 20 && e.clientX <= r.right + 20;
+      if (overDock) { clearTimeout(DOCK.timer); DOCK.timer = 0; } else hideDockSoon();
+    }
+  }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', function () { hideDockSoon(); });
+  document.addEventListener('focusin', function (e) {
+    var dock = $('dock'); if (!dock) return;
+    if (dock.contains(e.target)) setDock(true);
+    else if (DOCK.open && e.target !== dockLine()) { if ((DOCK.lastY || 0) < dockZoneTop()) setDock(false); }
+  });
+  document.addEventListener('keydown', function (e) {
+    var dock = $('dock');
+    if (e.key === 'Escape' && DOCK.open && dock && dock.contains(document.activeElement)) { setDock(false); var l = dockLine(); if (l) l.focus(); }
+  });
+  document.addEventListener('pointerdown', function (e) {
+    // tablets: tapping outside closes the dock
+    if (!DOCK.open || e.pointerType === 'mouse') return;
+    var dock = $('dock'); if (dock && !dock.contains(e.target) && e.target !== dockLine()) setDock(false);
+  });
+  if (mobileMQ.addEventListener) mobileMQ.addEventListener('change', function () { syncDockChrome(); });
   window.addEventListener('resize', function () { layoutDock(); });
   Z.onLang(function () { setTimeout(layoutDock, 0); });
 
@@ -707,7 +789,7 @@
   }
 
   window.ZDEV = {
-    fillIcons: fillIcons, layoutDock: layoutDock, pglyph: pglyph, pglyphCanvas: pglyphCanvas, PLATFORM_IDS: Object.keys(PG), applyBrand: applyBrand, clearBrand: clearBrand, resolveBrand: resolveBrand, contrast: contrast, FONT_ALLOW: FONT_ALLOW, ambient: ambient, neonLogo: neonLogo, cubeLight: cubeLight, getMood: getMood, setMood: setMood,
+    fillIcons: fillIcons, layoutDock: layoutDock, setDock: function (v) { setDock(!!v); }, dockOpen: function () { return DOCK.open; }, pglyph: pglyph, pglyphCanvas: pglyphCanvas, PLATFORM_IDS: Object.keys(PG), applyBrand: applyBrand, clearBrand: clearBrand, resolveBrand: resolveBrand, contrast: contrast, FONT_ALLOW: FONT_ALLOW, ambient: ambient, neonLogo: neonLogo, cubeLight: cubeLight, getMood: getMood, setMood: setMood,
     icon: icon, IC: IC, buildNav: buildNav, show: show, setAvailable: setAvailable, setBadge: setBadge,
     current: function () { return NAV.current; }, onView: function (fn) { NAV.listeners.push(fn); },
     clock: clock, ring: ring, gauge: gauge, spark: spark, animateIn: animateIn, art: art, phone: phone,

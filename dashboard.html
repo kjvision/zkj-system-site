@@ -30,26 +30,26 @@
   <div class="stage-fx" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
-  <div class="menubar desk-only">
-    <a class="mb-brand" href="index.html"><img src="assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span>ZKJ SYSTEM</span></a>
-    <span class="mb-item" data-i18n="d.live">Live demo</span>
-    <span class="pill pill-demo" data-i18n="d.demo.long">Demo — this is what your clients see</span>
-    <span class="mb-spacer"></span>
-    <a class="mb-link" href="index.html" data-i18n="d.back">Back to site</a>
-    <a class="mb-link" href="app/login.html" data-i18n="d.login">Client login</a>
-    <button class="mb-link mb-btn" type="button" data-action="enquire" data-i18n="d.enquire">Enquire</button>
-    <span class="mb-clock" id="mb-clock"></span>
-  </div>
-
   <div class="mac-window" id="win">
     <header class="titlebar dash-header">
-      <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="tb-left">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <nav class="tb-crumb desk-only" aria-label="Breadcrumb">
+          <a class="mb-brand" href="index.html"><img src="assets/brand/zkjsystem-icon-primary.svg" alt="" width="14" height="16"><span>ZKJ SYSTEM</span></a>
+          <span class="mb-item" data-i18n="d.live">Live demo</span>
+          <span class="pill pill-demo tb-demo-long" data-i18n="d.demo.long">Demo — this is what your clients see</span>
+        </nav>
+      </div>
       <div class="tb-title client-brand">
         <span class="client-logo" data-qlogo></span>
         <span class="tb-name client-name"><span class="tb-sys">ZKJ SYSTEM —</span> <strong data-i18n="d.client">Qahwa House</strong></span>
         <span class="pill pill-demo pill-solid" data-i18n="d.demo">DEMO</span>
       </div>
       <div class="tb-actions dash-actions">
+        <a class="mb-link tb-back desk-only" href="index.html" data-i18n="d.back">Back to site</a>
+        <a class="mb-link tb-login desk-only" href="app/login.html" data-i18n="d.login">Client login</a>
+        <button class="mb-link mb-btn tb-enq desk-only" type="button" data-action="enquire" data-i18n="d.enquire">Enquire</button>
+        <span class="mb-clock tb-clock" id="mb-clock"></span>
         <button class="tb-btn" type="button" data-action="theme" id="theme-btn" aria-pressed="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18z" fill="currentColor"/></svg>
           <span id="theme-label" class="desk-only">Theme</span>
