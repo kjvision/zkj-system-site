@@ -364,7 +364,7 @@
     this.cv.style.width = this.W + 'px'; this.cv.style.height = this.H + 'px';
     var ky = this.ky || .82, sq = ky > 1 ? .58 : 1, ext = (this.extent || 380) * sq;
     /* keep the universe clear of the arc dock that rises over the bottom of the stage */
-    this.inset = (this.W > 700 && document.querySelector('.dock.arc:not([hidden])')) ? 70 : 0;
+    this.inset = 0; // the dock auto-hides now: the universe gets the full height
     var fit = Math.min(this.W / (2 * ext * 1.08), (this.H - this.inset) / (2 * ext * Math.max(.86, ky) * 1.04));
     var wasHome = Math.abs(this.cam.tz - this.fit) < 1e-6 || !this.fit;
     this.fit = fit;

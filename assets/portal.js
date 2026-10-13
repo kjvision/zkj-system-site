@@ -901,9 +901,11 @@
     sb.auth.getSession().then(function (r) {
       var session = r && r.data && r.data.session;
       if (!session) {
-        window.location.replace('login.html' + (SB.linkError ? '?e=link' : ''));
+        window.location.replace('login.html' + (SB.linkError ? (SB.linkCode === 'otp_expired' ? '?e=expired' : '?e=link') : ''));
         return null;
       }
+      // signed in already: a stale "#error=access_denied&error_code=otp_expired…" from an old link is not an error
+      if (SB.linkError && SB.clearLinkError) SB.clearLinkError();
       S.user = session.user;
       signedInChrome();
       if (SB.linkType === 'invite' || SB.linkType === 'recovery') { showPassword(); return null; }

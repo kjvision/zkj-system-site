@@ -65,7 +65,10 @@
 
   try {
     var q = new URLSearchParams(window.location.search);
-    if (q.get('e') === 'link' || SB.linkError) status($('login-status'), 'error', 'p.e.link');
+    if (q.get('e') === 'expired' || SB.linkCode === 'otp_expired') status($('login-status'), 'error', 'p.e.expired');
+    else if (q.get('e') === 'link' || SB.linkError) status($('login-status'), 'error', 'p.e.link');
+    if (SB.clearLinkError) SB.clearLinkError();
+    if (q.get('e')) { q.delete('e'); window.history.replaceState(window.history.state, '', window.location.pathname + (q.toString() ? '?' + q : '')); }
     else if (q.get('out') === '1') status($('login-status'), 'ok', 'p.signedout');
   } catch (e) { /* ignore */ }
 
