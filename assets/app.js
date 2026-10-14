@@ -22,6 +22,7 @@
     smm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h3l7 5V5L6 10z"/><path d="M17 9a4 4 0 010 6M19.5 6.5a7.5 7.5 0 010 11"/></svg>',
     youtube: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="3.5"/><path d="M10 9l5 3-5 3z"/></svg>',
     google: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0112 3.5 6.5 6.5 0 0118.5 10c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+    dialect: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11h-9l-4 3.5V16H4z"/><path d="M8 9.5c1.2-1.1 2.2 1.1 3.5 0s2.3 1.1 3.5 0"/><path d="M8 12.5h5"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
     wa: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.56 2 2.1 6.45 2.1 11.93c0 1.75.46 3.46 1.33 4.97L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.47 0 9.93-4.45 9.93-9.93A9.86 9.86 0 0012.04 2zm0 18.15h-.01a8.25 8.25 0 01-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.36c0-4.55 3.71-8.25 8.27-8.25 2.2 0 4.28.86 5.84 2.42a8.2 8.2 0 012.42 5.84c0 4.55-3.71 8.21-8.27 8.21zm4.53-6.16c-.25-.12-1.47-.72-1.7-.8-.23-.09-.39-.13-.56.12-.17.25-.64.8-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.12-.15.17-.25.25-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.42h-.48c-.17 0-.44.06-.66.31-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.57.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.08.15-1.18-.06-.11-.23-.17-.48-.29z"/></svg>',
@@ -30,7 +31,7 @@
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
   };
 
-  /* ---------- Tool catalogue (12 tools in 5 groups) ---------- */
+  /* ---------- Tool catalogue (14 tools in 5 groups) ---------- */
   var GROUPS = [
     { id: 'brand', code: 'G-01', en: { name: 'Brand', d: 'Know where you stand, then look the part everywhere.' }, ar: { name: 'الهوية', d: 'اعرف موقعك في السوق، ثم اظهر بهوية واحدة في كل مكان.' } },
     { id: 'content', code: 'G-02', en: { name: 'Content', d: 'Your own footage, edited into content that performs.' }, ar: { name: 'المحتوى', d: 'موادك الحقيقية، محرَّرة إلى محتوى يحقق نتائج.' } },
@@ -69,12 +70,12 @@
         desc: 'يُجدول المحتوى المعتمد ويُنشر عبر الواجهة الرسمية (API) لكل منصة، من تقويم محتوى واحد — بأمان تام لحساباتك.',
         points: ['إنستغرام، فيسبوك، تيك توك، يوتيوب', 'بنترست، إكس ولينكدإن', 'عبر الواجهات الرسمية للمنصات فقط', 'وافق أو اطلب تعديل قبل أي نشر'] } },
     { id: 'inbox', group: 'engage', code: 'T-05', icon: ICONS.inbox,
-      en: { name: 'Inbox & Comments AI', tag: 'Every comment and DM answered in your brand voice.',
-        desc: 'Replies to comments and direct messages on Instagram, Facebook, TikTok and YouTube through their official APIs. Questions you’ve approved answers for are handled automatically; anything sensitive comes straight to you.',
-        points: ['Comments and DMs on Instagram, Facebook, TikTok, YouTube', 'Replies in your brand voice, Arabic or English', 'Approved FAQs answered automatically', 'Complaints and sensitive messages escalated to you'] },
-      ar: { name: 'الرد الذكي على التعليقات والرسائل', tag: 'كل تعليق ورسالة يُرد عليها بنبرة علامتك.',
-        desc: 'يرد على التعليقات والرسائل الخاصة في إنستغرام وفيسبوك وتيك توك ويوتيوب عبر واجهاتها الرسمية. الأسئلة التي اعتمدت إجاباتها يُرد عليها تلقائيًا، وأي رسالة حساسة تصلك مباشرة.',
-        points: ['تعليقات ورسائل إنستغرام وفيسبوك وتيك توك ويوتيوب', 'ردود بنبرة علامتك بالعربية أو الإنجليزية', 'الأسئلة المتكررة المعتمدة يُرد عليها تلقائيًا', 'الشكاوى والرسائل الحساسة تُحوَّل إليك'] } },
+      en: { name: 'Inbox, Comments & Email AI', tag: 'Every comment, DM and email answered in your brand voice.',
+        desc: 'Replies to comments and direct messages on Instagram, Facebook, TikTok and YouTube, and to email in Gmail, Outlook or your own domain — all through official access you can remove at any time. Email replies wait as drafts for your approval; anything sensitive comes straight to you.',
+        points: ['Comments and DMs on Instagram, Facebook, TikTok, YouTube', 'Email: Gmail, Outlook and your own domain', 'Replies in your brand voice, Arabic or English', 'Approved FAQs answered automatically', 'Complaints and sensitive messages escalated to you'] },
+      ar: { name: 'الرد الذكي على التعليقات والرسائل والإيميل', tag: 'كل تعليق ورسالة وإيميل يُرد عليه بنبرة علامتك.',
+        desc: 'يرد على التعليقات والرسائل الخاصة في إنستغرام وفيسبوك وتيك توك ويوتيوب، وعلى الإيميلات في جيميل وأوتلوك وبريد نطاقك الخاص — كلها عبر صلاحيات رسمية تستطيع إلغاءها متى شئت. ردود الإيميل تنتظر موافقتك كمسودات، وأي رسالة حساسة تصلك مباشرة.',
+        points: ['تعليقات ورسائل إنستغرام وفيسبوك وتيك توك ويوتيوب', 'الإيميل: جيميل وأوتلوك وبريدك الخاص', 'ردود بنبرة علامتك بالعربية أو الإنجليزية', 'الأسئلة المتكررة المعتمدة يُرد عليها تلقائيًا', 'الشكاوى والرسائل الحساسة تُحوَّل إليك'] } },
     { id: 'whatsapp', group: 'engage', code: 'T-06', icon: ICONS.whatsappTool,
       en: { name: 'WhatsApp AI Assistant', tag: 'Instant answers on WhatsApp, 24/7 — with a human one tap away.',
         desc: 'Runs on the official WhatsApp Business Platform: answers questions, shares your catalogue and takes orders or bookings, then hands over to your team whenever needed.',
@@ -130,8 +131,37 @@
         points: ['Website and booking-page checks', 'Account access and two-step login review', 'Code review for common issues', 'Plain-language fix list by priority'] },
       ar: { name: 'وكيل الأمان', tag: 'اكتشف نقاط الضعف قبل أن يكتشفها غيرك.',
         desc: 'يراجع موقعك وحساباتك على السوشال والكود بحثًا عن مشاكل أمنية، ثم يعطيك قائمة إصلاحات بلغة واضحة مرتبة حسب الخطورة.',
-        points: ['فحص الموقع وصفحات الحجز', 'مراجعة صلاحيات الحسابات والتحقق بخطوتين', 'مراجعة الكود للمشاكل الشائعة', 'قائمة إصلاحات واضحة حسب الأولوية'] } }
+        points: ['فحص الموقع وصفحات الحجز', 'مراجعة صلاحيات الحسابات والتحقق بخطوتين', 'مراجعة الكود للمشاكل الشائعة', 'قائمة إصلاحات واضحة حسب الأولوية'] } },
+    { id: 'dialect', group: 'content', code: 'T-14', icon: ICONS.dialect, demo: true,
+      en: { name: 'Arabic Dialect Writer', badge: 'New · Beta', tag: 'Copy that sounds like your customers talk.',
+        desc: 'Writes posts, captions, ads and customer replies in the Arabic your customers really speak — Gulf, Egyptian or Levantine — and in French for North Africa. Iraqi and Moroccan are coming soon. It keeps your brand voice, uses only facts you gave us, and you approve every line.',
+        points: ['Gulf, Egyptian and Levantine Arabic — Iraqi and Moroccan coming soon', 'Modern Standard Arabic and North-African French', 'Your brand voice, your real facts — nothing invented', 'Side-by-side versions to choose from, approved before use'] },
+      ar: { name: 'كاتب اللهجات العربية', badge: 'جديد · تجريبي', tag: 'نصوص تشبه كلام عملائك.',
+        desc: 'يكتب المنشورات والتعليقات والإعلانات وردود العملاء بالعربية التي يتكلمها عملاؤك فعلًا — خليجي أو مصري أو شامي — وبالفرنسية لشمال أفريقيا. العراقي والمغربي قريبًا. يحافظ على نبرة علامتك، ولا يستخدم إلا المعلومات التي أعطيتنا إياها، وأنت تعتمد كل سطر.',
+        points: ['لهجات خليجية ومصرية وشامية — والعراقية والمغربية قريبًا', 'العربية الفصحى المبسطة والفرنسية لشمال أفريقيا', 'نبرة علامتك ومعلوماتك الحقيقية — بلا أي إضافات من عندنا', 'نسخ جنبًا إلى جنب لتختار منها، وتُعتمد قبل أي استخدام'] } }
   ];
+  /* ---------- Coming next (not built yet — shown honestly, not counted in the 14) ---------- */
+  var COMING = [
+    { id: 'proof', icon: ICONS.check,
+      en: { name: 'Arabic Proofreader & Rewriter', d: 'Fix spelling and grammar, and polish your Arabic text in seconds.' },
+      ar: { name: 'المدقّق والمُعيد صياغة بالعربية', d: 'صحّح الإملاء والنحو، وحسّن نصّك العربي في ثوانٍ.' } },
+    { id: 'docs', icon: ICONS.mail,
+      en: { name: 'Business Documents AI', d: 'Official letters, quotes and proposals in Arabic and English, ready to send.' },
+      ar: { name: 'مستندات الأعمال بالذكاء الاصطناعي', d: 'خطابات رسمية وعروض أسعار ومقترحات بالعربية والإنجليزية، جاهزة للإرسال.' } },
+    { id: 'store', icon: ICONS.smm,
+      en: { name: 'Online Store Assistant', d: 'Product descriptions in three languages, and answers for shoppers around the clock.' },
+      ar: { name: 'مساعد المتجر الإلكتروني', d: 'أوصاف منتجات بثلاث لغات، وردود لمتسوقيك على مدار الساعة.' } }
+  ];
+  var DIALECTS = [
+    { id: 'msa', en: 'Standard', ar: 'الفصحى', line: 'الطلبات مفتوحة الآن، ونوصّلها إلى باب منزلك.' },
+    { id: 'gulf', en: 'Gulf', ar: 'خليجي', line: 'الطلبات مفتوحة الحين، ونوصّلها لين باب بيتك.' },
+    { id: 'egypt', en: 'Egyptian', ar: 'مصري', line: 'الطلبات اتفتحت دلوقتي، وبنوصّلها لحد باب بيتك.' },
+    { id: 'levant', en: 'Levantine', ar: 'شامي', line: 'الطلبات صارت مفتوحة هلّق، وبنوصّلها لحد باب بيتك.' },
+    { id: 'iraq', en: 'Iraqi', ar: 'عراقي', soon: true },
+    { id: 'morocco', en: 'Moroccan', ar: 'مغربي', soon: true },
+    { id: 'french', en: 'French (N. Africa)', ar: 'فرنسي (شمال أفريقيا)', line: 'Les commandes sont ouvertes, livraison jusqu’à votre porte.', fr: true }
+  ];
+
   TOOLS.forEach(function (tl, i) { tl.code = 'T-' + (i < 9 ? '0' : '') + (i + 1); });
 
   var PLATFORMS = [
@@ -154,7 +184,7 @@
   /* ---------- Strings ---------- */
   var STR = {
     en: {
-      'meta.title': 'ZKJ SYSTEM — 13 AI tools by KJ VISION · ZKJ VERSE',
+      'meta.title': 'ZKJ SYSTEM — 14 AI tools by KJ VISION · ZKJ VERSE',
       'skip': 'Skip to content',
       'nav.story': 'Story',
       'st.eyebrow': 'Our story',
@@ -176,7 +206,7 @@
       'nav.menu': 'Open menu', 'lang.switch': 'Switch language to Arabic',
       'hero.eyebrow': 'ZKJ VERSE · Where Engineering Meets Light',
       'hero.title': 'AI tools that run your brand’s content — <span class="hl">and show you every step.</span>',
-      'hero.lead': 'ZKJ SYSTEM is a set of 13 AI tools built by ZKJ VERSE. Send a short brief and your own photos and videos — the tools build your brand, edit your content, publish and reply through official platform APIs with your approval, run your campaigns and tell you what worked. All inside a live dashboard in your logo and colours.',
+      'hero.lead': 'ZKJ SYSTEM is a set of 14 AI tools built by ZKJ VERSE. Send a short brief and your own photos and videos — the tools build your brand, edit your content, publish and reply through official platform APIs with your approval, run your campaigns and tell you what worked. All inside a live dashboard in your logo and colours.',
       'hero.cta.wa': 'Enquire on WhatsApp', 'hero.cta.demo': 'See a live dashboard',
       'hero.f1': 'AI tools', 'hero.f2': 'platforms published', 'hero.f3': 'languages — Arabic & English', 'hero.f4': 'posts go live without your approval',
       'mock.client': 'Your brand here', 'mock.demo': 'Live demo',
@@ -192,8 +222,10 @@
       'how.2.t': 'Brief + your photos & videos', 'how.2.d': 'A short brief on your brand, audience and goals — plus your own product photos and videos, if you have them.',
       'how.3.t': 'Tools start', 'how.3.d': 'KJ sets up the tools you chose. Content is edited from your real footage first; anything missing is generated in your style.',
       'how.4.t': 'Your live branded dashboard', 'how.4.d': 'Notifications, content, approvals and publishing in one place — in your logo and colours, in Arabic or English.',
-      'tools.eyebrow': 'The Collection', 'tools.title': '13 tools. Five groups. One system.', 'tools.sub': 'Brand, Content, Engage & Sell, Grow, Build & Protect. Start with one tool or run them all — every tool reports into the same dashboard, so you always know what’s done and what needs you.',
+      'tools.eyebrow': 'The Collection', 'tools.title': '14 tools. Five groups. One system.', 'tools.sub': 'Brand, Content, Engage & Sell, Grow, Build & Protect. Start with one tool or run them all — every tool reports into the same dashboard, so you always know what’s done and what needs you.',
       'tools.cta': 'Enquire about this tool',
+      'soon.title': 'Coming next', 'soon.sub': 'Not built yet. Tell us which one you want first and it moves up the list.', 'soon.tag': 'coming next', 'soon.cta': 'I want this first',
+      'dia.label': 'Same message, your customers’ dialect', 'dia.soon': 'soon', 'dia.msg': 'Orders are open now — we deliver to your door.', 'dia.note': 'Beta — a sample, not a promise for every phrase. You approve every line before it is used.',
       'pk.eyebrow': 'Packages', 'pk.title': 'Packages by channel', 'pk.sub': 'Every package includes Content Studio, Social Media Publisher, Insights & Reports and your live branded dashboard. Pricing is shared with you personally after your brief.',
       'pk.starter.name': 'Starter', 'pk.starter.reach': '1–2 platforms', 'pk.starter.d': 'For a focused start on the channels where your customers already are.',
       'pk.growth.name': 'Growth', 'pk.growth.reach': '3–4 platforms', 'pk.growth.d': 'For businesses ready to show up consistently on more channels — and answer every comment and DM.',
@@ -244,7 +276,7 @@
       'nf.title.doc': 'Page not found — ZKJ SYSTEM', 'nf.title': 'This page doesn’t exist', 'nf.sub': 'The link may be old or mistyped. Let’s get you back on track.', 'nf.home': 'Back to home', 'nf.demo': 'Open the live demo',
       'nav.gallery': 'Gallery',
       'hero.label': '◆ Every project becomes a tool.',
-      'hero.sub': '13 AI tools. One living dashboard. Your brand, made visible.',
+      'hero.sub': '14 AI tools. One living dashboard. Your brand, made visible.',
       'hero.cta.enter': 'Enter the system',
       'hero.scroll': 'Scroll',
       'intro.title': 'About ZKJ SYSTEM',
@@ -328,7 +360,7 @@
       'sc.grid.alt': 'Real screenshot of the @zkjverse Instagram grid: editorial posts in gold and white serif on black, architecture photographs and artworks'
     },
     ar: {
-      'meta.title': 'ZKJ SYSTEM — 13 أداة ذكاء اصطناعي من KJ VISION · ZKJ VERSE',
+      'meta.title': 'ZKJ SYSTEM — 14 أداة ذكاء اصطناعي من KJ VISION · ZKJ VERSE',
       'skip': 'انتقل إلى المحتوى',
       'nav.story': 'القصة',
       'st.eyebrow': 'قصتنا',
@@ -350,7 +382,7 @@
       'nav.menu': 'فتح القائمة', 'lang.switch': 'تغيير اللغة إلى الإنجليزية',
       'hero.eyebrow': 'ZKJ VERSE · حيث تلتقي الهندسة بالضوء',
       'hero.title': 'أدوات ذكاء اصطناعي تدير محتوى علامتك — <span class="hl">وتريك كل خطوة.</span>',
-      'hero.lead': 'ZKJ SYSTEM مجموعة من 13 أداة ذكاء اصطناعي من تطوير ZKJ VERSE. أرسل موجزًا قصيرًا مع صورك وفيديوهاتك — والأدوات تبني هويتك، وتحرّر محتواك، وتنشر وترد عبر الواجهات الرسمية للمنصات بعد موافقتك، وتدير حملاتك، وتخبرك بما نجح. وكل ذلك داخل لوحة تحكم مباشرة بشعارك وألوانك.',
+      'hero.lead': 'ZKJ SYSTEM مجموعة من 14 أداة ذكاء اصطناعي من تطوير ZKJ VERSE. أرسل موجزًا قصيرًا مع صورك وفيديوهاتك — والأدوات تبني هويتك، وتحرّر محتواك، وتنشر وترد عبر الواجهات الرسمية للمنصات بعد موافقتك، وتدير حملاتك، وتخبرك بما نجح. وكل ذلك داخل لوحة تحكم مباشرة بشعارك وألوانك.',
       'hero.cta.wa': 'تواصل معنا على واتساب', 'hero.cta.demo': 'شاهد لوحة تحكم حيّة',
       'hero.f1': 'أدوات ذكاء اصطناعي', 'hero.f2': 'منصات للنشر', 'hero.f3': 'لغتان — العربية والإنجليزية', 'hero.f4': 'منشورات تُنشر بدون موافقتك',
       'mock.client': 'علامتك هنا', 'mock.demo': 'عرض مباشر',
@@ -366,7 +398,9 @@
       'how.2.t': 'الموجز + صورك وفيديوهاتك', 'how.2.d': 'موجز قصير عن علامتك وجمهورك وأهدافك — مع صور وفيديوهات منتجاتك إن توفّرت.',
       'how.3.t': 'تبدأ الأدوات', 'how.3.d': 'يجهّز KJ الأدوات التي اخترتها. يُحرَّر المحتوى من موادك الحقيقية أولًا، وما ينقص يُولَّد بأسلوب علامتك.',
       'how.4.t': 'لوحتك المباشرة بهويتك', 'how.4.d': 'الإشعارات والمحتوى والموافقات والنشر في مكان واحد — بشعارك وألوانك، بالعربية أو الإنجليزية.',
-      'tools.eyebrow': 'المجموعة', 'tools.title': '13 أداة. خمس مجموعات. نظام واحد.', 'tools.sub': 'الهوية، المحتوى، التفاعل والمبيعات، النمو، البناء والحماية. ابدأ بأداة واحدة أو شغّلها كلها — كل أداة ترفع تقاريرها إلى نفس اللوحة، فتعرف دائمًا ما الذي أُنجز وما الذي يحتاجك.',
+      'tools.eyebrow': 'المجموعة', 'tools.title': '14 أداة. خمس مجموعات. نظام واحد.', 'tools.sub': 'الهوية، المحتوى، التفاعل والمبيعات، النمو، البناء والحماية. ابدأ بأداة واحدة أو شغّلها كلها — كل أداة ترفع تقاريرها إلى نفس اللوحة، فتعرف دائمًا ما الذي أُنجز وما الذي يحتاجك.',
+      'soon.title': 'قريبًا', 'soon.sub': 'لم تُبنَ بعد. أخبرنا أيّها تريد أولًا فيتقدّم في القائمة.', 'soon.tag': 'قريبًا', 'soon.cta': 'أريدها أولًا',
+      'dia.label': 'الرسالة نفسها بلهجة عملائك', 'dia.soon': 'قريبًا', 'dia.msg': 'الطلبات مفتوحة الآن — نوصّل إلى باب بيتك.', 'dia.note': 'نسخة تجريبية — مثال وليس وعدًا بكل عبارة. وأنت تعتمد كل سطر قبل استخدامه.',
       'tools.cta': 'استفسر عن هذه الأداة',
       'pk.eyebrow': 'الباقات', 'pk.title': 'باقات حسب عدد المنصات', 'pk.sub': 'كل باقة تشمل استوديو المحتوى وناشر السوشال ميديا والتحليلات والتقارير ولوحتك المباشرة بهويتك. يُرسل لك التسعير شخصيًا بعد الموجز.',
       'pk.starter.name': 'البداية', 'pk.starter.reach': 'منصة أو منصتان', 'pk.starter.d': 'لبداية مركّزة على المنصات التي يتواجد فيها عملاؤك أصلًا.',
@@ -418,7 +452,7 @@
       'nf.title.doc': 'الصفحة غير موجودة — ZKJ SYSTEM', 'nf.title': 'هذه الصفحة غير موجودة', 'nf.sub': 'قد يكون الرابط قديمًا أو مكتوبًا بشكل خاطئ. خلّنا نرجعك للمسار الصحيح.', 'nf.home': 'العودة للرئيسية', 'nf.demo': 'افتح العرض المباشر',
       'nav.gallery': 'المعرض',
       'hero.label': '◆ كل مشروع يصبح أداة.',
-      'hero.sub': '13 أداة ذكاء اصطناعي. لوحة تحكم حيّة واحدة. علامتك، مرئية.',
+      'hero.sub': '14 أداة ذكاء اصطناعي. لوحة تحكم حيّة واحدة. علامتك، مرئية.',
       'hero.cta.enter': 'ادخل النظام',
       'hero.scroll': 'مرّر',
       'intro.title': 'عن ZKJ SYSTEM',
@@ -573,10 +607,12 @@
 
   /* ---------- Enquiry context + WhatsApp ---------- */
   var ctx = null; // { type: 'tool'|'package', id }
+  function soonById(id) { for (var i = 0; i < COMING.length; i++) if (COMING[i].id === id) return COMING[i]; return null; }
   function toolById(id) { for (var i = 0; i < TOOLS.length; i++) if (TOOLS[i].id === id) return TOOLS[i]; return null; }
   function ctxLabel(c) {
     if (!c) return '';
     if (c.type === 'tool') { var tl = toolById(c.id); return tl ? tl[lang].name : ''; }
+    if (c.type === 'soon') { var sn = soonById(c.id); return sn ? sn[lang].name + ' (' + t('soon.tag') + ')' : ''; }
     if (c.type === 'package') return t('wa.pkg', { name: t('pk.' + c.id + '.name'), reach: t('pk.' + c.id + '.reach') });
     return '';
   }
@@ -621,16 +657,36 @@
   }
 
   /* ---------- Index renderers ---------- */
+  var dialectSel = 'gulf';
+  function dialectDemo() {
+    var cur = null;
+    DIALECTS.forEach(function (d) { if (d.id === dialectSel) cur = d; });
+    return '<div class="dia-demo" data-dia><p class="dia-label">' + esc(t('dia.label')) + '</p>' +
+      '<p class="dia-msg">' + esc(t('dia.msg')) + '</p>' +
+      '<div class="dia-chips" role="group" aria-label="' + esc(t('dia.label')) + '">' + DIALECTS.map(function (d) {
+        if (d.soon) return '<span class="dia-chip is-soon" aria-disabled="true">' + esc(d[lang]) + ' <small>' + esc(t('dia.soon')) + '</small></span>';
+        return '<button type="button" class="dia-chip" data-dia-pick="' + d.id + '" aria-pressed="' + (d.id === dialectSel ? 'true' : 'false') + '">' + esc(d[lang]) + '</button>';
+      }).join('') + '</div>' +
+      '<p class="dia-line" aria-live="polite" lang="' + (cur.fr ? 'fr' : 'ar') + '" dir="' + (cur.fr ? 'ltr' : 'rtl') + '">' + esc(cur.line) + '</p>' +
+      '<p class="dia-note">' + esc(t('dia.note')) + '</p></div>';
+  }
+  function soonCard(c) {
+    var d = c[lang];
+    return '<li><article class="soon-card"><div class="tool-icon">' + c.icon + '</div>' +
+      '<div><h4>' + esc(d.name) + '</h4><p>' + esc(d.d) + '</p></div>' +
+      '<a class="btn btn-sm" href="#enquire" data-enquire="soon:' + c.id + '">' + esc(t('soon.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a></article></li>';
+  }
   function toolCard(tl) {
     var d = tl[lang];
     var ex = 'EX-' + tl.code.slice(2);
-    return '<li><article class="tool-card exhibit" id="tool-' + tl.id + '">' +
-      '<div class="plaque"><span class="tag">' + ex + '</span><div class="tool-icon">' + tl.icon + '</div></div>' +
+    return '<li><article class="tool-card exhibit' + (tl.demo ? ' has-demo' : '') + '" id="tool-' + tl.id + '">' +
+      '<div class="plaque"><span class="tag">' + ex + '</span>' + (d.badge ? '<span class="tool-badge">' + esc(d.badge) + '</span>' : '') + '<div class="tool-icon">' + tl.icon + '</div></div>' +
       '<h4>' + esc(d.name) + '</h4>' +
       '<p class="tool-tag">' + esc(d.tag) + '</p>' +
       '<p class="tool-desc">' + esc(d.desc) + '</p>' +
       '<ul>' + d.points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
-      '<a class="btn btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('ex.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a>' +
+      '<div class="ex-actions"><button type="button" class="btn btn-sm btn-primary btn-try" data-try="' + tl.id + '">' + esc(t('try.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></button>' +
+      '<a class="btn btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('ex.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a></div>' +
       '</article></li>';
   }
   function renderTools() {
@@ -641,7 +697,9 @@
       return '<div class="tool-group exroom" id="group-' + g.id + '">' +
         '<div class="exroom-head"><span class="tag">' + esc(t('ex.room', { n: gi + 1 })) + ' · ' + g.code + '</span><h3>' + esc(g[lang].name) + '</h3><p>' + esc(g[lang].d) + '</p></div>' +
         '<ul class="ex-track">' + list.map(toolCard).join('') + '</ul></div>';
-    }).join('');
+    }).join('') +
+      '<div class="tool-group exroom soon-room" id="group-soon"><div class="exroom-head"><span class="tag">' + esc(t('soon.tag')).toUpperCase() + '</span><h3>' + esc(t('soon.title')) + '</h3><p>' + esc(t('soon.sub')) + '</p></div>' +
+      '<ul class="soon-track">' + COMING.map(soonCard).join('') + '</ul></div>';
   }
   function renderPackages() {
     var grid = document.getElementById('packages-grid');
@@ -777,6 +835,8 @@
         }
         return;
       }
+      var dp = e.target.closest('[data-dia-pick]');
+      if (dp) { dialectSel = dp.getAttribute('data-dia-pick'); var box = dp.closest('[data-dia]'); if (box) { var tmp = document.createElement('div'); tmp.innerHTML = dialectDemo(); box.replaceWith(tmp.firstChild); var nb = document.querySelector('[data-dia-pick="' + dialectSel + '"]'); if (nb) nb.focus(); } return; }
       var cc = e.target.closest('[data-ctx-clear]');
       if (cc) { e.preventDefault(); setContext(null); return; }
       var menu = e.target.closest('[data-menu]');
@@ -809,7 +869,7 @@
 
   window.ZKJ = {
     t: t, tLang: tLang, extend: extend, esc: esc, onLang: onLang, setLang: setLang, getLang: function () { return lang; },
-    toast: toast, waLink: waLink, store: store, TOOLS: TOOLS, GROUPS: GROUPS, PLATFORMS: PLATFORMS, ICONS: ICONS, IG_URL: IG_URL,
+    toast: toast, waLink: waLink, store: store, TOOLS: TOOLS, COMING: COMING, GROUPS: GROUPS, PLATFORMS: PLATFORMS, ICONS: ICONS, IG_URL: IG_URL,
     applyLang: applyLang
   };
 

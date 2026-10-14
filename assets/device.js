@@ -372,10 +372,10 @@
       ticks += '<line x1="' + (100 + r1 * Math.sin(a)).toFixed(1) + '" y1="' + (100 - r1 * Math.cos(a)).toFixed(1) + '" x2="' + (100 + r2 * Math.sin(a)).toFixed(1) + '" y2="' + (100 - r2 * Math.cos(a)).toFixed(1) + '"/>';
     }
     var off = (C * (1 - Math.max(pct, .012))).toFixed(1);
-    return '<svg viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + (o.c1 || '#F6E7B4') + '"/><stop offset=".55" stop-color="' + (o.c2 || '#D4AF37') + '"/><stop offset="1" stop-color="' + (o.c3 || '#8E6E17') + '"/></linearGradient>' +
+    return '<svg viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + (o.c1 || '#F6E7B4') + '"/><stop offset=".55" stop-color="' + (o.c2 || '#C9A84C') + '"/><stop offset="1" stop-color="' + (o.c3 || '#8E6E17') + '"/></linearGradient>' +
       '<filter id="' + id + 'g" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.5"/></filter></defs>' +
       '<g stroke="rgba(255,255,255,.22)" stroke-width="1">' + ticks + '</g>' +
-      '<circle cx="100" cy="100" r="' + r + '" fill="none" stroke="' + (o.track || 'rgba(212,175,55,.12)') + '" stroke-width="16"/>' +
+      '<circle cx="100" cy="100" r="' + r + '" fill="none" stroke="' + (o.track || 'rgba(201, 168, 76,.12)') + '" stroke-width="16"/>' +
       '<g transform="rotate(-90 100 100)">' +
       '<circle class="ring-arc" cx="100" cy="100" r="' + r + '" fill="none" stroke="url(#' + id + ')" stroke-width="16" stroke-linecap="round" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (reduce ? off : C.toFixed(1)) + '" data-off="' + off + '" filter="url(#' + id + 'g)" opacity=".55"/>' +
       '<circle class="ring-arc" cx="100" cy="100" r="' + r + '" fill="none" stroke="url(#' + id + ')" stroke-width="16" stroke-linecap="round" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (reduce ? off : C.toFixed(1)) + '" data-off="' + off + '"/>' +
@@ -392,19 +392,19 @@
     for (var i = 0; i <= 40; i++) {
       var deg = 150 + i * 6, major = i % 10 === 0, mid = i % 5 === 0;
       var a = pt(deg, major ? 88 : mid ? 91 : 94), b = pt(deg, 99);
-      ticks += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" stroke="' + (major ? 'rgba(234,217,166,.9)' : 'rgba(255,255,255,.28)') + '" stroke-width="' + (major ? 1.6 : 1) + '"/>';
+      ticks += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" stroke="' + (major ? 'rgba(230, 213, 163,.9)' : 'rgba(255,255,255,.28)') + '" stroke-width="' + (major ? 1.6 : 1) + '"/>';
       if (major) { var lp = pt(deg, 75); labels += '<text x="' + lp[0] + '" y="' + (+lp[1] + 3).toFixed(1) + '" text-anchor="middle">' + Math.round((o.max || 100) * i / 40) + '</text>'; }
     }
     var zones = '<path d="' + arc(150, 246, 64) + '" stroke="rgba(229,83,75,.55)"/><path d="' + arc(246, 318, 64) + '" stroke="rgba(224,164,58,.55)"/><path d="' + arc(318, 390, 64) + '" stroke="rgba(63,191,115,.55)"/>';
     var end = pt(150 + 240 * pct, r);
-    return '<svg viewBox="0 0 200 172" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#8E6E17"/><stop offset=".6" stop-color="#D4AF37"/><stop offset="1" stop-color="#F6E7B4"/></linearGradient></defs>' +
+    return '<svg viewBox="0 0 200 172" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#8E6E17"/><stop offset=".6" stop-color="#C9A84C"/><stop offset="1" stop-color="#F6E7B4"/></linearGradient></defs>' +
       '<path d="' + arc(150, 390, r) + '" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="10" stroke-linecap="round"/>' +
       '<path class="ring-arc" d="' + arc(150, 390, r) + '" fill="none" stroke="url(#' + id + ')" stroke-width="10" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="' + (reduce ? (100 - pct * 100).toFixed(1) : 100) + '" data-off="' + (100 - pct * 100).toFixed(1) + '"/>' +
       '<g fill="none" stroke-width="3">' + zones + '</g>' + ticks +
       '<g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="rgba(255,255,255,.5)">' + labels + '</g>' +
       '<g class="needle" style="transform: rotate(' + (reduce ? 240 * pct : 0) + 'deg)" data-rot="' + (240 * pct).toFixed(1) + '">' +
       '<path d="M' + pt(150, 70)[0] + ' ' + pt(150, 70)[1] + ' L' + pt(240, 4)[0] + ' ' + pt(240, 4)[1] + ' L' + pt(60, 4)[0] + ' ' + pt(60, 4)[1] + 'Z" fill="#F6E7B4"/></g>' +
-      '<circle cx="100" cy="100" r="7" fill="#0B0B0F" stroke="#D4AF37" stroke-width="2"/>' +
+      '<circle cx="100" cy="100" r="7" fill="#0B0B0F" stroke="#C9A84C" stroke-width="2"/>' +
       '<circle cx="' + end[0] + '" cy="' + end[1] + '" r="3" fill="#fff" opacity=".9"/></svg>';
   }
   function spark(values, o) {
@@ -414,9 +414,9 @@
     var pts = values.map(function (v, i) { return [(i / (values.length - 1) * 100).toFixed(2), (28 - (v - min) / span * 24).toFixed(2)]; });
     var line = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0] + ' ' + p[1]; }).join(' ');
     var id = uid('sp'), last = pts[pts.length - 1];
-    return '<svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D4AF37" stop-opacity=".35"/><stop offset="1" stop-color="#D4AF37" stop-opacity="0"/></linearGradient></defs>' +
+    return '<svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9A84C" stop-opacity=".35"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/></linearGradient></defs>' +
       '<path d="' + line + ' L100 32 L0 32Z" fill="url(#' + id + ')"/>' +
-      '<path d="' + line + '" fill="none" stroke="#EAD9A6" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
+      '<path d="' + line + '" fill="none" stroke="#E6D5A3" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
       '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="2.2" fill="#fff" vector-effect="non-scaling-stroke"/></svg>';
   }
   // after inserting instruments: sweep rings and needles to their value
@@ -433,7 +433,7 @@
   /* ---------- Post placeholder art ---------- */
   function hash(s) { var h = 2166136261; s = String(s || ''); for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function art(o) {
-    var h = hash(o.seed), a = o.a || '#15151B', b = o.b || '#D4AF37';
+    var h = hash(o.seed), a = o.a || '#15151B', b = o.b || '#C9A84C';
     var vx = 20 + (h % 60), vy = 18 + ((h >> 8) % 50), lines = '';
     for (var i = 0; i < 16; i++) {
       var ex = i < 8 ? (i / 7) * 100 : 100 - ((i - 8) / 7) * 100, ey = i < 8 ? 125 : -5;
@@ -626,7 +626,7 @@
       '<div class="amb-blue"><div class="grid"></div>' +
       '<svg class="dims" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"><g class="scan"><line x1="80" y1="520" x2="560" y2="520"/><path d="M80 512v16M560 512v16M80 520l10-4v8zM560 520l-10-4v8z"/><text x="290" y="510">4 800</text></g>' +
       '<line x1="940" y1="120" x2="940" y2="460"/><path d="M932 120h16M932 460h16"/><text x="900" y="300" transform="rotate(-90 900 300)">3 400</text>' +
-      '<path d="M120 90h160M120 90v80" /><text x="128" y="84">± 0.00</text><circle cx="120" cy="90" r="4" fill="none" stroke="rgba(212,175,55,.6)"/></svg>' +
+      '<path d="M120 90h160M120 90v80" /><text x="128" y="84">± 0.00</text><circle cx="120" cy="90" r="4" fill="none" stroke="rgba(201, 168, 76,.6)"/></svg>' +
       '<div class="iso"><div class="cube3d"><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>';
   }
   var AMB_MS = 11000;
@@ -709,7 +709,7 @@
     var bg = hexOk(b.bg) || hexOk(fb.bg) || '#0B0B0F';
     var light = lumOf(bg) > .4;
     var surface = hexOk(b.surface) || (light ? mix(bg, '#FFFFFF', .7) : mix(bg, '#FFFFFF', .05));
-    var primary = hexOk(b.primary) || hexOk(fb.primary) || '#D4AF37';
+    var primary = hexOk(b.primary) || hexOk(fb.primary) || '#C9A84C';
     var accent = hexOk(b.accent) || hexOk(fb.accent) || primary;
     var notes = [];
     var text = hexOk(b.text) || bestInk(bg);

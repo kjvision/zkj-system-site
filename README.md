@@ -2,7 +2,7 @@
 
 Static marketing site for **ZKJ SYSTEM**, the AI tools sold by **ZKJ VERSE**, plus a clickable live demo of the client dashboard.
 
-- `index.html` — marketing site (hero, how it works, 13 tools in 5 groups — Brand / Content / Engage & Sell / Grow / Build & Protect — safety, packages, FAQ, enquiries)
+- `index.html` — marketing site (hero, how it works, 14 tools in 5 groups — Brand / Content / Engage & Sell / Grow / Build & Protect — safety, packages, FAQ, enquiries)
 - `dashboard.html` — live demo client dashboard (sample brand "Qahwa House" / «بيت القهوة»), no login, all state in memory
 - `404.html` — not-found page
 - `assets/style.css` — shared styles (ZKJ VERSE dark theme + the demo's brand theme)

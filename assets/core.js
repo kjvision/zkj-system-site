@@ -43,12 +43,12 @@
 
   var TAU = Math.PI * 2;
   var reduceMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-  var COL = { ok: '#3FBF73', warn: '#E0A43A', bad: '#FF6B5E', off: '#7B818B', gold: '#D4AF37', goldL: '#F6E7B4' };
+  var COL = { ok: '#3FBF73', warn: '#E0A43A', bad: '#FF6B5E', off: '#7B818B', gold: '#C9A84C', goldL: '#F6E7B4' };
   var STATUS_COL = { draft: COL.off, needs_approval: COL.gold, approved: COL.ok, changes_requested: COL.warn, scheduled: '#7FB7FF', published: '#FFFFFF' };
   function L() { return Z.getLang(); }
   function hash(s) { var h = 2166136261; s = String(s || ''); for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var x = Math.imul(seed ^ seed >>> 15, 1 | seed); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; }; }
-  function hexA(h, a) { var m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return 'rgba(212,175,55,' + a + ')'; var n = parseInt(m[1], 16); return 'rgba(' + (n >> 16) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
+  function hexA(h, a) { var m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return 'rgba(201, 168, 76,' + a + ')'; var n = parseInt(m[1], 16); return 'rgba(' + (n >> 16) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
   function ease(x) { return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function stageOf(s) { return s === 'draft' || s === 'changes_requested' ? 'studio' : s === 'needs_approval' ? 'gate' : s === 'approved' || s === 'scheduled' ? 'publisher' : s === 'published' ? 'channel' : 'studio'; }
@@ -611,7 +611,7 @@
         var a = s.a * (self.reduce ? .85 : .65 + .35 * Math.sin(T * s.tw + s.ph));
         if (warpK > .02) {
           var dx = x - W / 2, dy = y - H / 2, l = warpK * (li + 1) * .5;
-          g.strokeStyle = 'rgba(234,217,166,' + (a * .9) + ')'; g.lineWidth = s.s;
+          g.strokeStyle = 'rgba(230, 213, 163,' + (a * .9) + ')'; g.lineWidth = s.s;
           g.beginPath(); g.moveTo(x, y); g.lineTo(x + dx * l, y + dy * l); g.stroke();
         } else { g.fillStyle = 'rgba(255,250,235,' + a + ')'; g.fillRect(x, y, s.s, s.s); }
       }
@@ -648,7 +648,7 @@
   };
   P.addHit = function (e, p, r) { var s = this.toScreen(p); this.hits.push({ e: e, x: s.x, y: s.y, r: Math.max(14, r * this.cam.z + 6) }); };
   P.orbitRing = function (g, r, px, a, dash) {
-    g.strokeStyle = 'rgba(234,217,166,' + a + ')'; g.lineWidth = px;
+    g.strokeStyle = 'rgba(230, 213, 163,' + a + ')'; g.lineWidth = px;
     if (dash) g.setLineDash([2 * px, 6 * px]);
     var sq = this.ky > 1 ? .58 : 1;
     g.beginPath(); g.ellipse(0, 0, r * sq, r * this.ky * sq, 0, 0, TAU); g.stroke(); g.setLineDash([]);
