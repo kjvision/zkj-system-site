@@ -1001,3 +1001,57 @@ html[lang="ar"] .label { font-size: 16px; }
 .story-steps b { font-size: 19px; }
 .faq summary { font-size: 18px; }
 html[lang="ar"] .exroom-head h3, html[lang="ar"] .exhibit h4 { letter-spacing: 0; }
+
+/* ---------- TOOL 14 · badge, dialect demo, coming-next ---------- */
+.tool-badge { margin-inline-start: auto; margin-inline-end: 10px; font-family: var(--f-display); font-size: 11px; font-weight: 600; letter-spacing: 2.5px; color: var(--obsidian); background: var(--gold); padding: 5px 9px; white-space: nowrap; }
+html[lang="ar"] .tool-badge { font-size: 13px; letter-spacing: 0; }
+.dia-demo { margin: 4px 0 2px; padding: 16px; background: rgba(212, 175, 55, .05); border: 1px solid var(--hair-soft); display: grid; gap: 10px; }
+.dia-label { margin: 0; font-family: var(--f-display); font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); }
+html[lang="ar"] .dia-label { font-size: 14px; letter-spacing: 0; }
+.dia-msg { margin: 0; font-size: 14px; color: var(--silver); }
+.dia-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dia-chip { min-height: 36px; padding: 6px 12px; border: 1px solid var(--line-strong); background: var(--obsidian); color: var(--text-2); font: 600 13px/1 var(--f-body); cursor: pointer; }
+.dia-chip:hover { border-color: var(--gold); color: var(--white); }
+.dia-chip[aria-pressed="true"] { background: var(--gold); color: var(--obsidian); border-color: var(--gold); }
+.dia-chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.dia-line { margin: 0; min-height: 3.2em; padding: 12px 14px; background: var(--obsidian); border-inline-start: 2px solid var(--gold); font-size: 21px; line-height: 1.7; color: var(--white); font-family: "IBM Plex Sans Arabic", var(--f-body); }
+.dia-line[lang="fr"] { font-family: var(--f-body); font-size: 17px; line-height: 1.5; }
+.dia-note { margin: 0; font-size: 12.5px; color: var(--silver); line-height: 1.5; }
+
+.soon-room { margin-top: 56px; }
+.soon-track { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; list-style: none; margin: 0; padding: 0; }
+.soon-card { height: 100%; display: flex; flex-direction: column; gap: 14px; padding: 24px; border: 1px dashed var(--hair); background: rgba(255, 255, 255, .015); }
+.soon-card .tool-icon { width: 42px; height: 42px; display: grid; place-items: center; color: var(--silver); border: 1px solid var(--line-strong); }
+.soon-card .tool-icon svg { width: 20px; height: 20px; }
+.soon-card h4 { margin: 0 0 6px; font-size: 18px; }
+.soon-card p { margin: 0; font-size: 14.5px; color: var(--text-2); }
+.soon-card .btn { margin-top: auto; align-self: flex-start; }
+@media (max-width: 860px) { .soon-track { grid-template-columns: 1fr; } }
+
+/* ---------- QUIZ · find your tools in 30 seconds ---------- */
+.quiz-card { max-width: 900px; margin: 0 auto; padding: clamp(24px, 4.5vw, 48px); background: linear-gradient(180deg, #17171D, #111116); border: 1px solid var(--hair-soft); clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px); }
+.quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+.quiz-dots { display: flex; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.quiz-dots li { width: 12px; height: 12px; transform: rotate(45deg); border: 1px solid var(--silver); transition: background .25s, border-color .25s, box-shadow .25s; }
+.quiz-dots li.done { background: var(--gold); border-color: var(--gold); }
+.quiz-dots li.now { border-color: var(--gold); box-shadow: 0 0 14px rgba(212, 175, 55, .7); }
+.quiz-q { margin: 0 0 26px; font-size: clamp(26px, 4.4vw, 42px); font-weight: 700; line-height: 1.25; outline: none; }
+.quiz-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.quiz-opt { min-height: 68px; padding: 14px 18px; text-align: start; border: 1px solid var(--line-strong); background: var(--obsidian); color: var(--white); font: 600 17px/1.35 var(--f-body); cursor: pointer; transition: border-color .2s, background .2s, transform .2s; }
+.quiz-opt:hover, .quiz-opt:focus-visible { border-color: var(--gold); background: var(--gold-wash); transform: translateY(-2px); outline: none; }
+.quiz-opt:focus-visible { box-shadow: 0 0 0 2px var(--gold); }
+.quiz-link { margin-top: 22px; background: none; border: 0; padding: 8px 0; color: var(--silver); font: 600 14px var(--f-body); letter-spacing: 1px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.quiz-link:hover { color: var(--white); }
+.quiz-res-sub { margin: -10px 0 24px; font-size: 17px; color: var(--text-2); }
+.quiz-res { list-style: none; margin: 0 0 28px; padding: 0; display: grid; gap: 14px; }
+.quiz-tool { display: flex; gap: 18px; align-items: flex-start; padding: 18px; border: 1px solid var(--hair-soft); background: rgba(212, 175, 55, .04); }
+.quiz-tool .tool-icon { flex: none; width: 52px; height: 52px; display: grid; place-items: center; color: var(--gold); border: 1px solid var(--hair); }
+.quiz-tool .tool-icon svg { width: 24px; height: 24px; }
+.quiz-tool h4 { margin: 0 0 4px; font-size: 21px; }
+.quiz-tool .tool-tag { margin: 0 0 6px; color: var(--white); font-size: 15.5px; }
+.quiz-why { margin: 0; font-size: 14px; color: var(--gold-light); }
+.quiz-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.quiz-cta .quiz-link { margin: 0; }
+.quiz-privacy { margin: 20px 0 0; font-size: 13px; color: var(--silver); }
+@media (max-width: 640px) { .quiz-opts { grid-template-columns: 1fr; } .quiz-cta .btn { width: 100%; } .quiz-tool { padding: 14px; gap: 14px; } }
+html.reduce-motion .quiz-opt, html.reduce-motion .quiz-dots li { transition: none; }
