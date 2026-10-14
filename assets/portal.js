@@ -1304,9 +1304,10 @@
     list.hidden = false;
     list.innerHTML = res.rows.map(function (r) {
       var x = r.row, p = x.platform ? plat(x.platform)[L()] : '—';
-      return '<li' + (r.ok ? '' : ' class="bad"') + '><span class="mono">' + esc(t('p.imp.item', { n: r.n })) + '</span>' +
-        '<b>' + esc(x.title || '—') + '</b><span class="mono">' + esc(t('p.type.' + x.kind) || x.kind) + ' · ' + esc(p) + '</span>' +
-        (r.ok ? '<span class="imp-when">' + esc(r.when ? fmtWhen(r.when) : t('p.appr.nowhen')) + '</span>' : '<span>' + esc(r.errs.join(' ')) + '</span>') + '</li>';
+      var kindName = IMPORT_KINDS.indexOf(x.kind) > -1 ? t('p.type.' + x.kind) : x.kind;
+      return '<li' + (r.ok ? '' : ' class="bad"') + '><span class="imp-top"><span class="mono">' + esc(t('p.imp.item', { n: r.n })) + '</span><b>' + esc(x.title || '—') + '</b></span>' +
+        '<span class="imp-meta"><span class="mono">' + esc(kindName + ' · ' + p) + '</span>' +
+        (r.ok ? '<span class="imp-when">' + esc(r.when ? fmtWhen(r.when) : t('p.appr.nowhen')) + '</span>' : '<span class="imp-err">' + esc(r.errs.join(' ')) + '</span>') + '</span></li>';
     }).join('');
     var ok = !res.errors.length;
     sum.className = 'imp-sum' + (ok ? ' ok' : '');
