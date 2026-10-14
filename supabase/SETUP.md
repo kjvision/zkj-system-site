@@ -102,3 +102,10 @@ Drafts (status `draft`) stay hidden from clients until you change the status.
 - **Never share the database password.**
 - The **publishable key** (`sb_publishable_…`) in the website code is meant to be public. That's fine. The security rules from step 1 protect the data.
 - If you think a secret leaked, rotate it in **Project Settings → API / Database** straight away.
+
+---
+
+## Add ZKJ SYSTEM (client #3, 14 Oct 2026)
+
+After the launch, run `supabase/add-zkj-system.sql` once: **SQL Editor → New query → paste → Run**.
+It adds ZKJ SYSTEM as your own brand, with the launch reel (published) and the 4 posts waiting for your approval, and moves all three brands to gold #C9A84C. Running it twice changes nothing.
