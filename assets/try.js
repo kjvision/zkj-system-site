@@ -293,7 +293,7 @@
     init: function () { return { lg: 'system', col: '#C9A84C', font: 'cinzel', bg: 1, lay: 'stack', name: '' }; },
     render: function (s) {
       var lo = LOGOS[s.lg];
-      return lab({ en: '1 · Your logo', ar: '١ · شعارك' }) +
+      return '<div class="bk-wrap"><div class="bk-ctl">' + lab({ en: '1 · Your logo', ar: '١ · شعارك' }) +
         '<div class="bk-logos">' + Object.keys(LOGOS).map(function (k) { return '<button type="button" data-x="lg" data-v="' + k + '" aria-pressed="' + (k === s.lg) + '"><span class="m" style="-webkit-mask-image:url(' + LOGOS[k].src + ');mask-image:url(' + LOGOS[k].src + ')"></span><small>' + LOGOS[k].n + '</small></button>'; }).join('') + '</div>' +
         lab({ en: '2 · Colour', ar: '٢ · اللون' }) +
         '<div class="bk-cols">' + COLS.map(function (c) { return '<button type="button" data-x="col" data-v="' + c + '" aria-pressed="' + (c === s.col) + '" style="background:' + c + '"><span class="sr-only">' + c + '</span></button>'; }).join('') +
@@ -302,7 +302,7 @@
         lab({ en: '4 · Layout', ar: '٤ · التنسيق' }) + chips('lay', [{ v: 'stack', l: { en: 'Stacked', ar: 'عمودي' } }, { v: 'row', l: { en: 'Side by side', ar: 'أفقي' } }, { v: 'icon', l: { en: 'Icon only', ar: 'الرمز فقط' } }], s.lay) +
         lab({ en: '5 · Background — KJ’s artworks', ar: '٥ · الخلفية — من أعمال KJ' }) +
         '<div class="bk-bgs">' + BGS.map(function (b, i) { return '<button type="button" data-x="bg" data-v="' + i + '" aria-pressed="' + (i === s.bg) + '" style="' + (b === 'white' ? 'background:#F4F1EA' : b ? 'background-image:url(' + b + ')' : 'background:#0B0B0F') + '"><span class="sr-only">' + (i + 1) + '</span></button>'; }).join('') + '</div>' +
-        '<div data-out>' + S.brand.out(s) + '</div>';
+        '</div><div data-out>' + S.brand.out(s) + '</div></div>';
     },
     out: function (s) {
       var lo = LOGOS[s.lg], F = FONTS.filter(function (f) { return f.v === s.font; })[0], b = BGS[s.bg];
@@ -352,7 +352,7 @@
     render: function (s) {
       var B = BRANDS[s.b], sel = PPL.filter(function (p) { return s.on[p]; });
       var cap = tx(B.cap);
-      return '<div class="pb-brands">' + Object.keys(BRANDS).map(function (k) { return '<button type="button" data-x="b" data-v="' + k + '" aria-pressed="' + (k === s.b) + '"><img src="' + BRANDS[k].logo + '" alt=""><span><b>' + BRANDS[k].name + '</b><small>@' + BRANDS[k].h + '</small></span></button>'; }).join('') + '</div>' +
+      return '<div class="pb-wrap"><div class="pb-brands">' + Object.keys(BRANDS).map(function (k) { return '<button type="button" data-x="b" data-v="' + k + '" aria-pressed="' + (k === s.b) + '"><img src="' + BRANDS[k].logo + '" alt=""><span><b>' + BRANDS[k].name + '</b><small>@' + BRANDS[k].h + '</small></span></button>'; }).join('') + '</div>' +
         '<div class="ts-row pb-ctl">' + chips('f', ['post', 'reel', 'story'].map(function (k) { return { v: k, l: FMTN[k] }; }), s.f) + '</div>' +
         '<div class="ts-chips">' + PPL.map(function (p) { return '<button type="button" class="ts-chip plt" data-x="pl" data-v="' + p + '" aria-pressed="' + (!!s.on[p]) + '" style="--pc:' + PF[p].c + '"' + (s.st === 'done' ? ' disabled' : '') + '>' + pg(p) + PF[p].n + '</button>'; }).join('') + '</div>' +
         '<div class="pb-fan ' + s.st + '">' + (sel.length ? sel.map(function (p, i) {
@@ -361,7 +361,7 @@
         '<div class="pb-when">' + DAYS[L()].map(function (d, i) { return '<span class="' + (i === 3 ? 'on' : '') + '">' + esc(d.slice(0, L() === 'ar' ? 8 : 3)) + (i === 3 ? '<b>20:30</b>' : '') + '</span>'; }).join('') + '</div>' +
         (s.st === 'wait' ? '<p class="pb-st wait">● ' + esc(tx({ en: 'One post, ' + sel.length + ' platforms — waiting for your approval', ar: 'منشور واحد على ' + sel.length + ' منصات — بانتظار موافقتك' })) + '</p><div class="ts-row">' + btn('ok', { en: 'Approve all', ar: 'موافقة على الكل' }, true) + btn('chg', { en: 'Request changes', ar: 'اطلب تعديل' }) + '</div>' : '') +
         (s.st === 'done' ? '<p class="pb-st ok">✓ ' + esc(tx({ en: 'Scheduled: Thursday 20:30 on ' + sel.length + ' platforms, through each platform’s official API.', ar: 'مُجدول الخميس 20:30 على ' + sel.length + ' منصات، عبر الواجهة الرسمية لكل منصة.' })) + '</p>' + btn('reset', { en: 'Undo', ar: 'تراجع' }) : '') +
-        (s.st === 'chg' ? '<p class="pb-st chg">↺ ' + esc(tx({ en: 'Sent back to the studio with your note. Nothing was published.', ar: 'رجع للاستوديو مع ملاحظتك. لم يُنشر شيء.' })) + '</p>' + btn('reset', { en: 'Undo', ar: 'تراجع' }) : '');
+        (s.st === 'chg' ? '<p class="pb-st chg">↺ ' + esc(tx({ en: 'Sent back to the studio with your note. Nothing was published.', ar: 'رجع للاستوديو مع ملاحظتك. لم يُنشر شيء.' })) + '</p>' + btn('reset', { en: 'Undo', ar: 'تراجع' }) : '') + '</div>';
     },
     act: function (s, a, v) { if (a === 'b') s.b = v; if (a === 'f') s.f = v; if (a === 'pl') s.on[v] = !s.on[v]; if (a === 'ok') s.st = 'done'; if (a === 'chg') s.st = 'chg'; if (a === 'reset') s.st = 'wait'; }
   };
@@ -371,14 +371,16 @@
     { id: 'instagram', n: 'Instagram', c: '#E1306C', k: 2 }, { id: 'facebook', n: 'Facebook', c: '#1877F2', k: 1 }, { id: 'messenger', n: 'Messenger', c: '#A033FF', k: 1 },
     { id: 'tiktok', n: 'TikTok', c: '#25F4EE', k: 1 }, { id: 'youtube', n: 'YouTube', c: '#FF0000', k: 1 }, { id: 'whatsapp', n: 'WhatsApp', c: '#25D366', k: 1, via: 'T-06' },
     { id: 'reviews', n: { en: 'Google reviews', ar: 'تقييمات جوجل' }, c: '#FBBC04', k: 1, via: 'T-09' },
-    { id: 'gmail', n: 'Gmail', c: '#EA4335', soon: 1 }, { id: 'outlook', n: 'Outlook', c: '#0F78D4', soon: 1 }, { id: 'mail', n: { en: 'Your own email', ar: 'بريدك الخاص' }, c: '#C9A84C', soon: 1 },
-    { id: 'x', n: 'X', c: '#E7E9EA', soon: 1 }, { id: 'linkedin', n: 'LinkedIn', c: '#0A66C2', soon: 1 }
+    { id: 'gmail', n: 'Gmail', c: '#EA4335', k: 1 }, { id: 'outlook', n: 'Outlook', c: '#0F78D4', k: 1 }, { id: 'mail', n: { en: 'Your own email', ar: 'بريدك الخاص' }, c: '#C9A84C', k: 1 }
   ];
   var MSG = [
     { ch: 'instagram', u: 'sara.m', m: 'كم سعر الكيك الصغير؟', r: { en: 'Hi Sara! Prices are on our menu — link in bio. We deliver to your door too.', ar: 'أهلًا سارة! الأسعار في المنيو بالرابط في البايو، ونوصّل لين باب البيت.' } },
     { ch: 'tiktok', u: 'omar_k', m: 'Are you open on Friday?', r: { en: 'Yes — Friday from 9 am to 11 pm. See you there!', ar: 'إي نعم — الجمعة من 9 الصبح لين 11 بالليل. نشوفك!' } },
     { ch: 'reviews', u: 'Hessa A.', m: '★★★★★ أفضل لاتيه في المنطقة', r: { en: 'Thank you Hessa! See you on your next visit.', ar: 'شكرًا حصة! ننتظرك في زيارتك الجاية.' } },
     { ch: 'youtube', u: '@roastlab', m: 'What beans do you use in this video?', r: { en: 'Single-origin, roasted in-house every week — the full list is in the description.', ar: 'بن من مصدر واحد نحمّصه عندنا كل أسبوع — القائمة كاملة في الوصف.' } },
+    { ch: 'gmail', u: 'Noura K.', m: 'Can you host 12 people this Friday evening?', r: { en: 'Hi Noura, yes — we can seat 12 on Friday from 7 pm. Shall I hold the long table for you? (saved as a draft for your approval)', ar: 'أهلًا نورة، نعم — نقدر نستقبل 12 شخص يوم الجمعة من 7 المساء. نحجز لك الطاولة الطويلة؟ (محفوظ كمسودة بانتظار موافقتك)' } },
+    { ch: 'outlook', u: 'Office manager · Atlas Co.', m: 'Do you do coffee catering for meetings?', r: { en: 'Thank you for asking — yes, we cater meetings. Could you share the date, number of guests and location? (draft for your approval)', ar: 'شكرًا لتواصلكم — نعم، نقدّم ضيافة القهوة للاجتماعات. ممكن التاريخ وعدد الضيوف والموقع؟ (مسودة بانتظار موافقتك)' } },
+    { ch: 'mail', u: 'billing@supplier', m: 'Invoice #2207 attached', bad: 1, inv: 1 },
     { ch: 'facebook', u: 'guest_22', m: 'الطلب وصل بارد ومتأخر', bad: 1 }
   ];
   S.inbox = {
@@ -392,13 +394,13 @@
         CH.map(function (c) { return c.soon ? '<span class="ib-ch soon" style="--cc:' + c.c + '" title="' + esc(tx(c.n)) + '">' + pg(c.id) + '<small>' + esc(tx({ en: 'soon', ar: 'قريبًا' })) + '</small><span class="sr-only">' + esc(tx(c.n)) + '</span></span>'
           : '<button type="button" class="ib-ch" data-x="ch" data-v="' + c.id + '" aria-pressed="' + (s.ch === c.id) + '" style="--cc:' + c.c + '">' + pg(c.id) + '<span class="sr-only">' + esc(tx(c.n)) + '</span>' + (c.k ? '<em>' + c.k + '</em>' : '') + '</button>'; }).join('') + '</div>' +
         '<div class="ib-col"><ul class="ib-list">' + (list.length ? list.map(function (x) { var m = x[0], c = C(m.ch); return '<li><button type="button" data-x="sel" data-v="' + x[1] + '" aria-pressed="' + (x[1] === s.i) + '"><span class="ib-badge" style="--cc:' + c.c + '">' + pg(m.ch) + '</span><span><b>' + esc(m.u) + '</b> <small>' + esc(tx(c.n)) + (c.via ? ' · ' + c.via : '') + '</small><br><q dir="auto">' + esc(m.m) + '</q></span>' + (s.sent[x[1]] ? '<em>✓</em>' : m.bad ? '<em class="bad">!</em>' : '') + '</button></li>'; }).join('') : '<li class="sc-idle">' + esc(tx({ en: 'Nothing new here.', ar: 'لا جديد هنا.' })) + '</li>') + '</ul>' +
-        (cur.bad ? '<div class="ib-out bad">⚑ ' + esc(tx({ en: 'Complaint — sent straight to you. Complaints never get an automatic reply.', ar: 'شكوى — وصلتك مباشرة. الشكاوى لا يُرد عليها تلقائيًا أبدًا.' })) + '</div>'
+        (cur.bad ? '<div class="ib-out bad">⚑ ' + esc(tx(cur.inv ? { en: 'Invoice — sent straight to you. Invoices, payments and legal mail are never answered automatically, and attachments from unknown senders are never opened.', ar: 'فاتورة — وصلتك مباشرة. الفواتير والمدفوعات والمراسلات القانونية لا يُرد عليها تلقائيًا، ولا تُفتح مرفقات من مرسلين غير معروفين.' } : { en: 'Complaint — sent straight to you. Complaints never get an automatic reply.', ar: 'شكوى — وصلتك مباشرة. الشكاوى لا يُرد عليها تلقائيًا أبدًا.' })) + '</div>'
           : '<div class="ib-out">' + lab({ en: 'Suggested reply · your brand voice', ar: 'رد مقترح · بنبرة علامتك' }) + '<p class="ib-reply" dir="auto">' + esc(tx(cur.r)) + '</p>' +
             (s.sent[s.i] ? '<p class="pb-st ok">✓ ' + esc(tx({ en: 'Sent (sample)', ar: 'أُرسل (مثال)' })) + '</p>' : '<div class="ts-row">' + btn('send', { en: 'Send', ar: 'إرسال' }, true) + btn('esc', { en: 'Send to me instead', ar: 'حوّلها لي' }) + '</div>') + '</div>') +
         '</div></div>' +
-        sample({ en: 'Live today: Instagram, Facebook, Messenger, TikTok and YouTube. WhatsApp and Google reviews come with their own tools. Email (Gmail, Outlook, your own domain), X and LinkedIn are coming soon.', ar: 'متاح اليوم: إنستغرام وفيسبوك وماسنجر وتيك توك ويوتيوب. واتساب وتقييمات جوجل مع أدواتها الخاصة. البريد (جيميل وأوتلوك وبريدك الخاص) وإكس ولينكدإن قريبًا.' });
+        sample({ en: 'Instagram, Facebook, Messenger, TikTok, YouTube and email (Gmail, Outlook, your own domain). WhatsApp and Google reviews come with their own tools. Email replies are saved as drafts until you approve.', ar: 'إنستغرام وفيسبوك وماسنجر وتيك توك ويوتيوب والإيميل (جيميل وأوتلوك وبريدك الخاص). واتساب وتقييمات جوجل مع أدواتها الخاصة. ردود الإيميل تُحفظ كمسودات حتى توافق.' });
     },
-    act: function (s, a, v) { if (a === 'ch') { s.ch = v; var f = MSG.map(function (m, i) { return [m, i]; }).filter(function (x) { return v === 'all' || x[0].ch === v; }); if (f.length) s.i = f[0][1]; } if (a === 'sel') s.i = +v; if (a === 'send') s.sent[s.i] = 1; if (a === 'esc') s.i = 4; }
+    act: function (s, a, v) { if (a === 'ch') { s.ch = v; var f = MSG.map(function (m, i) { return [m, i]; }).filter(function (x) { return v === 'all' || x[0].ch === v; }); if (f.length) s.i = f[0][1]; } if (a === 'sel') s.i = +v; if (a === 'send') s.sent[s.i] = 1; if (a === 'esc') s.i = MSG.length - 1; }
   };
 
   /* T-08 YouTube Growth — see your video on YouTube, then pick the title */
