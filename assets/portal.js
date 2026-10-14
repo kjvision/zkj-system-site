@@ -122,12 +122,12 @@
     var b = c.brand && typeof c.brand === 'object' ? c.brand : {};
     var pc = hex(c.primary_color), ac = hex(c.accent_color);
     var dark = function (h) { return h && D.contrast(h, '#000000') < 3.5; };
-    return { b: b, fb: { bg: dark(pc) ? pc : '#0B0B0F', primary: ac || '#D4AF37', accent: ac } };
+    return { b: b, fb: { bg: dark(pc) ? pc : '#0B0B0F', primary: ac || '#C9A84C', accent: ac } };
   }
   function brandColor(c, k) { var r = brandOf(c); return r ? D.resolveBrand(r.b, r.fb).vars[k] : null; }
   function initials(c) {
     var n = (c && c.name ? c.name : '?').replace(/[^A-Za-z0-9 ]/g, '').trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 3) || '?';
-    var bg = (c && brandColor(c, '--b-primary')) || '#15151B', fg = (c && brandColor(c, '--b-on-primary')) || '#D4AF37';
+    var bg = (c && brandColor(c, '--b-primary')) || '#15151B', fg = (c && brandColor(c, '--b-on-primary')) || '#C9A84C';
     return '<span class="logo-initials" style="background:' + bg + ';color:' + fg + ';border-color:' + fg + '" aria-hidden="true">' + esc(n) + '</span>';
   }
   function logoHtml(c) {
@@ -304,7 +304,7 @@
   function media(x, sfx) {
     var m = safeUrl(x.media_url), c = clientOf(x);
     if (m && isImage(m)) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
-    return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#D4AF37', title: pick(x, 'title', 'title_ar'), kind: x.kind, seed: x.id, sfx: sfx, full: x.kind === 'reel' || x.kind === 'story', mark: 'ZKJ SYSTEM · ' + t('p.type.' + x.kind) });
+    return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#C9A84C', title: pick(x, 'title', 'title_ar'), kind: x.kind, seed: x.id, sfx: sfx, full: x.kind === 'reel' || x.kind === 'story', mark: 'ZKJ SYSTEM · ' + t('p.type.' + x.kind) });
   }
   function phoneOf(x, sfx) {
     var c = clientOf(x);
@@ -333,7 +333,7 @@
   function thumb(x) {
     var m = safeUrl(x.media_url), c = clientOf(x);
     if (m && isImage(m)) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
-    return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#D4AF37', kind: x.kind, seed: x.id, sfx: '-t' });
+    return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#C9A84C', kind: x.kind, seed: x.id, sfx: '-t' });
   }
   // compact card: reviewed items, inbox replies, ads
   function rowCard(x, prefix) {
