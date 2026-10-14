@@ -134,11 +134,11 @@
         points: ['فحص الموقع وصفحات الحجز', 'مراجعة صلاحيات الحسابات والتحقق بخطوتين', 'مراجعة الكود للمشاكل الشائعة', 'قائمة إصلاحات واضحة حسب الأولوية'] } },
     { id: 'dialect', group: 'content', code: 'T-14', icon: ICONS.dialect, demo: true,
       en: { name: 'Arabic Dialect Writer', badge: 'New · Beta', tag: 'Copy that sounds like your customers talk.',
-        desc: 'Writes posts, captions, ads and customer replies in the Arabic your customers really speak — Gulf, Egyptian, Levantine, Iraqi or Moroccan — and in French for North Africa. It keeps your brand voice, uses only facts you gave us, and you approve every line.',
-        points: ['Gulf, Egyptian, Levantine, Iraqi and Moroccan Arabic', 'Modern Standard Arabic and North-African French', 'Your brand voice, your real facts — nothing invented', 'Side-by-side versions to choose from, approved before use'] },
+        desc: 'Writes posts, captions, ads and customer replies in the Arabic your customers really speak — Gulf, Egyptian or Levantine — and in French for North Africa. Iraqi and Moroccan are coming soon. It keeps your brand voice, uses only facts you gave us, and you approve every line.',
+        points: ['Gulf, Egyptian and Levantine Arabic — Iraqi and Moroccan coming soon', 'Modern Standard Arabic and North-African French', 'Your brand voice, your real facts — nothing invented', 'Side-by-side versions to choose from, approved before use'] },
       ar: { name: 'كاتب اللهجات العربية', badge: 'جديد · تجريبي', tag: 'نصوص تشبه كلام عملائك.',
-        desc: 'يكتب المنشورات والتعليقات والإعلانات وردود العملاء بالعربية التي يتكلمها عملاؤك فعلًا — خليجي أو مصري أو شامي أو عراقي أو مغربي — وبالفرنسية لشمال أفريقيا. يحافظ على نبرة علامتك، ولا يستخدم إلا المعلومات التي أعطيتنا إياها، وأنت تعتمد كل سطر.',
-        points: ['لهجات خليجية ومصرية وشامية وعراقية ومغربية', 'العربية الفصحى المبسطة والفرنسية لشمال أفريقيا', 'نبرة علامتك ومعلوماتك الحقيقية — بلا أي إضافات من عندنا', 'نسخ جنبًا إلى جنب لتختار منها، وتُعتمد قبل أي استخدام'] } }
+        desc: 'يكتب المنشورات والتعليقات والإعلانات وردود العملاء بالعربية التي يتكلمها عملاؤك فعلًا — خليجي أو مصري أو شامي — وبالفرنسية لشمال أفريقيا. العراقي والمغربي قريبًا. يحافظ على نبرة علامتك، ولا يستخدم إلا المعلومات التي أعطيتنا إياها، وأنت تعتمد كل سطر.',
+        points: ['لهجات خليجية ومصرية وشامية — والعراقية والمغربية قريبًا', 'العربية الفصحى المبسطة والفرنسية لشمال أفريقيا', 'نبرة علامتك ومعلوماتك الحقيقية — بلا أي إضافات من عندنا', 'نسخ جنبًا إلى جنب لتختار منها، وتُعتمد قبل أي استخدام'] } }
   ];
   /* ---------- Coming next (not built yet — shown honestly, not counted in the 14) ---------- */
   var COMING = [
@@ -157,8 +157,8 @@
     { id: 'gulf', en: 'Gulf', ar: 'خليجي', line: 'الطلبات مفتوحة الحين، ونوصّلها لين باب بيتك.' },
     { id: 'egypt', en: 'Egyptian', ar: 'مصري', line: 'الطلبات اتفتحت دلوقتي، وبنوصّلها لحد باب بيتك.' },
     { id: 'levant', en: 'Levantine', ar: 'شامي', line: 'الطلبات صارت مفتوحة هلّق، وبنوصّلها لحد باب بيتك.' },
-    { id: 'iraq', en: 'Iraqi', ar: 'عراقي', line: 'الطلبات مفتوحة هسّه، ونوصّلها لباب بيتكم.' },
-    { id: 'morocco', en: 'Moroccan', ar: 'مغربي', line: 'الطلبات مفتوحة دابا، وكنوصلوها حتى لباب الدار.' },
+    { id: 'iraq', en: 'Iraqi', ar: 'عراقي', soon: true },
+    { id: 'morocco', en: 'Moroccan', ar: 'مغربي', soon: true },
     { id: 'french', en: 'French (N. Africa)', ar: 'فرنسي (شمال أفريقيا)', line: 'Les commandes sont ouvertes, livraison jusqu’à votre porte.', fr: true }
   ];
 
@@ -225,7 +225,7 @@
       'tools.eyebrow': 'The Collection', 'tools.title': '14 tools. Five groups. One system.', 'tools.sub': 'Brand, Content, Engage & Sell, Grow, Build & Protect. Start with one tool or run them all — every tool reports into the same dashboard, so you always know what’s done and what needs you.',
       'tools.cta': 'Enquire about this tool',
       'soon.title': 'Coming next', 'soon.sub': 'Not built yet. Tell us which one you want first and it moves up the list.', 'soon.tag': 'coming next', 'soon.cta': 'I want this first',
-      'dia.label': 'Same message, five dialects', 'dia.msg': 'Orders are open now — we deliver to your door.', 'dia.note': 'Beta — a sample, not a promise for every phrase. You approve every line before it is used.',
+      'dia.label': 'Same message, your customers’ dialect', 'dia.soon': 'soon', 'dia.msg': 'Orders are open now — we deliver to your door.', 'dia.note': 'Beta — a sample, not a promise for every phrase. You approve every line before it is used.',
       'pk.eyebrow': 'Packages', 'pk.title': 'Packages by channel', 'pk.sub': 'Every package includes Content Studio, Social Media Publisher, Insights & Reports and your live branded dashboard. Pricing is shared with you personally after your brief.',
       'pk.starter.name': 'Starter', 'pk.starter.reach': '1–2 platforms', 'pk.starter.d': 'For a focused start on the channels where your customers already are.',
       'pk.growth.name': 'Growth', 'pk.growth.reach': '3–4 platforms', 'pk.growth.d': 'For businesses ready to show up consistently on more channels — and answer every comment and DM.',
@@ -400,7 +400,7 @@
       'how.4.t': 'لوحتك المباشرة بهويتك', 'how.4.d': 'الإشعارات والمحتوى والموافقات والنشر في مكان واحد — بشعارك وألوانك، بالعربية أو الإنجليزية.',
       'tools.eyebrow': 'المجموعة', 'tools.title': '14 أداة. خمس مجموعات. نظام واحد.', 'tools.sub': 'الهوية، المحتوى، التفاعل والمبيعات، النمو، البناء والحماية. ابدأ بأداة واحدة أو شغّلها كلها — كل أداة ترفع تقاريرها إلى نفس اللوحة، فتعرف دائمًا ما الذي أُنجز وما الذي يحتاجك.',
       'soon.title': 'قريبًا', 'soon.sub': 'لم تُبنَ بعد. أخبرنا أيّها تريد أولًا فيتقدّم في القائمة.', 'soon.tag': 'قريبًا', 'soon.cta': 'أريدها أولًا',
-      'dia.label': 'الرسالة نفسها بخمس لهجات', 'dia.msg': 'الطلبات مفتوحة الآن — نوصّل إلى باب بيتك.', 'dia.note': 'نسخة تجريبية — مثال وليس وعدًا بكل عبارة. وأنت تعتمد كل سطر قبل استخدامه.',
+      'dia.label': 'الرسالة نفسها بلهجة عملائك', 'dia.soon': 'قريبًا', 'dia.msg': 'الطلبات مفتوحة الآن — نوصّل إلى باب بيتك.', 'dia.note': 'نسخة تجريبية — مثال وليس وعدًا بكل عبارة. وأنت تعتمد كل سطر قبل استخدامه.',
       'tools.cta': 'استفسر عن هذه الأداة',
       'pk.eyebrow': 'الباقات', 'pk.title': 'باقات حسب عدد المنصات', 'pk.sub': 'كل باقة تشمل استوديو المحتوى وناشر السوشال ميديا والتحليلات والتقارير ولوحتك المباشرة بهويتك. يُرسل لك التسعير شخصيًا بعد الموجز.',
       'pk.starter.name': 'البداية', 'pk.starter.reach': 'منصة أو منصتان', 'pk.starter.d': 'لبداية مركّزة على المنصات التي يتواجد فيها عملاؤك أصلًا.',
@@ -664,6 +664,7 @@
     return '<div class="dia-demo" data-dia><p class="dia-label">' + esc(t('dia.label')) + '</p>' +
       '<p class="dia-msg">' + esc(t('dia.msg')) + '</p>' +
       '<div class="dia-chips" role="group" aria-label="' + esc(t('dia.label')) + '">' + DIALECTS.map(function (d) {
+        if (d.soon) return '<span class="dia-chip is-soon" aria-disabled="true">' + esc(d[lang]) + ' <small>' + esc(t('dia.soon')) + '</small></span>';
         return '<button type="button" class="dia-chip" data-dia-pick="' + d.id + '" aria-pressed="' + (d.id === dialectSel ? 'true' : 'false') + '">' + esc(d[lang]) + '</button>';
       }).join('') + '</div>' +
       '<p class="dia-line" aria-live="polite" lang="' + (cur.fr ? 'fr' : 'ar') + '" dir="' + (cur.fr ? 'ltr' : 'rtl') + '">' + esc(cur.line) + '</p>' +
@@ -684,8 +685,8 @@
       '<p class="tool-tag">' + esc(d.tag) + '</p>' +
       '<p class="tool-desc">' + esc(d.desc) + '</p>' +
       '<ul>' + d.points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
-      (tl.demo ? dialectDemo() : '') +
-      '<a class="btn btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('ex.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a>' +
+      '<div class="ex-actions"><button type="button" class="btn btn-sm btn-primary btn-try" data-try="' + tl.id + '">' + esc(t('try.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></button>' +
+      '<a class="btn btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('ex.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a></div>' +
       '</article></li>';
   }
   function renderTools() {

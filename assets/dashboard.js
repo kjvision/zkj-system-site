@@ -29,6 +29,7 @@
       'd.t.content.p': 'Pending: 2 reels in edit from your latest shoot', 'd.t.content.d': 'Done: 6 posts + 3 reels delivered this week',
       'd.t.pub.p.n': 'Needs you: {n} posts waiting for approval', 'd.t.pub.p.0': 'Pending: queue is clear', 'd.t.pub.d': 'Done: {n} published on {p} platforms this week',
       'd.t.3d.p': 'Not started — e.g. a 3D preview of a new seating area', 'd.t.3d.d': 'Ask KJ to add it to your plan',
+      'd.t.dia.p': 'Not started — e.g. your menu captions in Gulf or Egyptian Arabic', 'd.t.dia.d': 'Ask KJ to add it to your plan',
       'd.t.2d.p': 'Not started — e.g. a bilingual layout for a second branch', 'd.t.2d.d': 'Ask KJ to add it to your plan',
       'd.t.sec.p': 'Pending: booking-page scan (2 of 3 checks)', 'd.t.sec.d': 'Done: two-step login confirmed on 5 accounts',
       'd.t.ins.p': 'Pending: next report on Sunday', 'd.t.ins.d': 'Done: weekly report — reels drove 64% of reach',
@@ -99,6 +100,7 @@
       'd.t.content.p': 'قيد التنفيذ: ريلزان قيد التحرير من آخر تصوير', 'd.t.content.d': 'تم: 6 منشورات و3 ريلز هذا الأسبوع',
       'd.t.pub.p.n': 'يحتاجك: {n} منشورات بانتظار الموافقة', 'd.t.pub.p.0': 'قيد التنفيذ: لا شيء بالانتظار', 'd.t.pub.d': 'تم: {n} منشورات على {p} منصات هذا الأسبوع',
       'd.t.3d.p': 'لم يبدأ — مثال: معاينة ثلاثية الأبعاد لجلسات جديدة', 'd.t.3d.d': 'اطلب من KJ إضافتها لخطتك',
+      'd.t.dia.p': 'لم يبدأ — مثال: تعليقات المنيو باللهجة الخليجية أو المصرية', 'd.t.dia.d': 'اطلب من KJ إضافتها لخطتك',
       'd.t.2d.p': 'لم يبدأ — مثال: مخطط ثنائي اللغة لفرع ثانٍ', 'd.t.2d.d': 'اطلب من KJ إضافتها لخطتك',
       'd.t.sec.p': 'قيد التنفيذ: فحص صفحة الحجز (2 من 3)', 'd.t.sec.d': 'تم: التحقق بخطوتين مفعّل على 5 حسابات',
       'd.t.ins.p': 'قيد التنفيذ: التقرير القادم يوم الأحد', 'd.t.ins.d': 'تم: التقرير الأسبوعي — الريلز حققت 64% من الوصول',
@@ -438,6 +440,7 @@
       case 'youtube': return { s: 'off', p: t('d.t.yt.p'), d: t('d.t.yt.d'), go: null };
       case 'google': return { s: 'ok', p: t('d.t.google.p'), d: t('d.t.google.d'), go: 'ads' };
       case 'builder3d': return { s: 'off', p: t('d.t.3d.p'), d: t('d.t.3d.d'), go: null };
+      case 'dialect': return { s: 'off', p: t('d.t.dia.p'), d: t('d.t.dia.d'), go: null };
       case 'drawings': return { s: 'off', p: t('d.t.2d.p'), d: t('d.t.2d.d'), go: null };
       case 'security': return { s: 'warn', p: t('d.t.sec.p'), d: t('d.t.sec.d'), go: null };
       case 'insights': return { s: 'ok', p: t('d.t.ins.p'), d: t('d.t.ins.d'), go: 'insights' };
