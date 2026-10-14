@@ -1,31 +1,34 @@
 # Automatic numbers: Instagram → your dashboard (plan 3)
 
-Every night at 03:20 Dubai, a small script reads Instagram Insights through Meta's official API and writes the numbers into **kpis**, so they show on each client's dashboard. Nothing is published, nothing is posted, nothing is replied to. Read-only on Meta.
+Every night at 03:20 Dubai, Supabase itself calls a small function (`meta-insights-sync`) that reads Instagram Insights through Meta's official API (the Instagram API with Facebook Login, part of the Meta Graph API) and writes the numbers into **kpis**, so they show on each client's dashboard. Nothing is published, posted or replied to. Read-only on Meta.
 
-It works for every Instagram professional account that is linked to a Facebook Page inside your Business Portfolio **and** has its handle in **Table Editor → clients → instagram** (for example `@zkjsystem`). Accounts with no matching client are skipped.
+It works for every Instagram professional account linked to a Facebook Page in your Business Portfolio **and** whose handle is in **Table Editor → clients → instagram** (for example `@zkjsystem`). Other accounts are skipped.
 
-## You do this once (about 15 minutes, on a laptop)
+Everything is already installed in the Supabase project (15 Oct 2026): the scheduler (pg_cron), the function, and a `sync_runs` log table. **One thing is missing: the Meta key.**
+
+## You do this once (about 10 minutes, laptop)
 
 ### 1 · Permissions on the app "ZKJ SYSTEM Engine"
-In developers.facebook.com → your app → **Use cases** → "Instagram messaging and content" → **Customize** → make sure these permissions are added:
+developers.facebook.com → your app → **Use cases** → "Instagram messaging and content" → **Customize** → make sure these are added:
 `instagram_basic`, `instagram_manage_insights`, `pages_show_list`, `pages_read_engagement`.
-The app can stay in development mode (unpublished): it already works for accounts in your own Business Portfolio. App review is only needed later for other people's accounts.
+The app can stay unpublished (development mode): it already works for accounts in your own Business Portfolio.
 
-### 2 · A token that does not expire (system user)
-1. business.facebook.com → **Settings** → **Users → System users** → **Add**. Name: `zkj-sync`, role: Admin.
-2. Open the system user → **Assign assets** → add the ZKJ SYSTEM Facebook Page (and later every client Page) with **Full control**.
-3. **Generate new token** → app: ZKJ SYSTEM Engine → expiry: **Never** → tick the four permissions from step 1 → Generate.
-4. Copy the token. Treat it like a password: never paste it in chat, WhatsApp or the repo.
+### 2 · A key that never expires (system user)
+1. business.facebook.com → **Settings → Users → System users** → **Add**. Name `zkj-sync`, role Admin.
+2. Open it → **Assign assets**: Apps → ZKJ SYSTEM Engine (full control); Pages → ZKJ SYSTEM (full control); Instagram accounts → @zkjsystem (full control).
+3. **Generate new token** → app ZKJ SYSTEM Engine → expiry **Never** → tick the four permissions from step 1 → Generate → copy.
+If the permissions list is empty, step 2 (Apps) was skipped.
 
-### 3 · Two secrets in GitHub
-github.com/kjvision/zkj-system-site → **Settings → Secrets and variables → Actions → New repository secret**:
-- `META_ACCESS_TOKEN` = the token from step 2
-- `SUPABASE_SERVICE_ROLE_KEY` = Supabase → **Project Settings → API → service_role** (copy straight from Supabase to GitHub; nowhere else)
+### 3 · Put the key in Supabase
+supabase.com/dashboard → your project → **Edge Functions** (left menu) → **Secrets** → **Add new secret**:
+Name `META_ACCESS_TOKEN`, value = the key from step 2 → Save.
+The key is stored by Supabase; it never goes through chat, the repo or GitHub.
 
 ### 4 · First run
-GitHub → **Actions → Meta insights sync → Run workflow**. Tick **Dry run** the first time: the log shows the accounts it found and the numbers it would write, and writes nothing. Run it again without dry run. Then check **Table Editor → kpis**.
-
-From then on it runs every night by itself (once this is on the `main` branch).
+Tell Claude "run the sync", or open this link in the browser after step 3:
+`https://usucmdjupfjuchfxnxpz.supabase.co/functions/v1/meta-insights-sync?dry=1` (shows what it would write, writes nothing).
+Then without `?dry=1` to write. Check **Table Editor → kpis**, and **sync_runs** for the log.
+From then on it runs every night by itself. It refuses to run more than once every 10 minutes.
 
 ## What lands in kpis
 
@@ -35,7 +38,10 @@ From then on it runs every night by itself (once this is on the `main` branch).
 | `reach_day` · `views_day` · `accounts_engaged_day` · `interactions_day` | yesterday's account totals | daily |
 | `reel_views` · `reel_reach` · `reel_avg_watch` · `reel_likes` · `reel_comments` · `reel_saves` · `reel_shares` | the latest reel | daily |
 
-Same metric on the same day is updated, never duplicated. Numbers you typed by hand with other metric names stay as they are.
+Same metric on the same day is updated, never duplicated. Numbers typed by hand with other metric names stay as they are.
 
 ## If something fails
-The Actions log says why. Common causes: the token expired or lost a permission (make a new one, step 2), the Page is not assigned to the system user, or the Instagram account is not a professional account linked to the Page. Meta can delay insights by up to 48 hours, so a fresh reel may show fewer numbers at first.
+`sync_runs.note` says why. Common causes: the key lost a permission or was deleted (make a new one, step 2), the Page or Instagram account is not assigned to the system user, or the account is not a professional account linked to the Page. Meta can delay insights by up to 48 hours.
+
+## Also in this repo (optional, not needed)
+`scripts/meta-insights-sync.mjs` + `.github/workflows/meta-insights-sync.yml` do the same job from GitHub Actions. Use only if you ever prefer GitHub; it needs two GitHub secrets.
