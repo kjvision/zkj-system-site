@@ -1,0 +1,31 @@
+# Nightly Instagram insights → Supabase kpis (plan 3: automatic numbers).
+# Runs at 03:20 Dubai (23:20 UTC). Needs two repository secrets:
+#   META_ACCESS_TOKEN, SUPABASE_SERVICE_ROLE_KEY   (Settings → Secrets and variables → Actions)
+# Scheduled runs only happen on the default branch, so this starts working after merge to main.
+name: Meta insights sync
+on:
+  schedule:
+    - cron: '20 23 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (print only, write nothing)'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Sync insights
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: node scripts/meta-insights-sync.mjs

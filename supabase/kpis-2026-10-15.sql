@@ -7,3 +7,9 @@ insert into public.kpis (id, client_id, period_start, metric, value, label, labe
   ('e1000000-0000-4000-8000-000000000104', 'c1000000-0000-4000-8000-000000000003', '2026-10-15', 'reel_avg_watch', 21, 'Launch reel · average watch time (s)', 'ريل الإطلاق · متوسط المشاهدة (ث)'),
   ('e1000000-0000-4000-8000-000000000105', 'c1000000-0000-4000-8000-000000000003', '2026-10-15', 'followers', 5, 'Followers (1 new since launch)', 'المتابعون (١ جديد منذ الإطلاق)')
 on conflict (id) do nothing;
+
+-- P10 "Try it before you start" v2: approved by KJ on 15 Oct 2026 (chat: "approved p10 v4.2"). KJ posts it by hand.
+update public.items set status = 'approved',
+  caption = replace(caption, 'ON HOLD. ', ''),
+  caption_ar = replace(caption_ar, 'متوقف مؤقتًا. ', '')
+ where id = 'd1000000-0000-4000-8000-000000000102' and status = 'draft';
