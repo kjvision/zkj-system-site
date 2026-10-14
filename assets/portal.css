@@ -224,3 +224,14 @@ html[dir="rtl"] .flip-rtl { transform: scaleX(-1); }
 @keyframes lock-glow { 0%, 100% { opacity: 1; } 50% { opacity: .75; } }
 @media (prefers-reduced-motion: reduce) { .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-dashoffset: 0; } }
 html.reduce-motion .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-dashoffset: 0; }
+
+/* Control Center · Import from AI */
+#f-import textarea { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.5; direction: ltr; text-align: left; min-height: 180px; }
+.imp-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; max-height: 240px; overflow: auto; }
+.imp-list li { display: flex; gap: 8px; align-items: baseline; font-size: 13px; padding: 7px 10px; border: 1px solid var(--line); background: var(--obsidian); }
+.imp-list li .mono { flex: none; font-size: 11px; color: var(--muted); }
+.imp-list li b { font-weight: 500; }
+.imp-list li .imp-when { margin-inline-start: auto; flex: none; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.imp-list li.bad { border-color: var(--bad); color: var(--bad); }
+.imp-sum { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+.imp-sum.ok { color: var(--gold); }

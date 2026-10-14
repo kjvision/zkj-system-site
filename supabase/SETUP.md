@@ -108,4 +108,6 @@ Drafts (status `draft`) stay hidden from clients until you change the status.
 ## Add ZKJ SYSTEM (client #3, 14 Oct 2026)
 
 After the launch, run `supabase/add-zkj-system.sql` once: **SQL Editor → New query → paste → Run**.
-It adds ZKJ SYSTEM as your own brand, with the launch reel (published) and the 4 posts waiting for your approval, and moves all three brands to gold #C9A84C. Running it twice changes nothing.
+It adds ZKJ SYSTEM as your own brand, with the launch reel (published on Instagram and Facebook), the 3 posts waiting for your approval and P10 as a draft on hold, and moves all three brands to gold #C9A84C. Running it twice changes nothing.
+
+If the Table Editor insert ever failed before: that is fine. Nothing was saved, so run this file once and then check **Table Editor → clients** shows 3 records.

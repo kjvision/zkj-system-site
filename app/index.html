@@ -335,6 +335,7 @@
                 <div class="cc-client-grid" id="client-switch" role="group" data-i18n-attr="aria-label:p.cc.for"></div>
               </div>
               <button class="cc-tile" type="button" data-action="cc-open" data-form="f-item"><span class="cc-ic gold" data-icon="plus"></span><span><strong data-i18n="p.adm.item">Add an item</strong><small data-i18n="p.cc.item.sub">Post, reel, story, ad…</small></span></button>
+              <button class="cc-tile" type="button" data-action="cc-open" data-form="f-import"><span class="cc-ic gold" data-icon="box"></span><span><strong data-i18n="p.adm.import">Import from AI</strong><small data-i18n="p.cc.import.sub">Paste a month of posts at once</small></span></button>
               <button class="cc-tile" type="button" data-action="cc-open" data-form="f-kpi"><span class="cc-ic" data-icon="number"></span><span><strong data-i18n="p.adm.kpi">Add a key number</strong><small data-i18n="p.cc.kpi.sub">Shows as an instrument</small></span></button>
               <button class="cc-tile" type="button" data-action="cc-open" data-form="f-notif"><span class="cc-ic" data-icon="bell"></span><span><strong data-i18n="p.adm.notif">Send a notification</strong><small data-i18n="p.cc.notif.sub">Lands on their bell</small></span></button>
               <div class="cc-tile"><small data-i18n="p.cc.activity">Client activity · unread</small><span class="cc-big" id="cc-unread">0</span></div>
@@ -430,6 +431,7 @@
     </div>
     <div class="segmented" role="tablist" data-i18n-attr="aria-label:p.adm.title">
       <button type="button" role="tab" data-form-tab="f-item" aria-controls="f-item" data-i18n="p.cc.tab.item">Item</button>
+      <button type="button" role="tab" data-form-tab="f-import" aria-controls="f-import" data-i18n="p.cc.tab.import">Import</button>
       <button type="button" role="tab" data-form-tab="f-kpi" aria-controls="f-kpi" data-i18n="p.cc.tab.kpi">Number</button>
       <button type="button" role="tab" data-form-tab="f-notif" aria-controls="f-notif" data-i18n="p.cc.tab.notif">Notification</button>
     </div>
@@ -449,6 +451,16 @@
         <div class="field"><label for="fi-when" data-i18n="p.f.when">Scheduled date &amp; time</label><input class="input" id="fi-when" name="scheduled_at" type="datetime-local"></div>
         <p class="form-status" role="alert"></p>
         <button class="btn btn-primary" type="submit" data-i18n="p.f.add">Add item</button>
+      </form>
+
+      <form class="admin-form" id="f-import" novalidate role="tabpanel" hidden>
+        <h3 data-i18n="p.adm.import">Import from AI</h3>
+        <p class="portal-muted small" id="imp-help"></p>
+        <div class="field"><label for="imp-text" data-i18n="p.imp.label">Block from the AI tool</label><textarea id="imp-text" name="block" rows="9" spellcheck="false" autocomplete="off" data-i18n-attr="placeholder:p.imp.ph"></textarea></div>
+        <p class="imp-sum" id="imp-sum" aria-live="polite"></p>
+        <ul class="imp-list" id="imp-list" hidden></ul>
+        <p class="form-status" role="alert"></p>
+        <button class="btn btn-primary" type="submit" id="imp-submit" disabled data-i18n="p.imp.add0">Add items as Needs approval</button>
       </form>
 
       <form class="admin-form" id="f-kpi" novalidate role="tabpanel" hidden>
