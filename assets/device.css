@@ -266,7 +266,7 @@ html[lang="ar"] .sub-head h3 { letter-spacing: 0; font-size: 14px; }
 .ig-acts .save { margin-inline-start: auto; }
 .ig-dots { display: flex; gap: 3px; position: absolute; left: 50%; transform: translateX(-50%); }
 .ig-dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.35); }
-.ig-dots i:first-child { background: #3897f0; }
+.ig-dots:not(.live) i:first-child, .ig-dots i.on { background: #3897f0; }
 .ig-cap { padding: 2px 10px; font-size: 11px; color: rgba(255,255,255,.92); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line; flex: none; }
 .ig-cap b { font-weight: 600; margin-inline-end: 4px; direction: ltr; unicode-bidi: isolate; }
 .ig-time { padding: 4px 10px; font-size: 9.5px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .04em; flex: none; }
