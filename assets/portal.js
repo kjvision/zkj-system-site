@@ -301,14 +301,17 @@
   }
 
   /* ---------- Approvals: iPhone previews ---------- */
+  function mediaList(x) { return String(x.media_url || '').split(/[\s,]+/).map(safeUrl).filter(function (u) { return u && isImage(u); }); }
   function media(x, sfx) {
-    var m = safeUrl(x.media_url), c = clientOf(x);
-    if (m && isImage(m)) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
+    var list = mediaList(x), c = clientOf(x);
+    if (list.length > 1) return '<div class="ig-strip" data-n="' + list.length + '">' + list.map(function (u, i) { return '<img src="' + esc(u) + '" alt="" loading="' + (i ? 'lazy' : 'eager') + '">'; }).join('') + '</div>';
+    if (list.length === 1) return '<img src="' + esc(list[0]) + '" alt="" loading="lazy">';
     return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#C9A84C', title: pick(x, 'title', 'title_ar'), kind: x.kind, seed: x.id, sfx: sfx, full: x.kind === 'reel' || x.kind === 'story', mark: 'ZKJ SYSTEM · ' + t('p.type.' + x.kind) });
   }
   function phoneOf(x, sfx) {
     var c = clientOf(x);
-    return D.phone({ kind: x.kind, platform: x.platform, platformName: x.platform ? plat(x.platform)[L()] : '', handle: handle(c), avatar: logoHtml(c), media: media(x, sfx), caption: pick(x, 'caption', 'caption_ar'), when: x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen'), slides: 5 });
+    var n = mediaList(x).length;
+    return D.phone({ kind: x.kind, platform: x.platform, platformName: x.platform ? plat(x.platform)[L()] : '', handle: handle(c), avatar: logoHtml(c), media: media(x, sfx), slides: n > 1 ? n : undefined, caption: pick(x, 'caption', 'caption_ar'), when: x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen'), slides: 5 });
   }
   function platChip(id) {
     if (!id) return '';
@@ -1190,6 +1193,13 @@
     if (id === 'calendar') setTimeout(function () { D.revealNow($('cal')); }, 0);
     if (id === 'today') D.animateIn($('kpi-row'));
   });
+
+  // Carousel preview: update the 1/N badge while swiping the strip.
+  document.addEventListener('scroll', function (e) {
+    var st = e.target; if (!st || !st.classList || !st.classList.contains('ig-strip')) return;
+    var n = +st.getAttribute('data-n') || 1, i = Math.min(n, Math.round(st.scrollLeft / Math.max(1, st.clientWidth)) + 1);
+    var badge = st.parentNode && st.parentNode.querySelector('.ig-count'); if (badge) badge.textContent = i + '/' + n;
+  }, true);
 
   /* ---------- Admin forms ---------- */
   function formStatus(form, kind, text) {

@@ -479,7 +479,7 @@
         '<div class="dm-input" aria-hidden="true">' + esc(t('dv.ig.dm')) + '</div></div>';
     } else {
       var count = k === 'carousel' ? '<span class="ig-count">1/' + (o.slides || 5) + '</span>' : '';
-      var dots = k === 'carousel' ? '<span class="ig-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>' : '';
+      var dots = k === 'carousel' ? '<span class="ig-dots" aria-hidden="true">' + new Array(Math.min(8, o.slides || 5) + 1).join('<i></i>') + '</span>' : '';
       screen = '<div class="screen">' + SBAR + head(o, k === 'ad' ? t('dv.ig.sponsored') : o.place) +
         '<div class="ig-media">' + o.media + count + '</div>' +
         '<div class="ig-acts" aria-hidden="true">' + IC.heart + IC.comment + IC.send + dots + '<span class="save">' + IC.save + '</span></div>' +
