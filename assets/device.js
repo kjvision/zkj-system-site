@@ -19,7 +19,8 @@
       'dv.now': 'Now', 'dv.tracks': 'Tracks', 'dv.target': '{p}% of target', 'dv.dubai': 'Dubai',
       'dv.ig.liked': 'Preview · not published yet', 'dv.ig.msg': 'Send message', 'dv.ig.audio': 'Original audio', 'dv.ig.follow': 'Follow',
       'dv.core': 'Core', 'dv.hq': 'HQ', 'dv.todo': 'To-do', 'dv.week': 'This week', 'dv.backhq': 'Back to HQ',
-      'dv.ig.sponsored': 'Sponsored', 'dv.ig.reply': 'Suggested reply', 'dv.ig.reels': 'Reels', 'dv.ig.dm': 'Message…'
+      'dv.ig.sponsored': 'Sponsored', 'dv.ig.reply': 'Suggested reply', 'dv.ig.reels': 'Reels', 'dv.ig.dm': 'Message…',
+      'dv.fb.like': 'Like', 'dv.fb.comment': 'Comment', 'dv.fb.share': 'Share', 'dv.fb.now': 'Just now · Public'
     },
     ar: {
       'dv.sections': 'الأقسام', 'dv.dockshow': 'إظهار الأقسام', 'dv.today': 'اليوم', 'dv.approvals': 'الموافقات', 'dv.approve': 'موافقة', 'dv.calendar': 'التقويم',
@@ -32,6 +33,7 @@
       'dv.now': 'الآن', 'dv.tracks': 'المسارات', 'dv.target': '{p}% من الهدف', 'dv.dubai': 'دبي',
       'dv.ig.liked': 'معاينة · لم يُنشر بعد', 'dv.ig.msg': 'أرسل رسالة', 'dv.ig.audio': 'صوت أصلي', 'dv.ig.follow': 'متابعة',
       'dv.core': 'النواة', 'dv.hq': 'المقر', 'dv.todo': 'مهامك', 'dv.week': 'هذا الأسبوع', 'dv.backhq': 'العودة للمقر',
+      'dv.fb.like': 'أعجبني', 'dv.fb.comment': 'تعليق', 'dv.fb.share': 'مشاركة', 'dv.fb.now': 'الآن · عام',
       'dv.ig.sponsored': 'مُموَّل', 'dv.ig.reply': 'الرد المقترح', 'dv.ig.reels': 'ريلز', 'dv.ig.dm': 'رسالة…'
     }
   });
@@ -457,6 +459,7 @@
   var STAMPS = '<div class="stamp yes" aria-hidden="true"><span>' + IC.check + '</span></div><div class="stamp no" aria-hidden="true"><span>' + IC.pencil + '</span></div>';
   function avatar(o) { return '<span class="ig-av"><span>' + (o.avatar || '') + '</span></span>'; }
   function head(o, sub) {
+    if (o.platform === 'facebook') return '<div class="ig-head fb-head">' + avatar(o) + '<span class="ig-who"><b>' + esc(o.pageName || o.handle || '') + '</b><small>' + esc(sub || o.when || t('dv.fb.now')) + '</small></span><span class="ig-more" aria-hidden="true">•••</span></div>';
     return '<div class="ig-head">' + avatar(o) + '<span class="ig-who"><b>' + esc(o.handle || '') + '</b>' + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span><span class="ig-more" aria-hidden="true">•••</span></div>';
   }
   function cap(o) { return '<p class="ig-cap"><b>' + esc(o.handle || '') + '</b>' + esc(o.caption || '') + '</p>'; }
@@ -480,15 +483,45 @@
     } else {
       var count = k === 'carousel' ? '<span class="ig-count">1/' + (o.slides || 5) + '</span>' : '';
       var dots = k === 'carousel' ? '<span class="ig-dots" aria-hidden="true">' + new Array(Math.min(8, o.slides || 5) + 1).join('<i></i>') + '</span>' : '';
-      screen = '<div class="screen">' + SBAR + head(o, k === 'ad' ? t('dv.ig.sponsored') : o.place) +
-        '<div class="ig-media">' + o.media + count + '</div>' +
-        '<div class="ig-acts" aria-hidden="true">' + IC.heart + IC.comment + IC.send + dots + '<span class="save">' + IC.save + '</span></div>' +
-        cap(o) + '<p class="ig-time">' + esc(o.when || t('dv.ig.liked')) + '</p>' + sharedNav + '</div>';
+      var arrows = o.slides > 1 ? '<button type="button" class="ig-arrow prev" data-strip="prev" aria-label="Previous slide">&#8249;</button><button type="button" class="ig-arrow next" data-strip="next" aria-label="Next slide">&#8250;</button>' : '';
+      if (o.platform === 'facebook') {
+        var fbNav = '<div class="ig-nav fb-nav" aria-hidden="true">' + IC.home + IC.reel + IC.search + IC.comment + '<span class="me">' + (o.avatar || '') + '</span></div>';
+        screen = '<div class="screen is-fb">' + SBAR + head(o, k === 'ad' ? t('dv.ig.sponsored') : (o.when || t('dv.fb.now'))) +
+          (o.caption ? '<p class="fb-cap">' + esc(o.caption) + '</p>' : '') +
+          '<div class="ig-media">' + o.media + count + arrows + '</div>' +
+          '<div class="fb-acts" aria-hidden="true"><span>' + IC.heart + esc(t('dv.fb.like')) + '</span><span>' + IC.comment + esc(t('dv.fb.comment')) + '</span><span>' + IC.send + esc(t('dv.fb.share')) + '</span>' + dots + '</div>' + fbNav + '</div>';
+      } else {
+        screen = '<div class="screen">' + SBAR + head(o, k === 'ad' ? t('dv.ig.sponsored') : o.place) +
+          '<div class="ig-media">' + o.media + count + arrows + '</div>' +
+          '<div class="ig-acts" aria-hidden="true">' + IC.heart + IC.comment + IC.send + dots + '<span class="save">' + IC.save + '</span></div>' +
+          cap(o) + '<p class="ig-time">' + esc(o.when || t('dv.ig.liked')) + '</p>' + sharedNav + '</div>';
+      }
     }
     screen = screen.slice(0, -6) + STAMPS + '</div>';
     var badge = o.platform && PG[o.platform] ? '<span class="pv-plat" title="' + esc(o.platformName || o.platform) + '">' + pglyph(o.platform) + '<span class="sr-only">' + esc(o.platformName || o.platform) + '</span></span>' : '';
     return '<div class="iphone"><span class="island" aria-hidden="true"></span>' + screen + badge + '<span class="home-ind" aria-hidden="true"></span></div>';
   }
+
+  (function stripControls() {
+    if (typeof document === 'undefined' || document.__zkjStrip) return; document.__zkjStrip = true;
+    function stripOf(el) { var m = el.closest('.ig-media'); return m && m.querySelector('.ig-strip'); }
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-strip]');
+      if (b) { var st = stripOf(b); if (st) st.scrollBy({ left: (b.getAttribute('data-strip') === 'next' ? 1 : -1) * st.clientWidth * (document.dir === 'rtl' ? -1 : 1), behavior: 'smooth' }); e.preventDefault(); return; }
+      var dot = e.target.closest('.ig-dots i');
+      if (dot) { var scr = dot.closest('.screen'), st2 = scr && scr.querySelector('.ig-strip'); if (st2) { var i = Array.prototype.indexOf.call(dot.parentNode.children, dot); st2.scrollTo({ left: i * st2.clientWidth * (document.dir === 'rtl' ? -1 : 1), behavior: 'smooth' }); } }
+    });
+    var drag = null;
+    document.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse') return; var st = e.target.closest('.ig-strip'); if (!st) return;
+      drag = { st: st, x: e.clientX, left: st.scrollLeft, moved: false }; st.classList.add('dragging');
+    });
+    document.addEventListener('pointermove', function (e) {
+      if (!drag) return; var dx = e.clientX - drag.x; if (Math.abs(dx) > 3) drag.moved = true; drag.st.scrollLeft = drag.left - dx;
+    });
+    function endDrag() { if (!drag) return; var st = drag.st; st.classList.remove('dragging'); var i = Math.round(st.scrollLeft / Math.max(1, st.clientWidth)); st.scrollTo({ left: i * st.clientWidth, behavior: 'smooth' }); drag = null; }
+    document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
+  })();
 
   /* ---------- Film-strip timeline ---------- */
   // o: { days:[{name, num, today}], tracks:[{label, color, clips:[{id, day, mins, time, title, dot, status, dim}]}], now: 0..1|null, nowLabel, action }

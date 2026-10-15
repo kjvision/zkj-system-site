@@ -311,7 +311,7 @@
   function phoneOf(x, sfx) {
     var c = clientOf(x);
     var n = mediaList(x).length;
-    return D.phone({ kind: x.kind, platform: x.platform, platformName: x.platform ? plat(x.platform)[L()] : '', handle: handle(c), avatar: logoHtml(c), media: media(x, sfx), slides: n > 1 ? n : undefined, caption: pick(x, 'caption', 'caption_ar'), when: x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen'), slides: 5 });
+    return D.phone({ kind: x.kind, platform: x.platform, platformName: x.platform ? plat(x.platform)[L()] : '', handle: handle(c), avatar: logoHtml(c), media: media(x, sfx), slides: n > 1 ? n : undefined, pageName: cName(c), caption: pick(x, 'caption', 'caption_ar'), when: x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen') });
   }
   function platChip(id) {
     if (!id) return '';
