@@ -334,8 +334,8 @@
       '</article></li>';
   }
   function thumb(x) {
-    var m = safeUrl(x.media_url), c = clientOf(x);
-    if (m && isImage(m)) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
+    var m = mediaList(x)[0], c = clientOf(x);
+    if (m) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
     return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#C9A84C', kind: x.kind, seed: x.id, sfx: '-t' });
   }
   // compact card: reviewed items, inbox replies, ads
@@ -370,6 +370,7 @@
     $('appr-done').innerHTML = reviewed.map(function (x) { return rowCard(x); }).join('');
     show($('done-wrap'), reviewed.length > 0);
     $('stack-ghosts').setAttribute('data-n', Math.min(pend.length, 3));
+    showCoach(pend.length > 0);
     var can = pend.length > 0 && canReview(pend[0]);
     show($('stack-ghosts'), pend.length > 1);
     show($('stack-hint'), can);
@@ -565,7 +566,7 @@
     brandDraft[k] = k === 'radius' ? Math.max(0, Math.min(32, parseInt(e.target.value, 10) || 0)) : e.target.value;
     previewBrand();
   });
-  document.addEventListener('change', function (e) { if (e.target && e.target.closest && e.target.closest('#cc-brand')) { var k = e.target.getAttribute('data-k'); if (k && brandDraft) { brandDraft[k] = k === 'radius' ? (parseInt(e.target.value, 10) || 0) : e.target.value; previewBrand(); } } });
+  document.addEventListener('change', function (e) { if (e.target && e.target.closest && e.target.closest('#cc-brand')) { var k = e.target.getAttribute('data-k'); if (k && brandDraft) { brandDraft[k] = k === 'radius' ? Math.max(0, Math.min(32, parseInt(e.target.value, 10) || 0)) : e.target.value; previewBrand(); } } });
 
   function renderMood() {
     var m = $('dash').getAttribute('data-mood');
@@ -972,7 +973,11 @@
   });
 
   var leaving = false;
-  function toLogin() { if (leaving) return; leaving = true; window.location.replace('login.html?out=1'); }
+  function toLogin() {
+    if (leaving) return; leaving = true;
+    try { localStorage.removeItem('sb-' + String(SB.url || '').replace(/^https?:\/\//, '').split('.')[0] + '-auth-token'); } catch (e) { /* ignore */ }
+    window.location.replace('login.html?out=1');
+  }
 
   /* ---------- Sheet (modal) ---------- */
   var modal = $('modal');
@@ -998,7 +1003,7 @@
   modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
 
   function itemDetail(x) {
-    var m = safeUrl(x.media_url);
+    var m = mediaList(x)[0] || '';
     var acts = [];
     if (x.status === 'needs_approval' && canReview(x)) {
       acts.push({ action: 'approve', id: x.id, label: t(S.isAdmin ? 'p.appr.owner' : 'p.appr.approve'), cls: 'btn-primary' });
@@ -1038,7 +1043,7 @@
     }).catch(function (err) {
       if (err && /no longer waiting/i.test(err.message || '')) {
         Z.toast(t('p.appr.stale'), 'warn');
-        return loadClientData();
+        return S.client ? loadClientData() : loadHQ();
       }
       Z.toast(t('p.appr.fail'), 'bad');
       if (window.console) console.warn('[portal] review failed', err && err.message);
@@ -1067,6 +1072,25 @@
       ]
     });
   }
+  // First-use coach: how to see slides vs how to decide. Shown once per device, or on demand (?).
+  var COACH_KEY = 'zkj-appr-coach', coachTimer = null;
+  function showCoach(force) {
+    var el = $('appr-coach'); if (!el || !force) return;
+    var seen = false; try { seen = localStorage.getItem(COACH_KEY) === '1'; } catch (e) { /* ignore */ }
+    if (force === true && seen) return;
+    if (force === 'again') seen = false;
+    if (seen || D.current() !== 'approvals') return;
+    el.hidden = false; var bar = el.querySelector('.bar i'); if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+    clearTimeout(coachTimer); coachTimer = setTimeout(function () { hideCoach(true); }, 9000);
+  }
+  // remember "seen" only once the card was really shown (or closed by hand), never just because another view opened first
+  function hideCoach(remember) {
+    var el = $('appr-coach'), wasShown = !!(el && !el.hidden);
+    if (el) el.hidden = true; clearTimeout(coachTimer);
+    if (remember || wasShown) { try { localStorage.setItem(COACH_KEY, '1'); } catch (e) { /* ignore */ } }
+  }
+  D.onView(function (id) { if (id === 'approvals') setTimeout(function () { showCoach(pending().length > 0); }, 400); else hideCoach(false); });
+
   D.swipe($('appr-list'), {
     approve: function (id) { var x = item(id); if (x && x.status === 'needs_approval') approveItem(x, true); else renderApprovals(); },
     changes: function (id) { var x = item(id); if (x && x.status === 'needs_approval') openChanges(x); else renderApprovals(); }
@@ -1095,6 +1119,8 @@
       }).catch(function () { Z.toast(t('p.e.generic'), 'bad'); });
     },
     'modal-close': function () { closeModal(); },
+    'coach-close': function () { hideCoach(true); },
+    'coach-show': function () { showCoach('again'); },
     'cal-prev': function () { S.week -= 1; renderCalendar(); },
     'cal-next': function () { S.week += 1; renderCalendar(); },
     filter: function (el) {
@@ -1197,7 +1223,7 @@
   // Carousel preview: update the 1/N badge while swiping the strip.
   document.addEventListener('scroll', function (e) {
     var st = e.target; if (!st || !st.classList || !st.classList.contains('ig-strip')) return;
-    var n = +st.getAttribute('data-n') || 1, i = Math.min(n, Math.round(st.scrollLeft / Math.max(1, st.clientWidth)) + 1);
+    var n = +st.getAttribute('data-n') || 1, i = Math.min(n, Math.round(Math.abs(st.scrollLeft) / Math.max(1, st.clientWidth)) + 1);
     var badge = st.parentNode && st.parentNode.querySelector('.ig-count'); if (badge) badge.textContent = i + '/' + n;
     var screen = st.closest('.screen'), dots = screen && screen.querySelector('.ig-dots');
     if (dots) { dots.classList.add('live'); Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle('on', k === i - 1); }); }

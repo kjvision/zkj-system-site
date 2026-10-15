@@ -519,8 +519,14 @@
     document.addEventListener('pointermove', function (e) {
       if (!drag) return; var dx = e.clientX - drag.x; if (Math.abs(dx) > 3) drag.moved = true; drag.st.scrollLeft = drag.left - dx;
     });
-    function endDrag() { if (!drag) return; var st = drag.st; st.classList.remove('dragging'); var i = Math.round(st.scrollLeft / Math.max(1, st.clientWidth)); st.scrollTo({ left: i * st.clientWidth, behavior: 'smooth' }); drag = null; }
+    function endDrag() { if (!drag) return; var st = drag.st; st.classList.remove('dragging'); var i = Math.round(Math.abs(st.scrollLeft) / Math.max(1, st.clientWidth)); st.scrollTo({ left: i * st.clientWidth * (document.dir === 'rtl' ? -1 : 1), behavior: 'smooth' }); drag = null; }
     document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) return;
+      var st = document.querySelector('.ig-strip:hover') || Array.prototype.find.call(document.querySelectorAll('.ig-strip'), function (s) { var r = s.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && r.width > 0; });
+      if (!st) return; var dir = (e.key === 'ArrowRight' ? 1 : -1) * (document.dir === 'rtl' ? -1 : 1);
+      st.scrollBy({ left: dir * st.clientWidth, behavior: 'smooth' }); e.preventDefault();
+    });
   })();
 
   /* ---------- Film-strip timeline ---------- */
@@ -590,6 +596,7 @@
     var st = null, TH = 100;
     list.addEventListener('pointerdown', function (e) {
       if (!mobileMQ.matches || e.button > 0) return;
+      if (e.target.closest('.ig-strip, .ig-arrow, .ig-dots')) return; // swiping the photo = next slide, never approve
       var ph = e.target.closest('.iphone'); if (!ph) return;
       var li = ph.closest('li'); if (!li || li !== list.firstElementChild) return;
       var card = ph.closest('.phone-card'); if (!card || card.getAttribute('data-pending') !== '1' || card.classList.contains('is-approving')) return;

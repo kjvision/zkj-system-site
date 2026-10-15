@@ -37,6 +37,7 @@
     if (/invalid_credentials|invalid login credentials|invalid_grant/i.test(code)) return 'p.e.creds';
     if (/email_not_confirmed|not confirmed/i.test(code)) return 'p.e.confirm';
     if (err.status === 429 || /rate|too many/i.test(code)) return 'p.e.rate';
+    if (err.status >= 500) return 'p.e.generic';
     if (err.name === 'AuthRetryableFetchError' || /fetch|network|failed to/i.test(code) || err.status === 0) return 'p.e.network';
     return 'p.e.generic';
   }
@@ -58,6 +59,10 @@
     return;
   }
 
+  // Just signed out (?out=1): make sure no session is left behind, so the page never bounces back in.
+  try {
+    if (new URLSearchParams(window.location.search).get('out') === '1') localStorage.removeItem('sb-' + String(SB.url || '').replace(/^https?:\/\//, '').split('.')[0] + '-auth-token');
+  } catch (e) { /* ignore */ }
   // Already signed in? Go straight to the dashboard.
   sb.auth.getSession().then(function (r) {
     if (r && r.data && r.data.session) window.location.replace('./');
