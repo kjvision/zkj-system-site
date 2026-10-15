@@ -370,6 +370,7 @@
     $('appr-done').innerHTML = reviewed.map(function (x) { return rowCard(x); }).join('');
     show($('done-wrap'), reviewed.length > 0);
     $('stack-ghosts').setAttribute('data-n', Math.min(pend.length, 3));
+    showCoach(pend.length > 0);
     var can = pend.length > 0 && canReview(pend[0]);
     show($('stack-ghosts'), pend.length > 1);
     show($('stack-hint'), can);
@@ -1067,6 +1068,20 @@
       ]
     });
   }
+  // First-use coach: how to see slides vs how to decide. Shown once per device, or on demand (?).
+  var COACH_KEY = 'zkj-appr-coach', coachTimer = null;
+  function showCoach(force) {
+    var el = $('appr-coach'); if (!el) return;
+    var seen = false; try { seen = localStorage.getItem(COACH_KEY) === '1'; } catch (e) { /* ignore */ }
+    if (force === true && seen) return;
+    if (force === 'again') seen = false;
+    if (seen || D.current() !== 'approvals') return;
+    el.hidden = false; var bar = el.querySelector('.bar i'); if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+    clearTimeout(coachTimer); coachTimer = setTimeout(hideCoach, 9000);
+  }
+  function hideCoach() { var el = $('appr-coach'); if (el) el.hidden = true; clearTimeout(coachTimer); try { localStorage.setItem(COACH_KEY, '1'); } catch (e) { /* ignore */ } }
+  D.onView(function (id) { if (id === 'approvals') setTimeout(function () { showCoach(pending().length > 0); }, 400); else hideCoach(); });
+
   D.swipe($('appr-list'), {
     approve: function (id) { var x = item(id); if (x && x.status === 'needs_approval') approveItem(x, true); else renderApprovals(); },
     changes: function (id) { var x = item(id); if (x && x.status === 'needs_approval') openChanges(x); else renderApprovals(); }
@@ -1095,6 +1110,8 @@
       }).catch(function () { Z.toast(t('p.e.generic'), 'bad'); });
     },
     'modal-close': function () { closeModal(); },
+    'coach-close': function () { hideCoach(); },
+    'coach-show': function () { showCoach('again'); },
     'cal-prev': function () { S.week -= 1; renderCalendar(); },
     'cal-next': function () { S.week += 1; renderCalendar(); },
     filter: function (el) {

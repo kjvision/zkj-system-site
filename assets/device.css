@@ -278,7 +278,8 @@ html[lang="ar"] .sub-head h3 { letter-spacing: 0; font-size: 14px; }
 .home-ind { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 36%; height: 4px; border-radius: 3px; background: rgba(255,255,255,.85); z-index: 26; }
 /* full-screen (reel / story) */
 .screen.is-full .full-media { position: absolute; inset: 0; z-index: 0; }
-.screen.is-full .full-media img { width: 100%; height: 100%; object-fit: cover; }
+.screen.is-full .full-media { background: #000; }
+.screen.is-full .full-media img { width: 100%; height: 100%; object-fit: contain; }
 .screen.is-full::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(0,0,0,.45) 0%, transparent 22%, transparent 55%, rgba(0,0,0,.75) 100%); }
 .screen.is-full > *:not(.full-media) { position: relative; z-index: 2; }
 .reel-top { display: flex; justify-content: space-between; align-items: center; padding: 2px 12px; font-weight: 700; font-size: 15px; }
