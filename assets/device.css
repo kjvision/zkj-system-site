@@ -278,7 +278,8 @@ html[lang="ar"] .sub-head h3 { letter-spacing: 0; font-size: 14px; }
 .home-ind { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 36%; height: 4px; border-radius: 3px; background: rgba(255,255,255,.85); z-index: 26; }
 /* full-screen (reel / story) */
 .screen.is-full .full-media { position: absolute; inset: 0; z-index: 0; }
-.screen.is-full .full-media img { width: 100%; height: 100%; object-fit: cover; }
+.screen.is-full .full-media { background: #000; }
+.screen.is-full .full-media img { width: 100%; height: 100%; object-fit: contain; }
 .screen.is-full::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(0,0,0,.45) 0%, transparent 22%, transparent 55%, rgba(0,0,0,.75) 100%); }
 .screen.is-full > *:not(.full-media) { position: relative; z-index: 2; }
 .reel-top { display: flex; justify-content: space-between; align-items: center; padding: 2px 12px; font-weight: 700; font-size: 15px; }
@@ -1317,3 +1318,18 @@ html[lang="ar"] .sb-group h3 { font-size: 14px; letter-spacing: 0; }
 .fb-acts svg { width: 14px; height: 14px; }
 .fb-acts .ig-dots { top: -12px; }
 .fb-nav { background: #242526; }
+
+/* First-use coach on the approvals page */
+.appr-coach { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 60; width: min(420px, calc(100% - 32px)); background: var(--surface, #15151B); border: 1px solid var(--gold, #C9A84C); border-radius: 16px; padding: 14px 16px 12px; box-shadow: 0 18px 50px rgba(0,0,0,.55); color: var(--white, #fff); animation: coach-in .35s ease-out; }
+.appr-coach[hidden] { display: none; }
+.appr-coach h4 { margin: 0 0 8px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold, #C9A84C); }
+.appr-coach ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 14px; line-height: 1.35; }
+.appr-coach li { display: flex; gap: 10px; align-items: flex-start; }
+.appr-coach li b { flex: none; min-width: 64px; font-weight: 600; color: var(--gold, #C9A84C); }
+.appr-coach .row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 10px; }
+.appr-coach .row small { color: var(--muted, #9AA0A6); font-size: 12px; }
+.appr-coach .bar { height: 3px; border-radius: 2px; background: rgba(201,168,76,.25); margin-top: 10px; overflow: hidden; }
+.appr-coach .bar i { display: block; height: 100%; background: var(--gold, #C9A84C); animation: coach-bar 9s linear forwards; }
+@keyframes coach-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes coach-bar { from { width: 100%; } to { width: 0; } }
+@media (hover: hover) { .appr-coach { bottom: 28px; } }
