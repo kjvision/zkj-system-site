@@ -1295,3 +1295,25 @@ html[lang="ar"] .sb-group h3 { font-size: 14px; letter-spacing: 0; }
   .dock.arc, .dock-line, .dock-scrim, .dock-open .dock-scrim { transition: none; }
   .dock-line::before { animation: none; background-position: 40% 50%; }
 }
+
+
+/* Carousel controls on desktop + Facebook preview */
+.ig-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(255,255,255,.88); color: #111; font: 700 18px/1 system-ui; display: grid; place-items: center; cursor: pointer; opacity: 0; transition: opacity .15s; padding: 0 0 2px; }
+.ig-arrow.prev { left: 6px; } .ig-arrow.next { right: 6px; }
+.ig-media:hover .ig-arrow, .ig-arrow:focus-visible { opacity: .95; }
+@media (hover: none) { .ig-arrow { display: none; } }
+.ig-strip.dragging { scroll-snap-type: none; cursor: grabbing; }
+.ig-strip { cursor: grab; }
+.ig-strip img { -webkit-user-drag: none; user-select: none; }
+.ig-dots i { cursor: pointer; }
+.screen.is-fb { background: #1c1c1d; }
+.screen.is-fb .fb-head { background: #242526; }
+.screen.is-fb .ig-who b { font-size: 12px; }
+.screen.is-fb .ig-who small { font-size: 9px; color: rgba(255,255,255,.55); }
+.fb-cap { padding: 4px 10px 8px; font-size: 11px; color: rgba(255,255,255,.92); background: #242526; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line; flex: none; }
+.screen.is-fb .ig-media { aspect-ratio: 4 / 5; }
+.fb-acts { display: flex; justify-content: space-around; align-items: center; gap: 6px; padding: 7px 8px; flex: none; background: #242526; border-top: 1px solid rgba(255,255,255,.08); font-size: 10px; color: rgba(255,255,255,.8); position: relative; }
+.fb-acts span { display: inline-flex; align-items: center; gap: 4px; }
+.fb-acts svg { width: 14px; height: 14px; }
+.fb-acts .ig-dots { top: -12px; }
+.fb-nav { background: #242526; }
