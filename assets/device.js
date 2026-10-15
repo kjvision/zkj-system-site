@@ -519,7 +519,7 @@
     document.addEventListener('pointermove', function (e) {
       if (!drag) return; var dx = e.clientX - drag.x; if (Math.abs(dx) > 3) drag.moved = true; drag.st.scrollLeft = drag.left - dx;
     });
-    function endDrag() { if (!drag) return; var st = drag.st; st.classList.remove('dragging'); var i = Math.round(st.scrollLeft / Math.max(1, st.clientWidth)); st.scrollTo({ left: i * st.clientWidth, behavior: 'smooth' }); drag = null; }
+    function endDrag() { if (!drag) return; var st = drag.st; st.classList.remove('dragging'); var i = Math.round(Math.abs(st.scrollLeft) / Math.max(1, st.clientWidth)); st.scrollTo({ left: i * st.clientWidth * (document.dir === 'rtl' ? -1 : 1), behavior: 'smooth' }); drag = null; }
     document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]')) return;

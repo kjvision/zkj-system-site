@@ -664,6 +664,8 @@ html[lang="ar"] .ios-cap { letter-spacing: 0; }
   .phone-row { position: relative; display: grid; padding: 6px 0 0; overflow: visible; gap: 0; justify-items: center; }
   .phone-row > li { display: none; grid-area: 1 / 1; }
   .phone-row > li:first-child { display: block; z-index: 3; }
+  /* a card flying off-screen must not widen the page (in Arabic that let the page pan sideways and the note sheet land half off-screen) */
+  .phone-row-wrap { overflow-x: clip; }
   .phone-card { width: min(340px, 100%); }
   .phone-card .iphone { --pw: min(272px, 72vw); touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; transition: transform .35s var(--spring); }
   .phone-card .iphone.dragging { transition: none; cursor: grabbing; }
