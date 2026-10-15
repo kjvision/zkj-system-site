@@ -1200,6 +1200,8 @@
     var st = e.target; if (!st || !st.classList || !st.classList.contains('ig-strip')) return;
     var n = +st.getAttribute('data-n') || 1, i = Math.min(n, Math.round(st.scrollLeft / Math.max(1, st.clientWidth)) + 1);
     var badge = st.parentNode && st.parentNode.querySelector('.ig-count'); if (badge) badge.textContent = i + '/' + n;
+    var screen = st.closest('.screen'), dots = screen && screen.querySelector('.ig-dots');
+    if (dots) { dots.classList.add('live'); Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle('on', k === i - 1); }); }
   }, true);
 
   /* ---------- Admin forms ---------- */
