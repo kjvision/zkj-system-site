@@ -63,7 +63,7 @@
       'p.day.0': 'Sun', 'p.day.1': 'Mon', 'p.day.2': 'Tue', 'p.day.3': 'Wed', 'p.day.4': 'Thu', 'p.day.5': 'Fri', 'p.day.6': 'Sat',
       'p.type.post': 'Post', 'p.type.carousel': 'Carousel', 'p.type.reel': 'Reel', 'p.type.story': 'Story', 'p.type.reply': 'Reply', 'p.type.ad': 'Ad',
       'p.s.draft': 'Draft', 'p.s.needs_approval': 'Needs your approval', 'p.s.approved': 'Approved', 'p.s.changes_requested': 'Changes requested', 'p.s.scheduled': 'Scheduled', 'p.s.published': 'Published',
-      'p.item.platform': 'Platform', 'p.item.type': 'Type', 'p.item.when': 'When', 'p.item.status': 'Status', 'p.item.note': 'Your note', 'p.item.media': 'Open media',
+      'p.item.platform': 'Platform', 'p.item.type': 'Type', 'p.item.when': 'When', 'p.item.status': 'Status', 'p.item.note': 'Your note', 'p.item.media': 'Open media', 'p.item.openpost': 'Open the live post', 'p.item.published': 'Published', 'p.item.puberr': 'Publishing problem',
 
       'p.inbox.title': 'Inbox replies', 'p.inbox.sub': 'Suggested replies to comments and DMs, in your brand voice.', 'p.inbox.empty': 'No replies to review right now.',
       'p.ads.title': 'Ads', 'p.ads.sub': 'Campaigns waiting for you or running.', 'p.ads.empty': 'No ad campaigns yet.', 'p.ads.note': 'Ad budget is paid by you directly to each platform.',
@@ -155,7 +155,7 @@
       'p.day.0': 'الأحد', 'p.day.1': 'الاثنين', 'p.day.2': 'الثلاثاء', 'p.day.3': 'الأربعاء', 'p.day.4': 'الخميس', 'p.day.5': 'الجمعة', 'p.day.6': 'السبت',
       'p.type.post': 'منشور', 'p.type.carousel': 'كاروسيل', 'p.type.reel': 'ريل', 'p.type.story': 'ستوري', 'p.type.reply': 'رد', 'p.type.ad': 'إعلان',
       'p.s.draft': 'مسودة', 'p.s.needs_approval': 'بانتظار موافقتك', 'p.s.approved': 'تمت الموافقة', 'p.s.changes_requested': 'طُلب تعديل', 'p.s.scheduled': 'مجدول', 'p.s.published': 'منشور',
-      'p.item.platform': 'المنصة', 'p.item.type': 'النوع', 'p.item.when': 'الموعد', 'p.item.status': 'الحالة', 'p.item.note': 'ملاحظتك', 'p.item.media': 'افتح الملف',
+      'p.item.platform': 'المنصة', 'p.item.type': 'النوع', 'p.item.when': 'الموعد', 'p.item.status': 'الحالة', 'p.item.note': 'ملاحظتك', 'p.item.openpost': 'افتح المنشور المنشور', 'p.item.published': 'نُشر', 'p.item.puberr': 'مشكلة في النشر', 'p.item.media': 'افتح الملف',
 
       'p.inbox.title': 'ردود الرسائل', 'p.inbox.sub': 'ردود مقترحة على التعليقات والرسائل بنبرة علامتك.', 'p.inbox.empty': 'لا ردود للمراجعة الآن.',
       'p.ads.title': 'الإعلانات', 'p.ads.sub': 'حملات بانتظارك أو تعمل الآن.', 'p.ads.empty': 'لا حملات إعلانية بعد.', 'p.ads.note': 'ميزانية الإعلانات تدفعها أنت مباشرة لكل منصة.',
@@ -253,6 +253,7 @@
       'p.cov.title': 'Background images', 'p.cov.label': 'Background image links, separated by commas', 'p.cov.save': 'Save images',
       'p.cov.help': 'Comma-separated links (site paths like /assets/… or https://). Empty = the client’s logo glows instead.',
       'p.cov.ok': '{n} background images saved for {name}.', 'p.cov.bad': 'Use links that start with https:// or /.',
+      'p.pub.title': 'Auto-publish (Meta)', 'p.pub.help': 'Approved posts go to Instagram and Facebook at their scheduled time through Meta’s official API. Paused = nothing is posted; the queue waits.', 'p.pub.pause': 'Pause publishing', 'p.pub.resume': 'Resume publishing', 'p.pub.on': 'On — approved posts go out at their scheduled time.', 'p.pub.off': 'Paused — nothing is posted; approved posts wait.', 'p.pub.saved': 'Saved.', 'p.pub.unknown': 'Setting not found — run supabase/publisher.sql.',
       'p.mood.title': 'Background mood', 'p.mood.a': 'A · Neon lines', 'p.mood.a.sub': 'Cube line-light + art', 'p.mood.b': 'B · Aurora', 'p.mood.b.sub': 'Gold aurora, particles',
       'p.mood.c': 'C · Blueprint', 'p.mood.c.sub': 'Grid, dimensions, 3D cube', 'p.mood.help': 'Saved on this device. Each client’s background images play in every mood.',
       'p.cc.for': 'Add to which client?', 'p.cc.addfor': 'Add for', 'p.adm.sub2': 'Choose a client, then add an item, a key number or a notification. Clients never see this.',
@@ -292,6 +293,7 @@
       'p.cov.title': 'صور الخلفية', 'p.cov.label': 'روابط صور الخلفية مفصولة بفواصل', 'p.cov.save': 'حفظ الصور',
       'p.cov.help': 'روابط مفصولة بفواصل (مسارات مثل /assets/… أو https://). إذا تُركت فارغة يتوهّج شعار العميل بدلًا منها.',
       'p.cov.ok': 'حُفظت {n} صور خلفية لـ {name}.', 'p.cov.bad': 'استخدم روابط تبدأ بـ https:// أو /.',
+      'p.pub.title': 'النشر التلقائي (ميتا)', 'p.pub.help': 'المنشورات المعتمدة تُنشر على إنستغرام وفيسبوك في موعدها عبر واجهة ميتا الرسمية. موقوف = لا يُنشر شيء، والطابور ينتظر.', 'p.pub.pause': 'إيقاف النشر', 'p.pub.resume': 'استئناف النشر', 'p.pub.on': 'يعمل — المنشورات المعتمدة تُنشر في موعدها.', 'p.pub.off': 'موقوف — لا يُنشر شيء، والمعتمد ينتظر.', 'p.pub.saved': 'تم الحفظ.', 'p.pub.unknown': 'الإعداد غير موجود — شغّل supabase/publisher.sql.',
       'p.mood.title': 'أجواء الخلفية', 'p.mood.a': 'A · خطوط النيون', 'p.mood.a.sub': 'ضوء خطوط المكعب + الفن', 'p.mood.b': 'B · الشفق', 'p.mood.b.sub': 'شفق ذهبي وجزيئات',
       'p.mood.c': 'C · المخطط الهندسي', 'p.mood.c.sub': 'شبكة وأبعاد ومكعب ثلاثي الأبعاد', 'p.mood.help': 'تُحفظ على هذا الجهاز. صور خلفية كل عميل تظهر في كل الأجواء.',
       'p.cc.for': 'لأي عميل؟', 'p.cc.addfor': 'إضافة لـ', 'p.adm.sub2': 'اختر عميلًا، ثم أضف عنصرًا أو رقمًا رئيسيًا أو إشعارًا. العملاء لا يرون هذا.',
