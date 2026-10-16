@@ -24,11 +24,11 @@ function tokenShape() {
   if (!RAW_TOKEN) return 'token check: the secret is empty or missing';
   const cleaned = RAW_TOKEN !== TOKEN;
   const odd = /[^\x21-\x7e]/.test(TOKEN);
-  const looks = /^EAA[A-Za-z0-9]{40,}$/.test(TOKEN);
+  const looks = /^EA[A-Z][A-Za-z0-9]{40,}$/.test(TOKEN); // Meta tokens start with EAA, EAB, EAC… depending on the app
   return `token check: saved length ${RAW_TOKEN.length}, starts with "${RAW_TOKEN.slice(0, 3)}", used length ${TOKEN.length}` +
     (cleaned ? ' (spaces, a newline, quotes or "Bearer" were around it and were removed)' : '') +
     (odd ? ', contains characters that are not part of a token' : '') +
-    (looks ? ', shape looks like a Meta token' : ', shape does NOT look like a Meta token (they start with EAA and are 150-300 letters and digits)');
+    (looks ? ', shape looks like a Meta token' : ', shape does NOT look like a Meta token (they start with EA + a letter, e.g. EAA or EAB, and are 150-300 letters and digits)');
 }
 
 async function uuid5(name: string) {
