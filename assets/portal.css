@@ -238,3 +238,13 @@ html.reduce-motion .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-
 .imp-list li.bad b, .imp-list li.bad .imp-err { color: var(--bad); }
 .imp-sum { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
 .imp-sum.ok { color: var(--gold); }
+
+/* "Edited after your note — ready for approval again" (items the owner sent back after a change request) */
+.pc-edited, .rc-edited { margin: 0; display: grid; gap: 4px; }
+.pc-edited { padding: 10px 12px; border-radius: 14px; background: rgba(201,168,76,.08); box-shadow: inset 0 0 0 1px rgba(201,168,76,.35); }
+.rc-edited { font-size: 12.5px; }
+.ed-badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; color: var(--gold); }
+.ed-badge svg { width: 14px; height: 14px; flex: none; }
+.ed-note { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.td-revised .td-ic { color: var(--gold); }
+#rv-note { width: 100%; min-height: 96px; margin-top: 10px; }
