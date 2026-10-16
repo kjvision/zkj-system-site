@@ -760,6 +760,7 @@
     $('cc-sheet-client').textContent = cName(target);
     $('cc-client-count').textContent = S.clients.length;
     $('cc-covers-client').textContent = cName(target);
+    $('imp-help').textContent = t('p.imp.help', { name: cName(target) });
     if (document.activeElement !== $('cc-covers-input')) $('cc-covers-input').value = coversOf(target).join(',\n');
     renderMood();
     renderBrandEditor(target);
@@ -782,7 +783,7 @@
   }
   var sheet = $('cc-sheet');
   function selectForm(id) {
-    ['f-item', 'f-kpi', 'f-notif'].forEach(function (f) { show($(f), f === id); });
+    ['f-item', 'f-import', 'f-kpi', 'f-notif'].forEach(function (f) { show($(f), f === id); });
     sheet.querySelectorAll('[data-form-tab]').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-form-tab') === id ? 'true' : 'false'); });
   }
   function openSheet(formId) {
@@ -1283,6 +1284,94 @@
   adminSubmit('f-notif', function (f) {
     return { audience: 'client', title: val(f, 'title'), title_ar: val(f, 'title_ar'), body: val(f, 'body'), body_ar: val(f, 'body_ar') };
   }, 'notifications', 'p.f.ok.notif');
+
+  /* ---------- Import from AI (admin) ----------
+     KJ pastes the block that the Content Studio tool wrote: a JSON list of items.
+     Each item: { kind, title, title_ar, caption, caption_ar, media_url, platform, when }.
+     Everything lands as needs_approval for the chosen client. No keys, nothing is published. */
+  var IMPORT_MAX = 60, IMPORT_KINDS = ['post', 'reel', 'story', 'carousel', 'reply', 'ad'];
+  function parseImportDate(v) {
+    if (v == null || v === '') return null;
+    var s = String(v).trim().replace(/\//g, '-');
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?$/.exec(s);
+    var d = m ? new Date(+m[1], +m[2] - 1, +m[3], m[4] ? +m[4] : 12, m[5] ? +m[5] : 0) : new Date(s);
+    return isNaN(d.getTime()) ? false : d.toISOString();
+  }
+  function parseImport(text) {
+    var raw = String(text || '').trim().replace(/^```[a-z]*\s*/i, '').replace(/```\s*$/, '').trim();
+    var out = { rows: [], errors: [], fatal: null };
+    if (!raw) return out;
+    var data;
+    try { data = JSON.parse(raw); } catch (e) {
+      var a = raw.indexOf('['), b = raw.lastIndexOf(']');
+      if (a > -1 && b > a) { try { data = JSON.parse(raw.slice(a, b + 1)); } catch (e2) { data = null; } }
+    }
+    if (data && !Array.isArray(data) && Array.isArray(data.items)) data = data.items;
+    if (!Array.isArray(data)) { out.fatal = t('p.imp.e.json'); return out; }
+    if (!data.length) { out.fatal = t('p.imp.e.empty'); return out; }
+    if (data.length > IMPORT_MAX) { out.fatal = t('p.imp.e.many', { max: IMPORT_MAX }); return out; }
+    var platforms = allPlatforms().map(function (p) { return p.id; });
+    var str = function (v, max) { return v == null ? null : String(v).trim().slice(0, max || 4000) || null; };
+    data.forEach(function (it, i) {
+      it = it && typeof it === 'object' ? it : {};
+      var errs = [], kind = str(it.kind || it.type, 20) || 'post', platform = str(it.platform, 30), url = str(it.media_url || it.media, 2000);
+      kind = kind.toLowerCase(); if (platform) platform = platform.toLowerCase();
+      var title = str(it.title || it.title_en, 200);
+      if (!title) errs.push(t('p.imp.e.title'));
+      if (IMPORT_KINDS.indexOf(kind) < 0) errs.push(t('p.imp.e.kind', { v: kind }));
+      if (platform && platforms.indexOf(platform) < 0) errs.push(t('p.imp.e.platform', { v: platform }));
+      if (url) { url = url.split(/[\s,]+/).filter(Boolean).join(','); if (url.split(',').some(function (u) { return !/^https:\/\//i.test(u); })) errs.push(t('p.imp.e.url')); }
+      var whenRaw = it.when != null ? it.when : it.scheduled_at, when = parseImportDate(whenRaw);
+      if (when === false) errs.push(t('p.imp.e.when', { v: whenRaw }));
+      out.rows.push({
+        n: i + 1, ok: !errs.length, errs: errs, when: when || null,
+        row: { kind: kind, title: title, title_ar: str(it.title_ar, 200), caption: str(it.caption || it.caption_en), caption_ar: str(it.caption_ar),
+          media_url: url, platform: platform || null, scheduled_at: when || null, status: 'needs_approval' }
+      });
+      if (errs.length) out.errors.push(i + 1);
+    });
+    return out;
+  }
+  function renderImportPreview() {
+    var form = $('f-import'), target = clientById(S.ccClient), res = parseImport($('imp-text').value);
+    var sum = $('imp-sum'), list = $('imp-list'), btn = $('imp-submit');
+    formStatus(form, '', '');
+    sum.className = 'imp-sum';
+    if (res.fatal) { sum.textContent = res.fatal; list.hidden = true; btn.disabled = true; btn.textContent = t('p.imp.add0'); return null; }
+    if (!res.rows.length) { sum.textContent = t('p.imp.none'); list.hidden = true; btn.disabled = true; btn.textContent = t('p.imp.add0'); return null; }
+    list.hidden = false;
+    list.innerHTML = res.rows.map(function (r) {
+      var x = r.row, p = x.platform ? plat(x.platform)[L()] : '—';
+      var kindName = IMPORT_KINDS.indexOf(x.kind) > -1 ? t('p.type.' + x.kind) : x.kind;
+      return '<li' + (r.ok ? '' : ' class="bad"') + '><span class="imp-top"><span class="mono">' + esc(t('p.imp.item', { n: r.n })) + '</span><b>' + esc(x.title || '—') + '</b></span>' +
+        '<span class="imp-meta"><span class="mono">' + esc(kindName + ' · ' + p) + '</span>' +
+        (r.ok ? '<span class="imp-when">' + esc(r.when ? fmtWhen(r.when) : t('p.appr.nowhen')) + '</span>' : '<span class="imp-err">' + esc(r.errs.join(' ')) + '</span>') + '</span></li>';
+    }).join('');
+    var ok = !res.errors.length;
+    sum.className = 'imp-sum' + (ok ? ' ok' : '');
+    sum.textContent = ok ? t('p.imp.ready', { n: res.rows.length, name: target ? cName(target) : '' }) : t('p.imp.fix');
+    btn.disabled = !ok || !S.isAdmin;
+    btn.textContent = ok ? t('p.imp.add', { n: res.rows.length }) : t('p.imp.add0');
+    return ok ? res.rows.map(function (r) { return r.row; }) : null;
+  }
+  $('imp-text').addEventListener('input', renderImportPreview);
+  $('f-import').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var form = $('f-import'), target = clientById(S.ccClient), rows = renderImportPreview();
+    if (!S.isAdmin || !target || !rows) return;
+    rows.forEach(function (r) { r.client_id = target.id; });
+    var btn = $('imp-submit'), label = btn.textContent, name = cName(target), n = rows.length;
+    btn.disabled = true; btn.textContent = t('p.f.saving');
+    q(sb.from('items').insert(rows).select()).then(function () {
+      $('imp-text').value = ''; renderImportPreview();
+      formStatus(form, 'ok', t('p.imp.done', { n: n, name: name }));
+      Z.toast(t('p.imp.done', { n: n, name: name }), 'ok');
+      return loadHQ().then(function () { renderBoard(); });
+    }).catch(function (err) {
+      formStatus(form, 'error', t('p.f.fail', { msg: (err && err.message) || '?' }));
+      btn.disabled = false; btn.textContent = label;
+    });
+  });
 
   /* ---------- Shell ---------- */
   navFor('client');
