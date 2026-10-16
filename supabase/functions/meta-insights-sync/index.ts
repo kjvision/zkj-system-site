@@ -56,8 +56,9 @@ async function sb(path: string, init: RequestInit = {}) {
     ...init,
     headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', ...(init.headers ?? {}) },
   });
-  if (!r.ok) throw new Error(`Supabase ${path}: ${r.status} ${await r.text()}`);
-  return r.status === 204 ? null : r.json();
+  const txt = await r.text();
+  if (!r.ok) throw new Error(`Supabase ${path}: ${r.status} ${txt}`);
+  return txt ? JSON.parse(txt) : null; // 201/204 with an empty body (return=minimal) is fine
 }
 const num = (v: unknown) => (v == null || isNaN(Number(v)) ? null : Number(v));
 function totals(insights: { data?: { name: string; total_value?: { value: unknown }; values?: { value: unknown }[] }[] }) {
