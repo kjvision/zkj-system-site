@@ -8,7 +8,8 @@
 // and every run logs a safe description of the token's shape (length and first 3 letters only, never the token).
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
-const RAW_TOKEN = Deno.env.get('META_ACCESS_TOKEN') ?? '';
+// The secret may have been saved under a misspelled name once (META_ACCESS_TOLEN); both names are accepted.
+const RAW_TOKEN = Deno.env.get('META_ACCESS_TOKEN') ?? Deno.env.get('META_ACCESS_TOLEN') ?? '';
 const TOKEN = RAW_TOKEN.trim().replace(/^["'`]+|["'`]+$/g, '').replace(/^Bearer\s+/i, '').trim();
 const SB_URL = (Deno.env.get('SUPABASE_URL') ?? '').replace(/\/$/, '');
 const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
