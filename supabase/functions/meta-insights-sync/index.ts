@@ -82,6 +82,7 @@ async function run(dry: boolean) {
 
   const pages = await graph('me/accounts', { fields: 'name,instagram_business_account{id,username,followers_count,media_count}', limit: 50 });
   const igs = (pages.data ?? []).filter((p: any) => p.instagram_business_account).map((p: any) => ({ page: p.name, ...p.instagram_business_account }));
+  say('Pages the token can see: ' + ((pages.data ?? []).map((p: any) => p.name + (p.instagram_business_account ? ' (Instagram linked)' : ' (no Instagram linked)')).join(', ') || 'none'));
   if (!igs.length) throw new Error('The token works, but no Facebook Page with a linked Instagram professional account is assigned to it. In Meta Business Settings → System users → Add assets, give the system user the Pages (and their Instagram accounts). Pages seen: ' + ((pages.data ?? []).map((p: any) => p.name).join(', ') || 'none'));
   say('Instagram accounts: ' + igs.map((a: any) => '@' + a.username).join(', '));
 
