@@ -20,7 +20,7 @@
     items: [], kpis: [], notifs: [], reports: [],
     week: 0, filter: 'all', busy: {}, keepFlown: false,
     mode: 'client', // 'client' (a client's login) · 'hq' (KJ's overview) · 'ws' (KJ inside one client's workspace)
-    all: [], hqWeek: 0, ccClient: null
+    all: [], hqWeek: 0, ccClient: null, settings: {}
   };
 
   /* ---------- Packages (plan → panels) ---------- */
@@ -568,6 +568,15 @@
   });
   document.addEventListener('change', function (e) { if (e.target && e.target.closest && e.target.closest('#cc-brand')) { var k = e.target.getAttribute('data-k'); if (k && brandDraft) { brandDraft[k] = k === 'radius' ? Math.max(0, Math.min(32, parseInt(e.target.value, 10) || 0)) : e.target.value; previewBrand(); } } });
 
+  // Auto-publish switch (app_settings.publisher_paused), admin only
+  function renderPub() {
+    var btn = $('pub-toggle'), st = $('pub-status'); if (!btn || !st) return;
+    var v = S.settings.publisher_paused;
+    if (v === undefined) { btn.disabled = true; btn.textContent = '—'; st.className = 'form-status show error'; st.textContent = t('p.pub.unknown'); return; }
+    var paused = v === 'true';
+    btn.disabled = false; btn.textContent = t(paused ? 'p.pub.resume' : 'p.pub.pause'); btn.setAttribute('aria-pressed', paused ? 'false' : 'true');
+    st.className = 'form-status show ' + (paused ? 'error' : 'ok'); st.textContent = t(paused ? 'p.pub.off' : 'p.pub.on');
+  }
   function renderMood() {
     var m = $('dash').getAttribute('data-mood');
     document.querySelectorAll('[data-action="set-mood"]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mood') === m ? 'true' : 'false'); });
@@ -763,6 +772,7 @@
     $('imp-help').textContent = t('p.imp.help', { name: cName(target) });
     if (document.activeElement !== $('cc-covers-input')) $('cc-covers-input').value = coversOf(target).join(',\n');
     renderMood();
+    renderPub();
     renderBrandEditor(target);
     $('client-switch').innerHTML = S.clients.map(function (c) {
       var on = c.id === target.id;
@@ -875,8 +885,9 @@
     return Promise.all([
       q(sb.from('clients').select('*').order('created_at', { ascending: true })),
       q(sb.from('items').select('*').order('scheduled_at', { ascending: true, nullsFirst: false })),
-      loadNotifs()
-    ]).then(function (r) { S.clients = r[0] || []; S.all = r[1] || []; });
+      loadNotifs(),
+      q(sb.from('app_settings').select('*')).catch(function () { return null; })
+    ]).then(function (r) { S.clients = r[0] || []; S.all = r[1] || []; S.settings = {}; (r[3] || []).forEach(function (s2) { S.settings[s2.key] = s2.value; }); if (r[3] === null) S.settings.__missing = '1'; });
   }
   function showHQ(view) {
     S.mode = 'hq'; S.client = null;
@@ -1010,6 +1021,7 @@
       acts.push({ action: 'approve', id: x.id, label: t(S.isAdmin ? 'p.appr.owner' : 'p.appr.approve'), cls: 'btn-primary' });
       acts.push({ action: 'changes', id: x.id, label: t('p.appr.changes') });
     }
+    if (x.published_url && safeUrl(x.published_url)) acts.push({ href: safeUrl(x.published_url), label: t('p.item.openpost'), cls: 'btn-primary' });
     if (m) acts.push({ href: m, label: t('p.item.media') });
     acts.push({ action: 'modal-close', label: t('p.close') });
     var dot = STATUS_DOT[x.status] || 'off';
@@ -1021,7 +1033,9 @@
         '<dt>' + esc(t('p.item.when')) + '</dt><dd>' + esc(fmtWhen(x.scheduled_at)) + '</dd>' +
         (S.isAdmin ? '<dt>' + esc(t('p.item.client')) + '</dt><dd>' + esc(cName(clientOf(x))) + '</dd>' : '') +
         '<dt>' + esc(t('p.item.status')) + '</dt><dd><span class="status-' + dot + '" style="font-weight:700">' + esc(x.status === 'needs_approval' && !canReview(x) ? t('p.wait.client') : statusLabel(x.status)) + '</span></dd>' +
-        (x.client_note ? '<dt>' + esc(t(S.isAdmin ? 'p.item.theirnote' : 'p.item.note')) + '</dt><dd>' + esc(x.client_note) + '</dd>' : '') + '</dl>',
+        (x.client_note ? '<dt>' + esc(t(S.isAdmin ? 'p.item.theirnote' : 'p.item.note')) + '</dt><dd>' + esc(x.client_note) + '</dd>' : '') +
+        (x.published_at ? '<dt>' + esc(t('p.item.published')) + '</dt><dd class="mono">' + esc(fmtWhen(x.published_at)) + '</dd>' : '') +
+        (x.publish_error && x.status !== 'published' ? '<dt>' + esc(t('p.item.puberr')) + '</dt><dd class="status-bad">' + esc(x.publish_error) + '</dd>' : '') + '</dl>',
       actions: acts
     });
   }
@@ -1178,6 +1192,14 @@
         .then(function () { el.disabled = false; });
     },
     'set-mood': function (el) { D.setMood(el.getAttribute('data-mood')); renderMood(); },
+    'pub-toggle': function (el) {
+      if (!S.isAdmin || S.settings.publisher_paused === undefined) return;
+      var next = S.settings.publisher_paused === 'true' ? 'false' : 'true'; el.disabled = true;
+      q(sb.from('app_settings').update({ value: next, updated_at: new Date().toISOString() }).eq('key', 'publisher_paused').select()).then(function (rows) {
+        if (!rows || !rows.length) throw new Error('not saved');
+        S.settings.publisher_paused = rows[0].value; renderPub(); Z.toast(t('p.pub.saved') + ' ' + t(rows[0].value === 'true' ? 'p.pub.off' : 'p.pub.on'), rows[0].value === 'true' ? 'warn' : 'ok');
+      }).catch(function (err) { Z.toast(t('p.f.fail', { msg: (err && err.message) || '?' }), 'bad'); el.disabled = false; });
+    },
     'save-covers': function (el) {
       var target = clientById(S.ccClient); if (!S.isAdmin || !target) return;
       var raw = $('cc-covers-input').value.split(/[\s,]+/).map(function (u) { return u.trim(); }).filter(Boolean);
