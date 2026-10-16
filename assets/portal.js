@@ -330,13 +330,19 @@
     return '<li class="appr-slot"><article class="appr phone-card' + (can ? '' : ' is-readonly') + '" id="appr-' + esc(x.id) + '" data-id="' + esc(x.id) + '" data-pending="' + (can ? '1' : '0') + '" aria-label="' + esc(title) + '">' +
       phoneOf(x) +
       '<div class="pc-meta"><h3>' + esc(title) + '</h3><p>' + platChip(x.platform) + '<span class="mono">' + esc(x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen')) + '</span></p></div>' +
-      acts + '<button class="link-btn pc-more" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '<span class="sr-only"> — ' + esc(title) + '</span></button>' +
+      editedTag(x, 'pc-edited') + acts + '<button class="link-btn pc-more" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '<span class="sr-only"> — ' + esc(title) + '</span></button>' +
       '</article></li>';
   }
   function thumb(x) {
     var m = mediaList(x)[0], c = clientOf(x);
     if (m) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
     return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#C9A84C', kind: x.kind, seed: x.id, sfx: '-t' });
+  }
+  // "edited after your note → ready for approval again" marker (items sent back by the owner after a change request)
+  function editedTag(x, cls) {
+    if (!x.revised_at || x.status !== 'needs_approval') return '';
+    return '<p class="' + cls + '"><span class="ed-badge">' + D.icon('pencil') + '<span>' + esc(t('p.appr.edited')) + '</span></span>' +
+      (x.revision_note ? '<span class="ed-note">' + esc(t('p.appr.whatchanged', { note: x.revision_note })) + '</span>' : '') + '</p>';
   }
   // compact card: reviewed items, inbox replies, ads
   function rowCard(x, prefix) {
@@ -356,7 +362,7 @@
     return '<li><article class="appr row-card' + (x.status !== 'needs_approval' ? ' is-done' : '') + '" id="' + (prefix || 'appr-') + esc(x.id) + '">' +
       '<div class="rc-thumb">' + thumb(x) + '</div><div class="rc-body"><h3>' + esc(title) + '</h3>' +
       '<div class="rc-line">' + platChip(x.platform) + '<span class="mono" style="font-size:12px;color:var(--muted)">' + esc(x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen')) + '</span></div>' +
-      (prefix ? '<p class="rc-caption">' + esc(pick(x, 'caption', 'caption_ar')) + '</p>' : '') + note +
+      (prefix ? '<p class="rc-caption">' + esc(pick(x, 'caption', 'caption_ar')) + '</p>' : '') + note + editedTag(x, 'rc-edited') +
       '<div class="appr-actions">' + actions + '<button class="link-btn" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '<span class="sr-only"> — ' + esc(title) + '</span></button></div></div>' +
       '</article></li>';
   }
@@ -654,12 +660,22 @@
     S.all.filter(function (x) { return x.status === 'changes_requested'; })
       .sort(function (a, b) { return String(b.reviewed_at).localeCompare(String(a.reviewed_at)); })
       .forEach(function (x) { rows.push({ type: 'changes', x: x, c: clientOf(x), when: x.reviewed_at }); });
+    // edited after a note and sent back: waiting for the client's approval again (or the owner's, on own brands)
+    S.all.filter(function (x) { return x.status === 'needs_approval' && x.revised_at; })
+      .sort(function (a, b) { return String(b.revised_at).localeCompare(String(a.revised_at)); })
+      .forEach(function (x) { rows.push({ type: 'revised', x: x, c: clientOf(x), when: x.revised_at }); });
     S.all.filter(function (x) { return x.status === 'draft'; })
       .forEach(function (x) { rows.push({ type: 'draft', x: x, c: clientOf(x), when: x.scheduled_at || x.created_at }); });
     S.notifs.forEach(function (n) { rows.push({ type: 'activity', n: n, c: clientById(n.client_id), when: n.created_at }); });
     return rows;
   }
-  function todoCount() { return todoRows().filter(function (r) { return r.type !== 'activity' || !r.n.read; }).length; }
+  function todoCount() {
+    return todoRows().filter(function (r) {
+      if (r.type === 'activity') return !r.n.read;
+      if (r.type === 'revised') return canReview(r.x); // the client's turn, unless it is one of the owner's own brands
+      return true;
+    }).length;
+  }
   function greeting() {
     var h = +new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hourCycle: 'h23', timeZone: 'Asia/Dubai' }).format(new Date());
     return h < 12 ? 'p.hq.morning' : h < 17 ? 'p.hq.afternoon' : 'p.hq.evening';
@@ -714,12 +730,14 @@
           '<strong>' + (r.n.read ? '' : '<span class="nb-unread" aria-hidden="true"></span>') + esc(pick(r.n, 'title', 'title_ar')) + '</strong>' + (body ? '<p>' + esc(body) + '</p>' : '') + '</div></li>';
       }
       var x = r.x;
-      return '<li class="td td-' + r.type + '"><span class="td-ic" data-kind="' + r.type + '">' + D.icon(r.type === 'changes' ? 'pencil' : 'reports') + '</span><div class="td-main"><div class="td-top">' + who +
-        '<span class="td-type">' + esc(t(r.type === 'changes' ? 'p.td.changes' : 'p.td.draft')) + '</span>' + when + '</div>' +
+      return '<li class="td td-' + r.type + '"><span class="td-ic" data-kind="' + r.type + '">' + D.icon(r.type === 'changes' ? 'pencil' : r.type === 'revised' ? 'check' : 'reports') + '</span><div class="td-main"><div class="td-top">' + who +
+        '<span class="td-type">' + esc(t(r.type === 'changes' ? 'p.td.changes' : r.type === 'revised' ? (canReview(x) ? 'p.td.revised.own' : 'p.td.revised') : 'p.td.draft')) + '</span>' + when + '</div>' +
         '<strong>' + esc(pick(x, 'title', 'title_ar')) + '</strong>' +
         (r.type === 'changes' && x.client_note ? '<p class="td-note">“' + esc(x.client_note) + '”</p>' : '') +
+        (r.type === 'revised' && x.revision_note ? '<p class="td-note">' + esc(t('p.appr.whatchanged', { note: x.revision_note })) + '</p>' : '') +
         (r.type === 'draft' ? '<p>' + esc(t('p.td.draft.sub')) + '</p>' : '') + '</div>' +
-        '<div class="td-acts"><button class="btn btn-ghost btn-sm" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '</button>' +
+        '<div class="td-acts">' + (r.type === 'changes' ? '<button class="btn btn-primary btn-sm" type="button" data-action="sendback" data-id="' + esc(x.id) + '">' + esc(t('p.sb.btn')) + '</button>' : '') +
+        '<button class="btn btn-ghost btn-sm" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '</button>' +
         '<button class="btn btn-ghost btn-sm" type="button" data-action="open-ws" data-id="' + esc(x.client_id) + '">' + esc(t('p.hq.open')) + '</button></div></li>';
     }).join('') : '<li class="gcard portal-empty">' + esc(t('p.td.empty')) + '</li>';
 
@@ -1021,6 +1039,7 @@
       acts.push({ action: 'approve', id: x.id, label: t(S.isAdmin ? 'p.appr.owner' : 'p.appr.approve'), cls: 'btn-primary' });
       acts.push({ action: 'changes', id: x.id, label: t('p.appr.changes') });
     }
+    if (S.isAdmin && x.status === 'changes_requested') acts.push({ action: 'sendback', id: x.id, label: t('p.sb.btn'), cls: 'btn-primary' });
     if (x.published_url && safeUrl(x.published_url)) acts.push({ href: safeUrl(x.published_url), label: t('p.item.openpost'), cls: 'btn-primary' });
     if (m) acts.push({ href: m, label: t('p.item.media') });
     acts.push({ action: 'modal-close', label: t('p.close') });
@@ -1034,6 +1053,7 @@
         (S.isAdmin ? '<dt>' + esc(t('p.item.client')) + '</dt><dd>' + esc(cName(clientOf(x))) + '</dd>' : '') +
         '<dt>' + esc(t('p.item.status')) + '</dt><dd><span class="status-' + dot + '" style="font-weight:700">' + esc(x.status === 'needs_approval' && !canReview(x) ? t('p.wait.client') : statusLabel(x.status)) + '</span></dd>' +
         (x.client_note ? '<dt>' + esc(t(S.isAdmin ? 'p.item.theirnote' : 'p.item.note')) + '</dt><dd>' + esc(x.client_note) + '</dd>' : '') +
+        (x.revised_at ? '<dt>' + esc(t('p.item.revised')) + '</dt><dd><span class="mono">' + esc(fmtWhen(x.revised_at)) + '</span>' + (x.revision_note ? ' — ' + esc(x.revision_note) : '') + '</dd>' : '') +
         (x.published_at ? '<dt>' + esc(t('p.item.published')) + '</dt><dd class="mono">' + esc(fmtWhen(x.published_at)) + '</dd>' : '') +
         (x.publish_error && x.status !== 'published' ? '<dt>' + esc(t('p.item.puberr')) + '</dt><dd class="status-bad">' + esc(x.publish_error) + '</dd>' : '') + '</dl>',
       actions: acts
@@ -1083,6 +1103,20 @@
         '</div><p class="err" id="ch-err" role="alert" style="color:#FF9A8F;font-size:13px;margin:0"></p>',
       actions: [
         { action: 'changes-send', id: x.id, label: t('p.ch.send'), cls: 'btn-primary' },
+        { action: 'modal-close', label: t('p.close') }
+      ]
+    });
+  }
+  // Owner: after editing an item the client sent back, return it to the queue with one line on what changed.
+  function openSendBack(x) {
+    openModal({
+      title: t('p.sb.title'),
+      body: '<label for="rv-note"><strong>' + esc(t('p.sb.label', { title: pick(x, 'title', 'title_ar') })) + '</strong></label>' +
+        (x.client_note ? '<p class="td-note" style="margin:6px 0 0">“' + esc(x.client_note) + '”</p>' : '') +
+        '<textarea id="rv-note" maxlength="500" placeholder="' + esc(t('p.sb.ph')) + '"></textarea>' +
+        '<p class="err" id="rv-err" role="alert" style="color:#FF9A8F;font-size:13px;margin:0"></p>',
+      actions: [
+        { action: 'sendback-send', id: x.id, label: t('p.sb.send'), cls: 'btn-primary' },
         { action: 'modal-close', label: t('p.close') }
       ]
     });
@@ -1174,6 +1208,34 @@
         if (isPhone && !card.classList.contains('is-flown-left')) card.classList.add('swipe-left');
         review(x, 'changes_requested', note, D.wait(isPhone ? 650 : 0));
       }
+    },
+    sendback: function (el) {
+      var x = item(el.getAttribute('data-id'));
+      if (!x || !S.isAdmin || x.status !== 'changes_requested') return;
+      closeModal(); openSendBack(x);
+    },
+    'sendback-send': function (el) {
+      var x = item(el.getAttribute('data-id')), ta = $('rv-note');
+      if (!x || !ta || !S.isAdmin) return;
+      var note = ta.value.trim();
+      if (!note) { $('rv-err').textContent = t('p.sb.need'); ta.focus(); return; }
+      el.disabled = true;
+      var patch = { status: 'needs_approval', revised_at: new Date().toISOString(), revision_note: note, reviewed_at: null, reviewed_by: null, publish_error: null, publish_attempts: 0 };
+      q(sb.from('items').update(patch).eq('id', x.id).eq('status', 'changes_requested').select()).then(function (rows) {
+        if (!rows || !rows.length) throw new Error('no longer waiting');
+        var row = rows[0]; for (var k in row) if (Object.prototype.hasOwnProperty.call(row, k)) x[k] = row[k];
+        // the client sees it in the bell as well as on the card
+        var n = { client_id: x.client_id, audience: 'client', title: 'Edited after your note: ' + x.title, title_ar: 'عُدّل بعد ملاحظتك: ' + (x.title_ar || x.title), body: note, body_ar: note };
+        return q(sb.from('notifications').insert(n).select()).catch(function () { return null; });
+      }).then(function () {
+        closeModal();
+        Z.toast(t('p.sb.toast', { title: pick(x, 'title', 'title_ar') }), 'ok');
+        return (S.client ? loadClientData() : loadHQ()).then(renderBoard);
+      }).catch(function (err) {
+        el.disabled = false;
+        var e2 = $('rv-err'); if (e2) e2.textContent = /no longer waiting/i.test((err && err.message) || '') ? t('p.appr.stale') : t('p.e.generic');
+        if (window.console) console.warn('[portal] send back failed', err && err.message);
+      });
     },
     'open-ws': function (el) { closeModal(); openWorkspace(el.getAttribute('data-id')).catch(loadError); },
     'back-hq': function () { backToHQ('hq'); },
