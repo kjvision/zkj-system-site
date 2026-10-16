@@ -140,7 +140,13 @@ Deno.serve(async (req) => {
     else q += `&scheduled_at=lte.${now.toISOString()}&publish_attempts=lt.${MAX_ATTEMPTS}`;
     if (!one && !force) q += `&scheduled_at=gte.${new Date(now.getTime() - hours * 3600e3).toISOString()}`;
     const due: Item[] = await sb(q);
-    if (!due.length) return json(200, { ok: true, due: 0, note: 'Nothing due.' });
+    // approved items whose time passed by more than the window: say so once on the card, never post them silently late
+    if (!one) {
+      const late: { id: string; title: string }[] = await sb(`items?select=id,title&status=eq.approved&publish_error=is.null&scheduled_at=lt.${new Date(now.getTime() - hours * 3600e3).toISOString()}`).catch(() => []);
+      for (const l of late) await sb(`items?id=eq.${l.id}`, { method: 'PATCH', body: JSON.stringify({ publish_error: `Scheduled time passed by more than ${hours} hours, so it was not posted. Give it a new date in the Control Center, or post it by hand.` }) }).catch(() => null);
+      if (late.length) say(`late, not posted: ${late.map((l) => l.title).join(' | ')}`);
+    }
+    if (!due.length) return json(200, { ok: true, due: 0, note: 'Nothing due.' + (log.length ? ' ' + log.join(' ') : '') });
     if (one && !force && due[0].scheduled_at && Date.parse(due[0].scheduled_at) > now.getTime()) throw new Error('This item is scheduled for later. Add &force=1 to post it now.');
     const accs = await accounts();
     say('Accounts: ' + accs.map((a) => `${a.pageName}${a.username ? ' / @' + a.username : ''}`).join(', '));
