@@ -596,7 +596,7 @@
     var st = null, TH = 100;
     list.addEventListener('pointerdown', function (e) {
       if (!mobileMQ.matches || e.button > 0) return;
-      if (e.target.closest('.ig-strip, .ig-arrow, .ig-dots')) return; // swiping the photo = next slide, never approve
+      if (e.target.closest('.ig-strip, .ig-arrow, .ig-dots, [data-vid]')) return; // swiping the photo = next slide, tapping a video = play; never approve
       var ph = e.target.closest('.iphone'); if (!ph) return;
       var li = ph.closest('li'); if (!li || li !== list.firstElementChild) return;
       var card = ph.closest('.phone-card'); if (!card || card.getAttribute('data-pending') !== '1' || card.classList.contains('is-approving')) return;
