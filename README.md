@@ -18,6 +18,8 @@ Static marketing site for **ZKJ SYSTEM**, the AI tools sold by **ZKJ VERSE**, pl
 - `assets/supabase-config.js` — Supabase project URL + publishable (public) key; never put a secret here
 - `assets/vendor/supabase-js-2.116.0.min.js` — vendored supabase-js UMD build (MIT)
 - `supabase/schema.sql` — tables, row-level security, RPCs, signup trigger and starter data; `supabase/SETUP.md` — one-time setup steps for KJ
+- `kj/` — KJ's digital business card (`/kj`) + `kj.vcf` contact file; `noindex`
+- `dr-raed/` — Dr. Raed Farhat's digital business card (`/dr-raed`) + `dr-raed-farhat.vcf`
 - `CNAME` — custom domain `system.zkjverse.com`
 - `.nojekyll` — serve files as-is (no Jekyll processing)
 
