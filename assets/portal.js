@@ -338,6 +338,10 @@
     if (m) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
     return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#C9A84C', kind: x.kind, seed: x.id, sfx: '-t' });
   }
+  // drafts: the owner sends them to the approval queue; a reel needs its video first (a cover image alone cannot be published)
+  function hasVideo(x) { return /\.(mp4|mov)(\?|$)/i.test(String(x.media_url || '')); }
+  function draftReady(x) { return x.kind === 'reel' ? hasVideo(x) : !!(x.media_url && String(x.media_url).trim()); }
+  function draftBlock(x) { return x.kind === 'reel' ? 'p.dr.novideo' : 'p.dr.nomedia'; }
   // "edited after your note → ready for approval again" marker (items sent back by the owner after a change request)
   function editedTag(x, cls) {
     if (!x.revised_at || x.status !== 'needs_approval') return '';
@@ -737,6 +741,7 @@
         (r.type === 'revised' && x.revision_note ? '<p class="td-note">' + esc(t('p.appr.whatchanged', { note: x.revision_note })) + '</p>' : '') +
         (r.type === 'draft' ? '<p>' + esc(t('p.td.draft.sub')) + '</p>' : '') + '</div>' +
         '<div class="td-acts">' + (r.type === 'changes' ? '<button class="btn btn-primary btn-sm" type="button" data-action="sendback" data-id="' + esc(x.id) + '">' + esc(t('p.sb.btn')) + '</button>' : '') +
+        (r.type === 'draft' ? (draftReady(x) ? '<button class="btn btn-primary btn-sm" type="button" data-action="to-approval" data-id="' + esc(x.id) + '">' + esc(t('p.dr.btn')) + '</button>' : '<span class="td-block">' + esc(t(draftBlock(x))) + '</span>') : '') +
         '<button class="btn btn-ghost btn-sm" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '</button>' +
         '<button class="btn btn-ghost btn-sm" type="button" data-action="open-ws" data-id="' + esc(x.client_id) + '">' + esc(t('p.hq.open')) + '</button></div></li>';
     }).join('') : '<li class="gcard portal-empty">' + esc(t('p.td.empty')) + '</li>';
@@ -1040,6 +1045,7 @@
       acts.push({ action: 'changes', id: x.id, label: t('p.appr.changes') });
     }
     if (S.isAdmin && x.status === 'changes_requested') acts.push({ action: 'sendback', id: x.id, label: t('p.sb.btn'), cls: 'btn-primary' });
+    if (S.isAdmin && x.status === 'draft' && draftReady(x)) acts.push({ action: 'to-approval', id: x.id, label: t('p.dr.btn'), cls: 'btn-primary' });
     if (x.published_url && safeUrl(x.published_url)) acts.push({ href: safeUrl(x.published_url), label: t('p.item.openpost'), cls: 'btn-primary' });
     if (m) acts.push({ href: m, label: t('p.item.media') });
     acts.push({ action: 'modal-close', label: t('p.close') });
@@ -1053,6 +1059,7 @@
         (S.isAdmin ? '<dt>' + esc(t('p.item.client')) + '</dt><dd>' + esc(cName(clientOf(x))) + '</dd>' : '') +
         '<dt>' + esc(t('p.item.status')) + '</dt><dd><span class="status-' + dot + '" style="font-weight:700">' + esc(x.status === 'needs_approval' && !canReview(x) ? t('p.wait.client') : statusLabel(x.status)) + '</span></dd>' +
         (x.client_note ? '<dt>' + esc(t(S.isAdmin ? 'p.item.theirnote' : 'p.item.note')) + '</dt><dd>' + esc(x.client_note) + '</dd>' : '') +
+        (S.isAdmin && x.status === 'draft' && !draftReady(x) ? '<dt>' + esc(t('p.item.status')) + '</dt><dd class="status-warn">' + esc(t(draftBlock(x))) + '</dd>' : '') +
         (x.revised_at ? '<dt>' + esc(t('p.item.revised')) + '</dt><dd><span class="mono">' + esc(fmtWhen(x.revised_at)) + '</span>' + (x.revision_note ? ' — ' + esc(x.revision_note) : '') + '</dd>' : '') +
         (x.published_at ? '<dt>' + esc(t('p.item.published')) + '</dt><dd class="mono">' + esc(fmtWhen(x.published_at)) + '</dd>' : '') +
         (x.publish_error && x.status !== 'published' ? '<dt>' + esc(t('p.item.puberr')) + '</dt><dd class="status-bad">' + esc(x.publish_error) + '</dd>' : '') + '</dl>',
@@ -1213,6 +1220,22 @@
       var x = item(el.getAttribute('data-id'));
       if (!x || !S.isAdmin || x.status !== 'changes_requested') return;
       closeModal(); openSendBack(x);
+    },
+    'to-approval': function (el) {
+      var x = item(el.getAttribute('data-id'));
+      if (!x || !S.isAdmin || x.status !== 'draft' || !draftReady(x)) return;
+      el.disabled = true;
+      q(sb.from('items').update({ status: 'needs_approval' }).eq('id', x.id).eq('status', 'draft').select()).then(function (rows) {
+        if (!rows || !rows.length) throw new Error('no longer a draft');
+        x.status = 'needs_approval';
+        closeModal();
+        Z.toast(t('p.dr.toast', { title: pick(x, 'title', 'title_ar') }), 'ok');
+        return (S.client ? loadClientData() : loadHQ()).then(renderBoard);
+      }).catch(function (err) {
+        el.disabled = false;
+        Z.toast(t('p.e.generic'), 'bad');
+        if (window.console) console.warn('[portal] to approval failed', err && err.message);
+      });
     },
     'sendback-send': function (el) {
       var x = item(el.getAttribute('data-id')), ta = $('rv-note');
