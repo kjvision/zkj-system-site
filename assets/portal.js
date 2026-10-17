@@ -302,8 +302,23 @@
 
   /* ---------- Approvals: iPhone previews ---------- */
   function mediaList(x) { return String(x.media_url || '').split(/[\s,]+/).map(safeUrl).filter(function (u) { return u && isImage(u); }); }
+  // a delivered reel/story video: shown as its first frame, tap to play (muted, like the feed)
+  function videoOf(x) { return String(x.media_url || '').split(/[\s,]+/).map(safeUrl).filter(function (u) { return u && /\.(mp4|mov)(\?.*)?$/i.test(u); })[0] || ''; }
+  function videoTag(v) { return '<div class="vid" data-vid><video src="' + esc(v) + '#t=0.1" muted loop playsinline preload="metadata"></video><span class="vid-btn" aria-hidden="true">' + D.icon('play') + '</span></div>'; }
+  document.addEventListener('click', function (e) {
+    // the phone frame's bars sit over a full-screen reel, so a tap anywhere on its screen counts (not on buttons/links)
+    if (!e.target.closest || e.target.closest('a, button')) return;
+    var scr = e.target.closest('[data-vid], .screen'); if (!scr) return;
+    var w = scr.matches('[data-vid]') ? scr : scr.querySelector('[data-vid]'); if (!w) return;
+    var v = w.querySelector('video'); if (!v) return;
+    e.preventDefault();
+    if (v.paused) { document.querySelectorAll('[data-vid] video').forEach(function (o) { if (o !== v && !o.paused) o.pause(); }); v.play().catch(function () { /* blocked: stays on the first frame */ }); } else v.pause();
+  });
+  document.addEventListener('play', function (e) { var w = e.target.closest && e.target.closest('[data-vid]'); if (w) w.classList.add('is-playing'); }, true);
+  document.addEventListener('pause', function (e) { var w = e.target.closest && e.target.closest('[data-vid]'); if (w) w.classList.remove('is-playing'); }, true);
   function media(x, sfx) {
-    var list = mediaList(x), c = clientOf(x);
+    var list = mediaList(x), c = clientOf(x), v = videoOf(x);
+    if (v) return videoTag(v);
     if (list.length > 1) return '<div class="ig-strip" data-n="' + list.length + '">' + list.map(function (u, i) { return '<img src="' + esc(u) + '" alt="" loading="' + (i ? 'lazy' : 'eager') + '">'; }).join('') + '</div>';
     if (list.length === 1) return '<img src="' + esc(list[0]) + '" alt="" loading="lazy">';
     return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#C9A84C', title: pick(x, 'title', 'title_ar'), kind: x.kind, seed: x.id, sfx: sfx, full: x.kind === 'reel' || x.kind === 'story', mark: 'ZKJ SYSTEM · ' + t('p.type.' + x.kind) });
@@ -334,8 +349,9 @@
       '</article></li>';
   }
   function thumb(x) {
-    var m = mediaList(x)[0], c = clientOf(x);
+    var m = mediaList(x)[0], c = clientOf(x), v = videoOf(x);
     if (m) return '<img src="' + esc(m) + '" alt="" loading="lazy">';
+    if (v) return '<video src="' + esc(v) + '#t=0.5" muted playsinline preload="metadata" tabindex="-1" aria-hidden="true"></video>';
     return D.art({ a: hex(c.primary_color) || '#15151B', b: hex(c.accent_color) || '#C9A84C', kind: x.kind, seed: x.id, sfx: '-t' });
   }
   // drafts: the owner sends them to the approval queue; a reel needs its video first (a cover image alone cannot be published)
@@ -1038,7 +1054,7 @@
   modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
 
   function itemDetail(x) {
-    var m = mediaList(x)[0] || '';
+    var m = videoOf(x) || mediaList(x)[0] || '';
     var acts = [];
     if (x.status === 'needs_approval' && canReview(x)) {
       acts.push({ action: 'approve', id: x.id, label: t(S.isAdmin ? 'p.appr.owner' : 'p.appr.approve'), cls: 'btn-primary' });
