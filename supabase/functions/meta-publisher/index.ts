@@ -1,5 +1,5 @@
 // Publisher: posts APPROVED items at their scheduled time through Meta's official publishing API.
-// Instagram (professional account): image, carousel, story (image), reel (mp4). Facebook Page: photo, carousel, photo story.
+// Instagram (professional account): image, carousel, story (image or mp4), reel (mp4). Facebook Page: photo, carousel, photo story, reel (mp4).
 // Runs from pg_cron every 5 minutes, or by hand:  POST ?dry=1  (plan only)  ·  POST ?item=<uuid>  (one item now)  ·  &force=1 (ignore the time window)
 // Secrets: META_ACCESS_TOKEN (system-user token with instagram_basic, instagram_content_publish, pages_show_list,
 // pages_read_engagement, pages_manage_posts). SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected by Supabase.
@@ -12,7 +12,8 @@ const RAW_TOKEN = Deno.env.get('META_ACCESS_TOKEN') ?? Deno.env.get('META_ACCESS
 const TOKEN = RAW_TOKEN.trim().replace(/^["'`]+|["'`]+$/g, '').replace(/^Bearer\s+/i, '').trim();
 const SB_URL = (Deno.env.get('SUPABASE_URL') ?? '').replace(/\/$/, '');
 const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-const GRAPH = 'https://graph.facebook.com/' + (Deno.env.get('GRAPH_VERSION') ?? 'v26.0');
+const GRAPH_VERSION = Deno.env.get('GRAPH_VERSION') ?? 'v26.0';
+const GRAPH = 'https://graph.facebook.com/' + GRAPH_VERSION;
 const MAX_ATTEMPTS = 3;
 const LOCK_MIN = 15;
 
@@ -99,9 +100,22 @@ async function publishInstagram(x: Item, acc: Account, media: { url: string; vid
   const info = await graph('GET', pub.id, { fields: 'permalink' }).catch(() => ({}));
   return info.permalink ?? `https://www.instagram.com/${acc.username ?? ''}/`;
 }
+// Facebook Reels API: start an upload, let Meta fetch the mp4 from its public link, then publish with the caption.
+async function facebookReel(x: Item, acc: Account, media: { url: string; video: boolean }[]) {
+  if (media.length !== 1 || !media[0].video) throw new Error('A reel needs one MP4 video link in the media field.');
+  const t = acc.pageToken, page = acc.pageId;
+  const start = await graph('POST', `${page}/video_reels`, { upload_phase: 'start' }, t);
+  const up = await fetch(`https://rupload.facebook.com/video-upload/${GRAPH_VERSION}/${start.video_id}`, { method: 'POST', headers: { Authorization: `OAuth ${t}`, file_url: media[0].url } });
+  const uj = await up.json().catch(() => ({}));
+  if (!up.ok || !uj.success) throw new Error(`Facebook reel upload: ${uj.debug_info?.message ?? uj.error?.message ?? up.status}`);
+  await graph('POST', `${page}/video_reels`, { upload_phase: 'finish', video_id: start.video_id, video_state: 'PUBLISHED', description: captionOf(x) }, t);
+  const info = await graph('GET', start.video_id, { fields: 'permalink_url' }, t).catch(() => ({}));
+  const link = String(info.permalink_url ?? '');
+  return link ? (link.startsWith('http') ? link : 'https://www.facebook.com' + link) : `https://www.facebook.com/reel/${start.video_id}`;
+}
 async function publishFacebook(x: Item, acc: Account, media: { url: string; video: boolean }[]) {
   const t = acc.pageToken, page = acc.pageId, message = captionOf(x);
-  if (x.kind === 'reel') throw new Error('Facebook reels are not published by the system yet. Post this one from the Facebook app.');
+  if (x.kind === 'reel') return await facebookReel(x, acc, media);
   if (!media.length || media.some((m) => m.video)) throw new Error('Facebook publishing here supports images only (one or several).');
   if (x.kind === 'story') {
     const ph = await graph('POST', `${page}/photos`, { url: media[0].url, published: false }, t);

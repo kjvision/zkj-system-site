@@ -6,6 +6,9 @@
 //   POST ?job=<uuid>&status=in_progress     → mark started (optional &note=…)
 //   PUT  ?job=<uuid>&name=<file.mp4>        → upload one file (raw body). mp4 / mov / jpg / png, max 300 MB
 //   POST ?job=<uuid>&status=delivered       → mark finished (optional; the first upload already does)
+//   POST ?job=<uuid>&text=1  (JSON body)     → captions: {title, title_ar, caption, caption_ar} for the feed card, {story_title} for the story
+// File names: story.jpg / story.mp4 go to the job's story card; everything else to its feed card. On the feed card one mp4 makes
+// it a reel, several images (01.jpg, 02.jpg …) a carousel, one image a post.
 // The job id (a random uuid) travels only in KJ's private agent board, so it works as the delivery key.
 // Jobs older than 30 days or cancelled accept nothing.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
@@ -42,9 +45,28 @@ Deno.serve(async (req) => {
           upload: `curl -X PUT --data-binary @<file> -H "Content-Type: <video/mp4|image/jpeg>" "${self}&name=<file-name>"`,
           started: `curl -X POST "${self}&status=in_progress"`,
           done: `curl -X POST "${self}&status=delivered&note=<one line>"`,
-          rules: 'mp4 for video (H.264, 1080x1920, 30 fps, AAC or silent), jpg for images. One upload per file. File names sort in slide order for carousels (01.jpg, 02.jpg …).',
+          captions: `curl -X POST "${self}&text=1" -H "Content-Type: application/json" --data-binary @captions.json   (captions.json: {"title":"…","title_ar":"…","caption":"…","caption_ar":"…","story_title":"…"})`,
+          rules: 'mp4 for video (H.264, 1080x1920, 30 fps, AAC or silent), jpg for images (feed 1080x1350, story 1080x1920). One upload per file. story.jpg / story.mp4 → the story card. Feed card: reel.mp4 → reel, post.jpg → post, 01.jpg 02.jpg … → carousel.',
         },
       });
+    }
+
+    const editable = ['draft', 'changes_requested', 'needs_approval'];
+    if (req.method === 'POST' && u.searchParams.get('text') === '1') {
+      const b = await req.json().catch(() => null);
+      if (!b || typeof b !== 'object') return json(400, { ok: false, error: 'Send a JSON body: {"title","title_ar","caption","caption_ar","story_title"}.' });
+      const str = (v: unknown, n: number) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, n) : undefined);
+      const feed = { title: str(b.title, 200), title_ar: str(b.title_ar, 200), caption: str(b.caption, 2200), caption_ar: str(b.caption_ar, 2200) };
+      const storyTitle = str(b.story_title, 200);
+      const items = job.item_ids?.length ? await sb(`items?id=in.(${job.item_ids.join(',')})&select=id,kind,status`) : [];
+      let n = 0;
+      for (const it of items) {
+        if (!editable.includes(it.status)) continue;
+        const patch = it.kind === 'story' ? (storyTitle ? { title: storyTitle } : {}) : Object.fromEntries(Object.entries(feed).filter(([, v]) => v !== undefined));
+        if (!Object.keys(patch).length) continue;
+        await sb(`items?id=eq.${it.id}`, { method: 'PATCH', body: JSON.stringify(patch) }); n++;
+      }
+      return json(200, { ok: true, updated: n });
     }
 
     const status = u.searchParams.get('status');
@@ -80,15 +102,23 @@ Deno.serve(async (req) => {
     const attached: string[] = [];
     if (job.item_ids?.length) {
       const items = await sb(`items?id=in.(${job.item_ids.join(',')})&select=id,kind,status,title,client_id`);
+      const isStory = /^story/i.test(name);
+      const hasStoryCard = items.some((it: any) => it.kind === 'story');
       for (const it of items) {
-        if (!['draft', 'changes_requested', 'needs_approval'].includes(it.status)) continue;
-        let media: string | null = null;
-        if (it.kind === 'reel' && isVideo) media = url;
-        else if (it.kind === 'carousel' && !isVideo) media = files.filter((f: any) => f.type.startsWith('image/')).map((f: any) => f.url).join(',');
-        else if (it.kind !== 'reel' && it.kind !== 'carousel' && !isVideo) media = url;
-        else if (it.kind === 'story' && isVideo) media = url;
+        if (!editable.includes(it.status)) continue;
+        let media: string | null = null, kind = it.kind;
+        if (it.kind === 'story') {
+          // a story card takes story.* files; jobs made before the story.* names (story card only) take any file
+          if (isStory || items.every((x: any) => x.kind === 'story')) media = url;
+        } else if (!isStory || !hasStoryCard) {
+          if (isVideo) { media = url; kind = 'reel'; }
+          else {
+            const imgs = files.filter((f: any) => f.type.startsWith('image/') && !/^story/i.test(f.name)).map((f: any) => f.url);
+            media = imgs.join(','); kind = imgs.length > 1 ? 'carousel' : (it.kind === 'reel' || it.kind === 'carousel' ? 'post' : it.kind);
+          }
+        }
         if (!media) continue;
-        await sb(`items?id=eq.${it.id}`, { method: 'PATCH', body: JSON.stringify({ media_url: media, status: 'needs_approval', revised_at: new Date().toISOString(), revision_note: `Delivered by ${job.agent === 'content' ? 'Content Studio' : job.agent}: ${name}`, reviewed_at: null, reviewed_by: null, publish_error: null, publish_attempts: 0 }) });
+        await sb(`items?id=eq.${it.id}`, { method: 'PATCH', body: JSON.stringify({ media_url: media, kind, status: 'needs_approval', revised_at: new Date().toISOString(), revision_note: `Delivered by ${job.agent === 'content' ? 'Content Studio' : job.agent}: ${name}`, reviewed_at: null, reviewed_by: null, publish_error: null, publish_attempts: 0 }) });
         attached.push(it.title);
       }
     }
