@@ -136,6 +136,19 @@ transform:translate3d(-60%,0,0)}
 .amb{position:fixed;inset:0;pointer-events:none;z-index:1;
 background:radial-gradient(60% 45% at 50% 40%,rgba(212,175,55,.09),rgba(212,175,55,0) 70%)}
 .wrap{position:relative;z-index:2}
+
+/* working hours: Monday to Friday, 9:00 to 18:00, UAE time */
+.hours{margin-top:var(--h-gap,28px);border-top:1px solid var(--h-line);font-variant-numeric:tabular-nums}
+.hours-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0 10px}
+.hours-k{margin:0;font:inherit;font-size:9.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--h-k)}
+.hours-now{display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-off)}
+.hours-now::before{content:"";width:6px;height:6px;background:var(--h-off);transform:rotate(45deg)}
+.hours-now[data-state="open"]{color:var(--h-on)}
+.hours-now[data-state="open"]::before{background:var(--h-on);box-shadow:0 0 8px var(--h-on)}
+.hours-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--h-line);font-size:14px;color:var(--h-v)}
+.hours-t{white-space:nowrap}
+.hours-tz{margin:8px 0 0;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-off)}
+.hours{--h-k:var(--mute);--h-v:var(--pure);--h-line:var(--edge);--h-on:var(--teal);--h-off:var(--mute);--h-gap:30px}
 </style>
 </head>
 <body style="margin:0;background:#0B0B0F">
@@ -184,6 +197,12 @@ background:radial-gradient(60% 45% at 50% 40%,rgba(212,175,55,.09),rgba(212,175,
       <button class="btn copy" data-for="v-ig" aria-label="Copy the Instagram name" title="Copy the Instagram name"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.6 1.6h8.8v8.8"/><rect x="1.6" y="5.6" width="8.8" height="8.8"/></svg></button></div>
   </div>
 
+  <section class="hours" aria-labelledby="hoursTitle">
+    <div class="hours-head"><h2 class="hours-k" id="hoursTitle">Working hours</h2><span class="hours-now" id="hoursNow" data-state="closed">UAE time</span></div>
+    <div class="hours-row"><span>Monday – Friday</span><span class="hours-t">9:00 – 18:00</span></div>
+    <div class="hours-row"><span>Saturday – Sunday</span><span class="hours-t">Closed</span></div>
+    <p class="hours-tz">UAE time · GMT+4</p>
+  </section>
   <div class="foot">
     <span>ZKJ VERSE</span>
     <span><a href="https://zkjverse.com" target="_blank" rel="noopener">zkjverse.com</a></span>
@@ -535,6 +554,23 @@ background:radial-gradient(60% 45% at 50% 40%,rgba(212,175,55,.09),rgba(212,175,
   window.addEventListener("resize",resize);
   resize(); requestAnimationFrame(frame);
   startBuild();
+})();
+</script>
+<script>
+/* working hours status, computed in UAE time (UTC+4, no daylight saving) */
+(function(){
+  var el=document.getElementById("hoursNow"); if(!el) return;
+  var DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function tick(){
+    var t=new Date(Date.now()+4*3600*1000), d=t.getUTCDay(), m=t.getUTCHours()*60+t.getUTCMinutes();
+    var work=d>=1&&d<=5, open=work&&m>=540&&m<1080, txt;
+    if(open){ txt="Open now"; }
+    else if(work&&m<540){ txt="Closed · opens 9:00"; }
+    else { var n=(d+1)%7; while(n<1||n>5) n=(n+1)%7;
+      txt="Closed · opens "+(n===(d+1)%7?"tomorrow":DAYS[n])+" 9:00"; }
+    el.textContent=txt; el.setAttribute("data-state",open?"open":"closed");
+  }
+  tick(); setInterval(tick,30000);
 })();
 </script>
 </body>
