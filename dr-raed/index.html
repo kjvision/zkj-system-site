@@ -72,7 +72,8 @@ body{background:var(--carbon);color:var(--cream);font:400 15px/1.6 "Libre Basker
 
 /* working hours: Monday to Friday, 9:00 to 18:00, UAE time */
 .hours{margin-top:var(--h-gap,28px);border-top:1px solid var(--h-line);font-variant-numeric:tabular-nums}
-.hours-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0 10px}
+.hours-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 12px;padding:14px 0 10px}
+.hours-k,.hours-now,.loc-open{white-space:nowrap}
 .hours-k{margin:0;font:inherit;font-size:9.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--h-k)}
 .hours-now{display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-off)}
 .hours-now::before{content:"";width:6px;height:6px;background:var(--h-off);transform:rotate(45deg)}
@@ -81,6 +82,12 @@ body{background:var(--carbon);color:var(--cream);font:400 15px/1.6 "Libre Basker
 .hours-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--h-line);font-size:14px;color:var(--h-v)}
 .hours-t{white-space:nowrap}
 .hours-tz{margin:8px 0 0;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-off)}
+/* location: Dubai only, no street address */
+.loc{margin-top:var(--h-gap,28px);border-top:1px solid var(--h-line)}
+.loc-open{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-on);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
+.loc-open:focus-visible{outline:2px solid var(--h-on);outline-offset:3px}
+.loc-map{position:relative;height:170px;border:1px solid var(--h-line);overflow:hidden;background:var(--h-line)}
+.loc-map iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(1) invert(.9) contrast(.85) brightness(.95)}
 .hours{--h-k:var(--soft);--h-v:var(--cream);--h-line:rgba(168,128,173,.35);--h-on:var(--cream);--h-off:var(--soft);--h-gap:calc(var(--x)*6)}
 </style>
 </head>
@@ -119,6 +126,11 @@ body{background:var(--carbon);color:var(--cream);font:400 15px/1.6 "Libre Basker
    <div class="hours-row"><span>Monday – Friday</span><span class="hours-t">9:00 – 18:00</span></div>
    <div class="hours-row"><span>Saturday – Sunday</span><span class="hours-t">Closed</span></div>
    <p class="hours-tz">UAE time · GMT+4</p>
+ </section>
+ <section class="loc" aria-labelledby="locTitle">
+   <div class="hours-head"><h2 class="hours-k" id="locTitle">Location</h2><a class="loc-open" href="https://www.google.com/maps/place/Dubai+-+United+Arab+Emirates" target="_blank" rel="noopener">Open in Maps</a></div>
+   <div class="loc-map"><iframe title="Map of Dubai, United Arab Emirates" src="https://maps.google.com/maps?q=Dubai%2C%20United%20Arab%20Emirates&amp;z=10&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" tabindex="-1"></iframe></div>
+   <div class="hours-row"><span>Dubai</span><span class="hours-t">United Arab Emirates</span></div>
  </section>
  <p class="live" id="live" role="status" aria-live="polite"></p>
 </main>
