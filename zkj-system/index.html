@@ -123,6 +123,19 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 @media (min-width:600px){
   .wrap{padding-top:40px;padding-bottom:48px}
 }
+
+/* working hours: Monday to Friday, 9:00 to 18:00, UAE time */
+.hours{margin-top:var(--h-gap,28px);border-top:1px solid var(--h-line);font-variant-numeric:tabular-nums}
+.hours-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0 10px}
+.hours-k{margin:0;font:inherit;font-size:9.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--h-k)}
+.hours-now{display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-off)}
+.hours-now::before{content:"";width:6px;height:6px;background:var(--h-off);transform:rotate(45deg)}
+.hours-now[data-state="open"]{color:var(--h-on)}
+.hours-now[data-state="open"]::before{background:var(--h-on);box-shadow:0 0 8px var(--h-on)}
+.hours-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--h-line);font-size:14px;color:var(--h-v)}
+.hours-t{white-space:nowrap}
+.hours-tz{margin:8px 0 0;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-off)}
+.hours{--h-k:var(--sil);--h-v:var(--wh);--h-line:var(--line);--h-on:var(--gold);--h-off:var(--mute);--h-gap:26px}
 </style>
 </head>
 <body>
@@ -167,6 +180,12 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
     <li class="end" aria-hidden="true"></li>
   </ul>
 
+  <section class="hours" aria-labelledby="hoursTitle">
+    <div class="hours-head"><h2 class="hours-k" id="hoursTitle">Working hours</h2><span class="hours-now" id="hoursNow" data-state="closed">UAE time</span></div>
+    <div class="hours-row"><span>Monday – Friday</span><span class="hours-t">9:00 – 18:00</span></div>
+    <div class="hours-row"><span>Saturday – Sunday</span><span class="hours-t">Closed</span></div>
+    <p class="hours-tz">UAE time · GMT+4</p>
+  </section>
   <footer class="foot"><i aria-hidden="true"></i><span>Every project becomes a tool.</span><i aria-hidden="true"></i></footer>
 </main>
 
@@ -433,6 +452,23 @@ function frame(now){
   if(!shown&&t>2.6){shown=true;mark.classList.add("on");hint.classList.add("on");}
 }
 requestAnimationFrame(frame);
+})();
+</script>
+<script>
+/* working hours status, computed in UAE time (UTC+4, no daylight saving) */
+(function(){
+  var el=document.getElementById("hoursNow"); if(!el) return;
+  var DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function tick(){
+    var t=new Date(Date.now()+4*3600*1000), d=t.getUTCDay(), m=t.getUTCHours()*60+t.getUTCMinutes();
+    var work=d>=1&&d<=5, open=work&&m>=540&&m<1080, txt;
+    if(open){ txt="Open now"; }
+    else if(work&&m<540){ txt="Closed · opens 9:00"; }
+    else { var n=(d+1)%7; while(n<1||n>5) n=(n+1)%7;
+      txt="Closed · opens "+(n===(d+1)%7?"tomorrow":DAYS[n])+" 9:00"; }
+    el.textContent=txt; el.setAttribute("data-state",open?"open":"closed");
+  }
+  tick(); setInterval(tick,30000);
 })();
 </script>
 </body>
