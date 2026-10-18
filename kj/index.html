@@ -72,7 +72,26 @@ window.__AR={
 "tiltNoReport": "هذا الجهاز أو المتصفح لا يرسل بيانات الإمالة — اسحب بدلًا من ذلك.",
 "tiltDenied": "لم يُسمح بالإمالة — اسحب بدلًا من ذلك.",
 "tiltBlocked": "الإمالة محظورة هنا — اسحب بدلًا من ذلك.",
-"tiltNone": "هذا المتصفح لا يدعم مستشعر الإمالة — اسحب بدلًا من ذلك."
+"tiltNone": "هذا المتصفح لا يدعم مستشعر الإمالة — اسحب بدلًا من ذلك.",
+"bkTitle": "احجز موعدًا",
+"bkTz": "بتوقيت الإمارات",
+"bkDay": "اليوم",
+"bkTime": "الوقت",
+"bkGo": "احجز عبر واتساب",
+"bkNote": "أنت تختار الموعد، ويتم التأكيد عبر واتساب.",
+"bkMsg": "مرحبًا KJ، أودّ حجز موعد (ZKJ VERSE) يوم {day} الساعة {time} (بتوقيت الإمارات).",
+"rvTitle": "التقييمات",
+"rvFirst": "كن أول من يكتب تقييمًا.",
+"rvGo": "اكتب تقييمًا",
+"rvGoG": "اكتب تقييمًا على Google",
+"rvMsg": "تقييمي لـ KJ (ZKJ VERSE): ",
+"rvStars": "{n} من 5 نجوم",
+"rvNone": "لا توجد تقييمات بعد",
+"rv1": "تقييم واحد",
+"rv2": "تقييمان",
+"rvFew": "{n} تقييمات",
+"rvMany": "{n} تقييمًا",
+"rvHund": "{n} تقييم"
 };
 window.__EN={
 "noteTap": "<b>Tap the card</b> &nbsp;·&nbsp; drag to move the light",
@@ -87,7 +106,20 @@ window.__EN={
 "copied": "Copied",
 "copyAll": "Copy all details",
 "copyFail": "Could not copy — select the text instead.",
-"copyRole": "Artist & Founder · ZKJ VERSE"
+"copyRole": "Artist & Founder · ZKJ VERSE",
+"bkGo": "Book on WhatsApp",
+"bkMsg": "Hello KJ, I'd like to book a meeting (ZKJ VERSE) on {day} at {time} (UAE time).",
+"rvGo": "Write a review",
+"rvFirst": "Be the first to leave a review.",
+"rvGoG": "Write a review on Google",
+"rvMsg": "My review of KJ (ZKJ VERSE): ",
+"rvStars": "{n} out of 5 stars",
+"rvNone": "No reviews yet",
+"rv1": "1 review",
+"rv2": "2 reviews",
+"rvFew": "{n} reviews",
+"rvMany": "{n} reviews",
+"rvHund": "{n} reviews"
 };
 
 /* English / Arabic switch: ?lang=ar|en forces a language, then the visitor's saved choice, then the browser language */
@@ -284,6 +316,43 @@ background:radial-gradient(60% 45% at 50% 40%,rgba(212,175,55,.09),rgba(212,175,
 .loc-map iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(1) invert(.9) contrast(.85) brightness(.95)}
 .hours{--h-k:var(--mute);--h-v:var(--pure);--h-line:var(--edge);--h-on:var(--teal);--h-off:var(--mute);--h-gap:30px}
 
+/* book a meeting + reviews: the same look as the working hours (the --h-* colours above) */
+.bk-tz,.rv-sum{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-off);white-space:nowrap}
+.bk-l{margin:2px 0 8px;font-size:9px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--h-off)}
+.bk-g{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 0 14px;padding:0}
+.bk-c{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:44px;margin:0;padding:6px 2px;
+  font:inherit;font-variant-numeric:tabular-nums;color:var(--h-v);background:transparent;border:1px solid var(--h-line);border-radius:0;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .2s,background-color .2s,color .2s}
+.bk-c:hover:not(:disabled){border-color:var(--bk-acc)}
+.bk-c[aria-pressed="true"]{background:var(--bk-acc);border-color:var(--bk-acc);color:var(--bk-ink)}
+.bk-c:disabled{opacity:.32;cursor:default;text-decoration:line-through}
+.bk-c:focus-visible{outline:2px solid var(--bk-acc);outline-offset:2px}
+.bk-wd{font-size:9px;letter-spacing:.16em;text-transform:uppercase;line-height:1.2;color:var(--h-k);white-space:nowrap}
+.bk-c[aria-pressed="true"] .bk-wd{color:inherit}
+.bk-dn{font-size:16px;line-height:1.1}
+.bk-t{font-size:13px;line-height:1.2;white-space:nowrap}
+.bk-go,.rv-go{width:100%;margin:0}
+.bk-go[aria-disabled="true"]{opacity:.38;cursor:default;pointer-events:none}
+.bk-note{margin:10px 0 0;font-size:11.5px;line-height:1.5;color:var(--h-off)}
+.rv-st{display:inline-flex;gap:4px;flex:0 0 auto}
+.rv-st svg{width:13px;height:13px;display:block;fill:none;stroke:var(--bk-star);stroke-width:1.1;stroke-linejoin:miter}
+.rv-st svg.on{fill:var(--bk-star)}
+.rv-empty{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:2px 0 14px}
+.rv-empty .rv-st svg{width:16px;height:16px}
+.rv-first{margin:0;font-size:13px;line-height:1.5;color:var(--h-v)}
+.rv-list{list-style:none;margin:0 0 14px;padding:0;border-top:1px solid var(--h-line)}
+.rv-i{padding:12px 0;border-bottom:1px solid var(--h-line)}
+.rv-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.rv-n{min-width:0;font-size:14px;color:var(--h-v);overflow-wrap:anywhere}
+.rv-x{margin:6px 0 0;font-size:13px;line-height:1.6;color:var(--h-v);opacity:.82;overflow-wrap:anywhere}
+.rv-d{margin:6px 0 0;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-off)}
+.rv [lang="ar"]{font-family:"IBM Plex Sans Arabic","Noto Kufi Arabic","Geeza Pro",Tahoma,sans-serif;letter-spacing:0;font-style:normal}
+.bk svg,.rv-go svg{flex:none}
+.bk,.rv{--bk-acc:var(--gold);--bk-ink:var(--void);--bk-star:var(--gold)}
+html[lang="ar"] .bk-tz,html[lang="ar"] .rv-sum{font-size:11.5px}
+html[lang="ar"] .bk-l,html[lang="ar"] .bk-wd,html[lang="ar"] .rv-d{font-size:11px;letter-spacing:0}
+html[lang="ar"] .bk-note{font-size:12.5px}
+
 /* ---- English / Arabic ------------------------------------------------ */
 html[lang="ar"] [data-i18n],html[lang="ar"] [data-i18n-html],html[lang="ar"] [data-i18n-dyn]{
   font-family:"IBM Plex Sans Arabic","Noto Kufi Arabic","Geeza Pro",Tahoma,sans-serif!important;letter-spacing:0!important;font-style:normal!important}
@@ -350,6 +419,20 @@ html[lang="ar"] .block h2,html[lang="ar"] .sheet h2{font-size:15px}
       <button class="btn copy" data-for="v-ig" aria-label="Copy the Instagram name" title="Copy the Instagram name" data-i18n-aria="copyIg" data-i18n-title="copyIg"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.6 1.6h8.8v8.8"/><rect x="1.6" y="5.6" width="8.8" height="8.8"/></svg></button></div>
   </div>
 
+  <section class="hours bk" id="book" aria-labelledby="bkTitle">
+    <div class="hours-head"><h2 class="hours-k" id="bkTitle" data-i18n="bkTitle">Book a meeting</h2><span class="bk-tz" data-i18n="bkTz">UAE time</span></div>
+    <p class="bk-l" id="bkDayL" data-i18n="bkDay">Day</p>
+    <div class="bk-g" id="bkDays" role="group" aria-labelledby="bkDayL"></div>
+    <p class="bk-l" id="bkTimeL" data-i18n="bkTime">Time</p>
+    <div class="bk-g" id="bkTimes" role="group" aria-labelledby="bkTimeL"></div>
+    <a class="btn primary bk-go" id="bkGo" role="link" aria-disabled="true" target="_blank" rel="noopener"><span class="bk-go-t" data-i18n-dyn>Book on WhatsApp</span></a>
+    <p class="bk-note" data-i18n="bkNote">You choose the time; KJ confirms on WhatsApp.</p>
+  </section>
+  <section class="hours rv" id="reviews" aria-labelledby="rvTitle">
+    <div class="hours-head"><h2 class="hours-k" id="rvTitle" data-i18n="rvTitle">Reviews</h2><span class="rv-sum" id="rvSum" data-i18n-dyn hidden></span></div>
+    <div id="rvBody"></div>
+    <a class="btn rv-go" id="rvGo" target="_blank" rel="noopener"><span class="rv-go-t" data-i18n-dyn>Write a review</span></a>
+  </section>
   <section class="hours" aria-labelledby="hoursTitle">
     <div class="hours-head"><h2 class="hours-k" id="hoursTitle" data-i18n="hours">Working hours</h2><span class="hours-now" id="hoursNow" data-state="closed" data-i18n-dyn>UAE time</span></div>
     <div class="hours-row"><span data-i18n="monfri">Monday – Friday</span><span class="hours-t" dir="ltr">9:00 – 18:00</span></div>
@@ -738,6 +821,131 @@ html[lang="ar"] .block h2,html[lang="ar"] .sheet h2{font-size:15px}
   }
   tick(); setInterval(tick,30000);
   if(window.ZL) ZL.on(tick);
+})();
+</script>
+<script>
+/* ── EDIT HERE: reviews ─────────────────────────────────────────────────
+   Put REAL reviews only. Never invent a name, a quote or a rating.
+   While the list is empty the card shows "Be the first to leave a review." */
+const REVIEWS = [];            // real reviews only: {name:"…", stars:5, text:"…", lang:"en"|"ar", date:"2026-10"}
+const GOOGLE_REVIEW_URL = "";  // Google "write a review" link for this business, when KJ provides it
+
+/* book a meeting + reviews, computed in UAE time (UTC+4, no daylight saving), in English and Arabic */
+(function(){
+  "use strict";
+  var WA="971541668700";                         /* WhatsApp number that receives bookings and reviews */
+  var SLOTS=[9,10,11,12,13,14,15,16,17],   /* hourly start times; the office is open 9:00 to 18:00 */
+      LEAD=60, NDAYS=5;                    /* a slot needs 60 minutes' notice; show the next 5 working days */
+  var WD_EN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var WD_AR=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  var MO_EN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var MO_AR=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  var NS="http://www.w3.org/2000/svg";
+  function $(id){return document.getElementById(id);}
+  function ar(){return window.ZL&&ZL.lang()==="ar";}
+  function t(k){return window.ZL?ZL.t(k):k;}
+  function wa(text){return "https://wa.me/"+WA+"?text="+encodeURIComponent(text);}
+
+  /* ================= book a meeting ================= */
+  var dayBox=$("bkDays"),timeBox=$("bkTimes"),go=$("bkGo");
+  if(dayBox&&timeBox&&go){
+    var goT=go.querySelector(".bk-go-t"),selDay=null,selHour=null,sig="",cur=[];
+    var uae=function(){return new Date(Date.now()+4*3600*1000);};  /* UTC fields of this date = UAE wall clock */
+    var key=function(d){return d.toISOString().slice(0,10);};
+    var hhmm=function(h){return h+":00";};
+    var dayName=function(d,long){var w=d.getUTCDay(),n=d.getUTCDate(),m=d.getUTCMonth();
+      if(ar())return WD_AR[w]+" "+n+(long?" "+MO_AR[m]:"");
+      return (long?WD_EN[w]:WD_EN[w].slice(0,3))+" "+n+(long?" "+MO_EN[m]:"");};
+    /* the next working days (Mon–Fri) that still have a free slot; today only if a slot is 60+ minutes away */
+    var plan=function(){
+      var now=uae(),today=key(now),mins=now.getUTCHours()*60+now.getUTCMinutes(),out=[];
+      var base=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate());
+      for(var k=0;out.length<NDAYS&&k<21;k++){
+        var d=new Date(base+k*864e5),w=d.getUTCDay();if(w<1||w>5)continue;
+        var free=SLOTS.filter(function(h){return key(d)!==today||h*60-mins>=LEAD;});
+        if(free.length)out.push({d:d,k:key(d),free:free});}
+      return out;};
+    var chip=function(cls){var b=document.createElement("button");b.type="button";b.className="bk-c "+cls;
+      b.setAttribute("aria-pressed","false");b.setAttribute("data-i18n-dyn","");return b;};
+    SLOTS.forEach(function(h){var b=chip("bk-th");b.setAttribute("data-h",h);
+      b.innerHTML='<span class="bk-t" dir="ltr">'+h+':00</span>';
+      b.addEventListener("click",function(){selHour=h;update();});timeBox.appendChild(b);});
+    var update=function(){
+      cur=plan();var day=null;
+      cur.forEach(function(x){if(x.k===selDay)day=x;});
+      if(!day)selDay=null;
+      var free=day?day.free:SLOTS;
+      if(selHour!==null&&free.indexOf(selHour)<0)selHour=null;
+      var s=(ar()?"ar":"en")+"|"+cur.map(function(x){return x.k;}).join(",");
+      if(s!==sig){ /* (re)build the day chips; keep keyboard focus on the same day */
+        sig=s;var fk=document.activeElement&&document.activeElement.getAttribute("data-k");
+        dayBox.textContent="";
+        cur.forEach(function(x){var b=chip("bk-dh");b.setAttribute("data-k",x.k);
+          var w=document.createElement("span");w.className="bk-wd";
+          w.textContent=ar()?WD_AR[x.d.getUTCDay()]:WD_EN[x.d.getUTCDay()].slice(0,3);
+          var n=document.createElement("span");n.className="bk-dn";n.textContent=x.d.getUTCDate();
+          b.appendChild(w);b.appendChild(n);b.setAttribute("aria-label",dayName(x.d,true));
+          b.addEventListener("click",function(){selDay=x.k;update();});
+          dayBox.appendChild(b);if(fk===x.k)b.focus();});}
+      [].forEach.call(dayBox.children,function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-k")===selDay));});
+      [].forEach.call(timeBox.children,function(b){var h=+b.getAttribute("data-h");
+        b.disabled=free.indexOf(h)<0;b.setAttribute("aria-pressed",String(h===selHour));});
+      goT.textContent=t("bkGo");
+      if(day&&selHour!==null){
+        go.href=wa(t("bkMsg").replace("{day}",dayName(day.d,true)).replace("{time}",hhmm(selHour)));
+        go.removeAttribute("aria-disabled");
+      }else{go.removeAttribute("href");go.setAttribute("aria-disabled","true");}
+    };
+    update();setInterval(update,60000);
+    if(window.ZL)ZL.on(update);
+    document.addEventListener("visibilitychange",function(){if(!document.hidden)update();});
+  }
+
+  /* ================= reviews ================= */
+  var rvBody=$("rvBody"),rvSum=$("rvSum"),rvGo=$("rvGo");
+  function stars(n){var s=document.createElement("span");s.className="rv-st";
+    for(var i=0;i<5;i++){var g=document.createElementNS(NS,"svg");g.setAttribute("viewBox","0 0 16 16");g.setAttribute("aria-hidden","true");
+      if(i<n)g.setAttribute("class","on");
+      var p=document.createElementNS(NS,"path");p.setAttribute("d","M8 1.6l1.9 4.3 4.7.5-3.5 3.1 1 4.6L8 11.7l-4.1 2.4 1-4.6-3.5-3.1 4.7-.5z");
+      g.appendChild(p);s.appendChild(g);}
+    return s;}
+  function count(n){if(n===1)return t("rv1");if(n===2)return t("rv2");var r=n%100,k=(r>=3&&r<=10)?"rvFew":(r>=11?"rvMany":"rvHund");
+    return t(k).replace("{n}",n);}
+  function month(s){var m=/^(\d{4})-(\d{1,2})/.exec(s||"");if(!m||+m[2]<1||+m[2]>12)return s||"";
+    return (ar()?MO_AR:MO_EN)[+m[2]-1]+" "+m[1];}
+  function rvRender(){
+    if(!rvBody||!rvGo)return;
+    var list=(Array.isArray(REVIEWS)?REVIEWS:[]).filter(function(r){return r&&r.name&&r.text;});
+    rvBody.textContent="";
+    if(!list.length){
+      var e=document.createElement("div");e.className="rv-empty";
+      var st=stars(0);st.setAttribute("role","img");st.setAttribute("aria-label",t("rvNone"));e.appendChild(st);
+      var p=document.createElement("p");p.className="rv-first";p.setAttribute("data-i18n-dyn","");p.textContent=t("rvFirst");e.appendChild(p);
+      rvBody.appendChild(e);rvSum.hidden=true;rvSum.textContent="";
+    }else{
+      var sum=0;
+      var ul=document.createElement("ul");ul.className="rv-list";
+      list.forEach(function(r){
+        var n=Math.max(0,Math.min(5,Math.round(+r.stars||0)));sum+=n;
+        var lang=r.lang==="ar"?"ar":"en",dir=lang==="ar"?"rtl":"ltr";
+        var li=document.createElement("li");li.className="rv-i";
+        var top=document.createElement("div");top.className="rv-top";
+        var nm=document.createElement("span");nm.className="rv-n";nm.dir="auto";nm.textContent=r.name;
+        var st=stars(n);st.setAttribute("role","img");st.setAttribute("aria-label",t("rvStars").replace("{n}",n));
+        top.appendChild(nm);top.appendChild(st);li.appendChild(top);
+        var x=document.createElement("p");x.className="rv-x";x.lang=lang;x.dir=dir;x.textContent=r.text;li.appendChild(x);
+        if(r.date){var d=document.createElement("p");d.className="rv-d";d.setAttribute("data-i18n-dyn","");d.textContent=month(r.date);li.appendChild(d);}
+        ul.appendChild(li);});
+      rvBody.appendChild(ul);
+      rvSum.textContent=(sum/list.length).toFixed(1)+" ★ · "+count(list.length);rvSum.hidden=false;
+    }
+    var g=typeof GOOGLE_REVIEW_URL==="string"&&GOOGLE_REVIEW_URL.trim();
+    rvGo.href=g?GOOGLE_REVIEW_URL.trim():wa(t("rvMsg"));
+    rvGo.querySelector(".rv-go-t").textContent=t(g?"rvGoG":"rvGo");
+  }
+  window.__rvRender=rvRender;               /* re-draws the reviews (used after editing the list) */
+  rvRender();
+  if(window.ZL)ZL.on(rvRender);
 })();
 </script>
 </body>
