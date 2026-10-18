@@ -21,6 +21,7 @@ Static marketing site for **ZKJ SYSTEM**, the AI tools sold by **ZKJ VERSE**, pl
 - `kj/` — KJ's digital business card (`/kj`) + `kj.vcf` contact file; `noindex`
 - `dr-raed/` — Dr. Raed Farhat's digital business card (`/dr-raed`) + `dr-raed-farhat.vcf`
 - `zkj-system/` — KJ's ZKJ SYSTEM digital card (`/zkj-system`) + contact file
+- `kj-vision/` — KJ's KJ VISION digital card (`/kj-vision`) + contact file
 - `CNAME` — custom domain `system.zkjverse.com`
 - `.nojekyll` — serve files as-is (no Jekyll processing)
 
