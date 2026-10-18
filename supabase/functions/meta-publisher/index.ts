@@ -3,6 +3,10 @@
 // Runs from pg_cron every 5 minutes, or by hand:  POST ?dry=1  (plan only)  ·  POST ?item=<uuid>  (one item now)  ·  &force=1 (ignore the time window)
 // Secrets: META_ACCESS_TOKEN (system-user token with instagram_basic, instagram_content_publish, pages_show_list,
 // pages_read_engagement, pages_manage_posts). SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected by Supabase.
+// Cross-posting (KJ, 18 Oct: "once you post from Instagram also Facebook at the same time", Threads for all accounts):
+// after an Instagram item is published, the same item goes to the client's Facebook Page (clients.mirror_facebook:
+// 'all' or 'stories') and Threads profile (clients.mirror_threads, token in threads_accounts). Results land in
+// items.fb_url / fb_error and threads_url / threads_error; a failed copy never undoes the Instagram post.
 // Rules: only status = approved; only at or after scheduled_at; never older than the window (app_settings.publisher_window_hours,
 // default 36 h); at most 3 attempts per item; a pause switch in app_settings.publisher_paused. Nothing else is ever posted.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
@@ -17,7 +21,7 @@ const GRAPH = 'https://graph.facebook.com/' + GRAPH_VERSION;
 const MAX_ATTEMPTS = 3;
 const LOCK_MIN = 15;
 
-type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; clients: { id: string; name: string; instagram: string | null; active: boolean } };
+type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; clients: { id: string; name: string; instagram: string | null; active: boolean; mirror_facebook: string; mirror_threads: boolean } };
 type Account = { igId: string | null; username: string | null; pageId: string; pageName: string; pageToken: string };
 
 async function sb(path: string, init: RequestInit = {}) {
@@ -113,9 +117,20 @@ async function facebookReel(x: Item, acc: Account, media: { url: string; video: 
   const link = String(info.permalink_url ?? '');
   return link ? (link.startsWith('http') ? link : 'https://www.facebook.com' + link) : `https://www.facebook.com/reel/${start.video_id}`;
 }
+// Facebook video story: same three-step upload as reels, on the video_stories edge.
+async function facebookVideoStory(acc: Account, url: string) {
+  const t = acc.pageToken, page = acc.pageId;
+  const start = await graph('POST', `${page}/video_stories`, { upload_phase: 'start' }, t);
+  const up = await fetch(`https://rupload.facebook.com/video-upload/${GRAPH_VERSION}/${start.video_id}`, { method: 'POST', headers: { Authorization: `OAuth ${t}`, file_url: url } });
+  const uj = await up.json().catch(() => ({}));
+  if (!up.ok || !uj.success) throw new Error(`Facebook story upload: ${uj.debug_info?.message ?? uj.error?.message ?? up.status}`);
+  await graph('POST', `${page}/video_stories`, { upload_phase: 'finish', video_id: start.video_id }, t);
+  return `https://www.facebook.com/${page}`;
+}
 async function publishFacebook(x: Item, acc: Account, media: { url: string; video: boolean }[]) {
   const t = acc.pageToken, page = acc.pageId, message = captionOf(x);
   if (x.kind === 'reel') return await facebookReel(x, acc, media);
+  if (x.kind === 'story' && media.length === 1 && media[0].video) return await facebookVideoStory(acc, media[0].url);
   if (!media.length || media.some((m) => m.video)) throw new Error('Facebook publishing here supports images only (one or several).');
   if (x.kind === 'story') {
     const ph = await graph('POST', `${page}/photos`, { url: media[0].url, published: false }, t);
@@ -137,6 +152,66 @@ async function publishFacebook(x: Item, acc: Account, media: { url: string; vide
   return info.permalink_url ?? `https://www.facebook.com/${post.id}`;
 }
 
+// Threads: graph.threads.net with the profile's own token (connected once through threads-connect). Stories do not exist on
+// Threads, so they are skipped. Text max 500 characters.
+const THREADS = 'https://graph.threads.net/v1.0';
+async function threads(method: 'GET' | 'POST', path: string, params: Record<string, string | number | boolean>, token: string) {
+  const u = new URL(`${THREADS}/${path}`);
+  const body = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) (method === 'GET' ? u.searchParams : body).set(k, String(v));
+  (method === 'GET' ? u.searchParams : body).set('access_token', token);
+  const r = await fetch(u, method === 'GET' ? {} : { method: 'POST', body });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.error) throw new Error(`Threads ${path}: ${j.error?.message ?? r.status}`);
+  return j;
+}
+async function threadsWait(id: string, token: string) {
+  for (let i = 0; i < 20; i++) {
+    const s = await threads('GET', id, { fields: 'status,error_message' }, token);
+    if (s.status === 'FINISHED') return;
+    if (s.status === 'ERROR' || s.status === 'EXPIRED') throw new Error(`Threads container ${s.status}: ${s.error_message ?? ''}`);
+    await sleep(3000);
+  }
+  throw new Error('Threads container still processing after 60 s.');
+}
+async function publishThreads(x: Item, acct: { threads_user_id: string; access_token: string; username: string | null }, media: { url: string; video: boolean }[]) {
+  const t = acct.access_token, me = acct.threads_user_id;
+  const text = captionOf(x).slice(0, 500);
+  let creation: string;
+  if (media.length > 1) {
+    const kids: string[] = [];
+    for (const m of media.slice(0, 20)) kids.push((await threads('POST', `${me}/threads`, m.video ? { media_type: 'VIDEO', video_url: m.url, is_carousel_item: true } : { media_type: 'IMAGE', image_url: m.url, is_carousel_item: true }, t)).id);
+    for (const k of kids) await threadsWait(k, t);
+    creation = (await threads('POST', `${me}/threads`, { media_type: 'CAROUSEL', children: kids.join(','), text }, t)).id;
+  } else if (media.length === 1) {
+    creation = (await threads('POST', `${me}/threads`, media[0].video ? { media_type: 'VIDEO', video_url: media[0].url, text } : { media_type: 'IMAGE', image_url: media[0].url, text }, t)).id;
+  } else {
+    creation = (await threads('POST', `${me}/threads`, { media_type: 'TEXT', text }, t)).id;
+  }
+  await threadsWait(creation, t);
+  const pub = await threads('POST', `${me}/threads_publish`, { creation_id: creation }, t);
+  const info = await threads('GET', pub.id, { fields: 'permalink' }, t).catch(() => ({}));
+  return info.permalink ?? `https://www.threads.com/@${acct.username ?? ''}`;
+}
+// After an Instagram post: the same item to the Facebook Page and to Threads, as the client is set up.
+async function crossPost(x: Item, acc: Account, media: { url: string; video: boolean }[], say: (s: string) => void) {
+  const patch: Record<string, string | null> = {};
+  const fbMode = x.clients.mirror_facebook ?? 'none';
+  if (fbMode === 'all' || (fbMode === 'stories' && x.kind === 'story')) {
+    try { patch.fb_url = await publishFacebook(x, acc, media); patch.fb_error = null; say(`  + Facebook ${patch.fb_url}`); }
+    catch (e) { patch.fb_error = (e as Error).message.slice(0, 1000); say(`  ✗ Facebook copy: ${patch.fb_error}`); }
+  }
+  if (x.clients.mirror_threads && x.kind !== 'story') {
+    const acct = (await sb(`threads_accounts?client_id=eq.${x.client_id}&select=threads_user_id,access_token,username`).catch(() => []))?.[0];
+    if (!acct) patch.threads_error = 'Threads profile not connected yet (threads-connect).';
+    else {
+      try { patch.threads_url = await publishThreads(x, acct, media); patch.threads_error = null; say(`  + Threads ${patch.threads_url}`); }
+      catch (e) { patch.threads_error = (e as Error).message.slice(0, 1000); say(`  ✗ Threads copy: ${patch.threads_error}`); }
+    }
+  }
+  if (Object.keys(patch).length) await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify(patch) }).catch(() => null);
+}
+
 Deno.serve(async (req) => {
   const u = new URL(req.url);
   const dry = u.searchParams.get('dry') === '1', one = u.searchParams.get('item'), force = u.searchParams.get('force') === '1';
@@ -150,7 +225,7 @@ Deno.serve(async (req) => {
     if (get('publisher_paused', 'false') === 'true' && !one) return json(200, { ok: true, paused: true, note: 'Publisher is paused (app_settings.publisher_paused = true).' });
     const hours = Number(get('publisher_window_hours', '36')) || 36;
     const now = new Date();
-    let q = `items?select=*,clients!inner(id,name,instagram,active)&status=eq.approved&clients.active=eq.true&order=scheduled_at.asc&limit=10`;
+    let q = `items?select=*,clients!inner(id,name,instagram,active,mirror_facebook,mirror_threads)&status=eq.approved&clients.active=eq.true&order=scheduled_at.asc&limit=10`;
     if (one) q += `&id=eq.${one}`;
     else q += `&scheduled_at=lte.${now.toISOString()}&publish_attempts=lt.${MAX_ATTEMPTS}`;
     if (!one && !force) q += `&scheduled_at=gte.${new Date(now.getTime() - hours * 3600e3).toISOString()}`;
@@ -181,6 +256,7 @@ Deno.serve(async (req) => {
         await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'published', published_at: new Date().toISOString(), published_url: url, publish_error: null, publish_lock: null }) });
         await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: 'client', title: `Published: ${x.title}`, title_ar: `نُشر: ${x.title}`, body: url, body_ar: url }) }).catch(() => null);
         say(`✓ ${tag} → ${url}`); results.push({ id: x.id, title: x.title, ok: true, url });
+        if (x.platform === 'instagram') await crossPost(x, acc, media, say);
       } catch (e) {
         const msg = (e as Error).message;
         if (!dry) await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ publish_error: msg.slice(0, 1000), publish_attempts: (x.publish_attempts ?? 0) + 1, publish_lock: null }) }).catch(() => null);
