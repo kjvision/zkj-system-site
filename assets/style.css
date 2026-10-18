@@ -1388,3 +1388,18 @@ html[dir="rtl"] .sx-foot { right: 0; left: 40px; }
 }
 .dev-phone > .sx.post { height: 100%; }
 @media (max-width: 640px) { .yt-app.long ~ *, .cs-view .dev-phone:has(.yt-app) { height: min(46vh, 400px); } }
+
+/* Hero intro (KJ, 18 Oct): the logo opens big in the middle of the screen while it draws itself, then settles into its
+   place and the rest of the hero arrives. Background, rings and slides are untouched. Once per visit, skipped for
+   reduced motion, deep links and reloads mid-page (intro.js + the class set in <head>). */
+html.hero-intro .hero-mark { position: relative; z-index: 2; will-change: transform; }
+html.hero-intro .hero-inner > :not(.hero-mark) { opacity: 0; transform: translateY(16px); }
+html.hero-intro .scroll-cue, html.hero-intro .site-header { opacity: 0; }
+html.hero-intro .hero-mark path { stroke-width: .35; }
+html.hero-intro-out .hero-mark { transition: transform 1.25s cubic-bezier(.65, 0, .25, 1); }
+html.hero-intro-out .hero-inner > :not(.hero-mark) { opacity: 1; transform: none; transition: opacity .9s ease, transform .9s cubic-bezier(.2, .8, .2, 1); }
+html.hero-intro-out .hero-inner > :nth-child(1) { transition-delay: .55s; }
+html.hero-intro-out .hero-inner > :nth-child(3) { transition-delay: .7s; }
+html.hero-intro-out .hero-inner > :nth-child(4) { transition-delay: .85s; }
+html.hero-intro-out .hero-inner > :nth-child(5) { transition-delay: 1s; }
+html.hero-intro-out .scroll-cue, html.hero-intro-out .site-header { opacity: 1; transition: opacity .9s ease 1.1s, background .35s, border-color .35s; }
