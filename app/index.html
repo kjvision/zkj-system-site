@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="../assets/device.css">
   <link rel="stylesheet" href="../assets/portal.css">
   <link rel="stylesheet" href="../assets/core.css">
+  <link rel="stylesheet" href="../drawings/drawings.css">
 </head>
 <body data-title-key="p.app.meta">
 <div class="dash portal device no-client" id="dash" data-theme="core" data-state="loading" data-view="today" data-mood="a">
@@ -74,6 +75,7 @@
             <ul class="sb-stats">
               <li><button type="button" data-nav="hq"><span class="sb-ic" data-icon="box"></span><span data-i18n="p.hq.clients">Clients</span><span class="sb-v" id="sbh-clients">0</span></button></li>
               <li><button type="button" data-nav="todo"><span class="sb-ic" data-icon="pencil"></span><span data-i18n="p.hq.todo">Your to-do</span><span class="sb-v" id="sbh-todo">0</span></button></li>
+              <li><button type="button" data-nav="drawings"><span class="sb-ic" data-icon="drawings"></span><span data-i18n="p.hq.jobs">Jobs · Drawings</span><span class="sb-v" id="sbh-dw">0</span></button></li>
               <li><button type="button" data-nav="week"><span class="sb-ic" data-icon="calendar"></span><span data-i18n="p.hq.week">This week across clients</span><span class="sb-v" id="sbh-week">0</span></button></li>
             </ul>
           </div>
@@ -150,8 +152,23 @@
               <button class="hello-cta" type="button" data-nav="todo" id="hq-todo-btn">…</button>
             </header>
             <div class="instruments hq-sum" id="hq-sum"></div>
-            <div class="sub-head"><h3 data-i18n="p.hq.board">Clients</h3><button class="link-btn" type="button" data-nav="admin" data-i18n="p.hq.addclient">Add a new client</button></div>
+            <div class="sub-head"><h3 data-i18n="p.hq.jobs">Jobs · Drawings</h3><button class="link-btn" type="button" data-nav="drawings" data-i18n="p.hq.jobs.open">Open drawings</button></div>
+            <div class="hq-jobs" id="hq-jobs"></div>
+            <div class="sub-head"><h3 data-i18n="p.hq.board">Content · brands</h3><button class="link-btn" type="button" data-nav="admin" data-i18n="p.hq.addclient">Add a new client</button></div>
             <ul class="client-board" id="hq-clients"></ul>
+          </section>
+
+          <section class="view hq-view" id="drawings" data-view-panel="drawings" aria-labelledby="dwv-title" hidden>
+            <header class="view-head">
+              <div>
+                <span class="eyebrow" data-i18n="p.hq.name">ZKJ SYSTEM HQ</span>
+                <h2 id="dwv-title" data-i18n="p.dw.title" data-view-title>Drawings · jobs</h2>
+                <p data-i18n="p.dw.sub">Every drawing order.</p>
+              </div>
+              <a class="btn btn-ghost btn-sm" href="../drawings/" target="_blank" rel="noopener" data-i18n="p.hq.jobs.form">Order page</a>
+            </header>
+            <div class="instruments hq-sum" id="dw-sum"></div>
+            <div id="dw-board" class="dw-in-app"></div>
           </section>
 
           <section class="view hq-view" id="todo" data-view-panel="todo" aria-labelledby="todo-title" hidden>
@@ -503,6 +520,7 @@
 <script src="../assets/portal-strings.js"></script>
 <script src="../assets/device.js"></script>
 <script src="../assets/core.js"></script>
+<script src="../drawings/drawings.js"></script>
 <script src="../assets/portal.js"></script>
 </body>
 </html>

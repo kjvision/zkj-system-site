@@ -18,7 +18,7 @@
       'dv.prev': 'Previous post', 'dv.next': 'Next post', 'dv.of': '{i} / {n}',
       'dv.now': 'Now', 'dv.tracks': 'Tracks', 'dv.target': '{p}% of target', 'dv.dubai': 'Dubai',
       'dv.ig.liked': 'Preview · not published yet', 'dv.ig.msg': 'Send message', 'dv.ig.audio': 'Original audio', 'dv.ig.follow': 'Follow',
-      'dv.core': 'Core', 'dv.hq': 'HQ', 'dv.todo': 'To-do', 'dv.week': 'This week', 'dv.backhq': 'Back to HQ',
+      'dv.core': 'Core', 'dv.hq': 'HQ', 'dv.todo': 'To-do', 'dv.week': 'This week', 'dv.backhq': 'Back to HQ', 'dv.drawings': 'Drawings',
       'dv.ig.sponsored': 'Sponsored', 'dv.ig.reply': 'Suggested reply', 'dv.ig.reels': 'Reels', 'dv.ig.dm': 'Message…',
       'dv.fb.like': 'Like', 'dv.fb.comment': 'Comment', 'dv.fb.share': 'Share', 'dv.fb.now': 'Just now · Public'
     },
@@ -32,7 +32,7 @@
       'dv.prev': 'المنشور السابق', 'dv.next': 'المنشور التالي', 'dv.of': '{i} / {n}',
       'dv.now': 'الآن', 'dv.tracks': 'المسارات', 'dv.target': '{p}% من الهدف', 'dv.dubai': 'دبي',
       'dv.ig.liked': 'معاينة · لم يُنشر بعد', 'dv.ig.msg': 'أرسل رسالة', 'dv.ig.audio': 'صوت أصلي', 'dv.ig.follow': 'متابعة',
-      'dv.core': 'النواة', 'dv.hq': 'المقر', 'dv.todo': 'مهامك', 'dv.week': 'هذا الأسبوع', 'dv.backhq': 'العودة للمقر',
+      'dv.core': 'النواة', 'dv.hq': 'المقر', 'dv.todo': 'مهامك', 'dv.week': 'هذا الأسبوع', 'dv.backhq': 'العودة للمقر', 'dv.drawings': 'الرسومات',
       'dv.fb.like': 'أعجبني', 'dv.fb.comment': 'تعليق', 'dv.fb.share': 'مشاركة', 'dv.fb.now': 'الآن · عام',
       'dv.ig.sponsored': 'مُموَّل', 'dv.ig.reply': 'الرد المقترح', 'dv.ig.reels': 'ريلز', 'dv.ig.dm': 'رسالة…'
     }
@@ -72,6 +72,7 @@
     plus: S + '<path d="M12 5v14M5 12h14"/></svg>',
     number: S + '<path d="M4 18l4-6 4 3 6-9"/><path d="M15 6h3v3"/></svg>',
     bell: S + '<path d="M6 8a6 6 0 1112 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 004 0"/></svg>',
+    drawings: S + '<path d="M3.5 20.5V5l15.5 15.5z"/><path d="M7.5 16.5v-4.3l4.3 4.3z"/><path d="M3.5 9h2M3.5 13h2M3.5 17h2"/><path d="M14 3.5l6.5 6.5"/></svg>',
     box: S + '<path d="M12 2.5l8.5 4.75v9.5L12 21.5l-8.5-4.75v-9.5z"/><path d="M12 12l8.5-4.75M12 12L3.5 7.25M12 12v9.5"/></svg>',
     chev: '<svg class="chev" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5l5 5-5 5"/></svg>',
     // instagram glyphs (white, inside the phone)

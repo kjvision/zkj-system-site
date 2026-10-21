@@ -84,7 +84,7 @@
   }
   function msg(el, text, kind) { el.hidden = !text; el.className = 'dw-msg' + (kind ? ' ' + kind : ''); el.textContent = text || ''; }
   var page = document.body.getAttribute('data-page');
-  applyLang();
+  if (page) applyLang(); // inside the dashboard (/app) the dashboard owns the language
 
   /* ---------- order form ---------- */
   if (page === 'order') {
@@ -181,12 +181,14 @@
     load();
   }
 
-  /* ---------- HQ (KJ, admin login) ---------- */
-  if (page === 'hq') {
-    var SB = window.ZKJ_SB && window.ZKJ_SB.client, root = $('dw-hq');
+  /* ---------- HQ (KJ, admin login): /drawings/hq.html and the Drawings section of the dashboard ---------- */
+  // ZKJDrawingsHQ.mount(root, supabaseClient, { onChange }) → { reload(), open(id) }
+  function mountHQ(root, SB, opts) {
+    opts = opts || {};
     var STATUS_ORDER = ['received', 'check', 'changes', 'confirmed', 'quoted', 'in_work', 'review', 'approved', 'cancelled'];
     var price = '';
-    if (!SB) { root.innerHTML = '<p class="dw-msg err">Supabase not loaded.</p>'; return; }
+    if (!SB) { root.innerHTML = '<p class="dw-msg err">Supabase not loaded.</p>'; return { reload: function () {}, open: function () {} }; }
+    var want = null;
     function copyRow(label, value) { return '<div class="dw-field"><span>' + esc(label) + '</span><div class="dw-copy"><input readonly value="' + esc(value) + '"><button class="btn btn-sm" type="button" data-copy>Copy</button></div></div>'; }
     function signed(path) { return SB.storage.from('drawings').createSignedUrl(path, 3600).then(function (r) { return r.data ? r.data.signedUrl : '#'; }); }
     function drawJob(j) {
@@ -199,7 +201,7 @@
         (j.customer_note ? '<dt>Changes asked</dt><dd>' + esc(j.customer_note) + '</dd>' : '') + (j.sheets ? '<dt>Quote</dt><dd>' + esc(j.sheets) + ' × ' + esc(j.price_per_sheet) + ' ' + esc(j.currency) + '</dd>' : '') + '</dl>' +
         '<div><span class="dw-small">Customer files</span><div class="dw-out" data-files="in"></div></div>' +
         (revOut.length ? '<div><span class="dw-small">Agent output · revision ' + j.revision + '</span><div class="dw-out" data-files="out"></div></div>' : '');
-      if (j.status === 'received' || j.status === 'quoted') h += '<div class="dw-row"><label class="dw-field"><span>Sheets (method statement / 3D: count each document or view sheet)</span><input type="number" min="1" data-f="sheets" value="' + esc(j.sheets || '') + '"></label><label class="dw-field"><span>Price per sheet (' + esc(j.currency) + ')</span><input type="number" min="0" step="1" data-f="price" value="' + esc(j.price_per_sheet || price) + '"></label></div><div class="dw-actions"><button class="btn btn-primary" type="button" data-a="quote">' + (j.status === 'quoted' ? 'Update quote' : 'Send quote to customer') + '</button></div>';
+      if (j.status === 'received' || j.status === 'quoted') h += '<div class="dw-row"><label class="dw-field"><span>Sheets</span><input type="number" min="1" data-f="sheets" value="' + esc(j.sheets || '') + '"><small>Method statement or 3D: count each document page set or view sheet.</small></label><label class="dw-field"><span>Price per sheet (' + esc(j.currency) + ')</span><input type="number" min="0" step="1" data-f="price" value="' + esc(j.price_per_sheet || price) + '"></label></div><div class="dw-actions"><button class="btn btn-primary" type="button" data-a="quote">' + (j.status === 'quoted' ? 'Update quote' : 'Send quote to customer') + '</button></div>';
       if (j.status === 'check') h += '<label class="dw-field"><span>Note back to the agent (only if it needs fixing)</span><textarea class="dw-note" data-f="hq"></textarea></label><div class="dw-actions"><button class="btn btn-primary" type="button" data-a="release">Send to customer</button><button class="btn" type="button" data-a="back">Back to the agent</button></div>';
       h += copyRow('Customer page (send this to the customer)', view) + (wa ? '<div class="dw-actions"><a class="btn btn-sm" target="_blank" rel="noopener" href="' + esc(wa) + '">Send link on WhatsApp</a></div>' : '') +
         copyRow('Agent brief (give this to your drawings agent — never to the customer)', agent) +
@@ -215,14 +217,24 @@
     function load() {
       SB.auth.getSession().then(function (s) {
         if (!s.data || !s.data.session) { root.innerHTML = '<p class="dw-msg">Log in first: <a href="/app/login.html">open the dashboard login</a>, then come back here.</p>'; return; }
+        root.setAttribute('aria-busy', 'true');
         return Promise.all([SB.from('drawing_jobs').select('*').order('created_at', { ascending: false }).limit(100), SB.from('app_settings').select('key,value').in('key', ['drawings_price_per_sheet'])]).then(function (r) {
           if (r[0].error) { root.innerHTML = '<p class="dw-msg err">' + esc(r[0].error.message) + ' (admin only)</p>'; return; }
           price = ((r[1].data || [])[0] || {}).value || '';
           jobs = (r[0].data || []).sort(function (a, b) { return STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) || (a.created_at < b.created_at ? 1 : -1); });
+          root.removeAttribute('aria-busy');
           root.innerHTML = jobs.length ? jobs.map(drawJob).join('') : '<p class="dw-small">No drawing orders yet.</p>';
           jobs.forEach(function (j) { fill(root.querySelector('[data-id="' + j.id + '"]'), j); });
+          if (want) focusJob(want);
+          if (opts.onChange) opts.onChange(jobs);
         });
       });
+    }
+    function focusJob(id) {
+      var el = root.querySelector('[data-id="' + id + '"]');
+      if (!el) return;
+      want = null; el.open = true;
+      el.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
     root.addEventListener('click', function (e) {
       var c = e.target.closest('[data-copy]');
@@ -242,5 +254,8 @@
       SB.from('drawing_jobs').update(patch).eq('id', id).then(function (r) { if (r.error) alert(r.error.message); load(); });
     });
     load();
+    return { reload: load, open: function (id) { want = id; if (root.querySelector('[data-id="' + id + '"]')) focusJob(id); } };
   }
+  window.ZKJDrawingsHQ = { mount: mountHQ };
+  if (page === 'hq') mountHQ($('dw-hq'), window.ZKJ_SB && window.ZKJ_SB.client);
 })();

@@ -142,6 +142,13 @@ html[lang="ar"] .cc-pkg { font-family: var(--f-body); letter-spacing: 0; font-si
 .td-ic[data-kind="changes"] { background: rgba(224,164,58,.16); color: #F5CF86; }
 .td-ic[data-kind="draft"] { background: rgba(154,160,166,.14); }
 .td-ic[data-kind="activity"] { background: rgba(201, 168, 76,.14); color: var(--gold); }
+.td-ic[data-kind="drawing"] { background: rgba(120,160,200,.16); color: #A9C7E8; }
+/* HQ: Jobs · Drawings block above the brands, and the Drawings view (cards come from drawings/drawings.js) */
+.hq-jobs { display: grid; gap: 12px; margin: 0 0 22px; }
+.hq-jobs .hq-sum { margin: 0; }
+.hq-jobs-list { margin: 0; }
+.dw-in-app { display: grid; gap: 0; margin-top: 18px; }
+.dw-in-app[aria-busy="true"] { opacity: .6; }
 .td-main { min-width: 0; display: grid; gap: 3px; }
 .td-main strong { color: #fff; font-size: 14.5px; font-weight: 600; }
 .td-main p { margin: 0; font-size: 13px; color: var(--text-2); }
