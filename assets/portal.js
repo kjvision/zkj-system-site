@@ -686,6 +686,8 @@
       .forEach(function (x) { rows.push({ type: 'revised', x: x, c: clientOf(x), when: x.revised_at }); });
     S.all.filter(function (x) { return x.status === 'draft'; })
       .forEach(function (x) { rows.push({ type: 'draft', x: x, c: clientOf(x), when: x.scheduled_at || x.created_at }); });
+    (S.dw || []).filter(function (j) { return j.status === 'check' || j.status === 'received'; })
+      .forEach(function (j) { rows.push({ type: j.status === 'check' ? 'dw-check' : 'dw-quote', j: j, when: j.updated_at || j.created_at }); });
     S.notifs.forEach(function (n) { rows.push({ type: 'activity', n: n, c: clientById(n.client_id), when: n.created_at }); });
     return rows;
   }
@@ -744,6 +746,12 @@
     $('hq-todo').innerHTML = rows.length ? rows.map(function (r) {
       var c = r.c, who = c ? '<span class="td-client">' + miniLogo(c) + esc(cName(c)) + '</span>' : '';
       var when = r.when ? '<span class="td-when">' + esc(ago(r.when)) + '</span>' : '';
+      if (r.type === 'dw-quote' || r.type === 'dw-check') {
+        var j = r.j;
+        return '<li class="td td-drawing"><span class="td-ic" data-kind="drawing">' + D.icon('drawings') + '</span><div class="td-main"><div class="td-top"><span class="td-type">' + esc(t('p.td.' + r.type.replace('-', '.'))) + '</span>' + when + '</div>' +
+          '<strong>' + esc(j.name) + (j.company ? ' · ' + esc(j.company) : '') + '</strong><p>' + (j.parent_id ? esc(t('p.dw.addon')) + ' · ' : '') + esc(dwWork(j)) + '</p></div>' +
+          '<div class="td-acts"><button class="btn btn-primary btn-sm" type="button" data-action="dw-open" data-id="' + esc(j.id) + '">' + esc(t('p.td.dw.open')) + '</button></div></li>';
+      }
       if (r.type === 'activity') {
         var body = pick(r.n, 'body', 'body_ar');
         return '<li class="td td-activity' + (r.n.read ? ' is-read' : '') + '"><span class="td-ic" data-kind="activity">' + D.icon('bell') + '</span><div class="td-main"><div class="td-top">' + who + '<span class="td-type">' + esc(t('p.td.activity')) + '</span>' + when + '</div>' +
@@ -763,6 +771,7 @@
     }).join('') : '<li class="gcard portal-empty">' + esc(t('p.td.empty')) + '</li>';
 
     renderHQWeek();
+    renderJobs();
     // sidebar
     $('sbh-clients').textContent = S.clients.length;
     $('sbh-todo').textContent = todo; $('sbh-todo').classList.toggle('hot', todo > 0);
@@ -907,14 +916,15 @@
   ];
   var HQ_NAV = [
     { id: 'hq', key: 'dv.hq', icon: 'box', tone: 'gold' },
+    { id: 'drawings', key: 'dv.drawings', icon: 'drawings', tone: 'steel' },
     { id: 'core', key: 'dv.core', icon: 'core', tone: 'core' },
     { id: 'todo', key: 'dv.todo', icon: 'pencil' },
     { id: 'week', key: 'dv.week', icon: 'calendar', tone: 'cal' },
     { id: 'admin', key: 'dv.control', icon: 'control', sep: true }
   ];
-  var HQ_VIEWS = ['hq', 'todo', 'week', 'admin'];
+  var HQ_VIEWS = ['hq', 'drawings', 'todo', 'week', 'admin'];
   function navFor(mode) {
-    if (mode === 'hq') D.buildNav({ items: HQ_NAV, tabs: ['hq', 'core', 'todo', 'week', 'more'] });
+    if (mode === 'hq') D.buildNav({ items: HQ_NAV, tabs: ['hq', 'drawings', 'todo', 'week', 'more'] });
     else if (mode === 'ws') D.buildNav({ items: [{ id: 'hq', key: 'dv.backhq', icon: 'back', tone: 'steel' }].concat(CLIENT_NAV.map(function (it, i) { return i === 0 ? Object.assign({ sep: true }, it) : it; })), tabs: ['today', 'core', 'approvals', 'calendar', 'more'] });
     else D.buildNav({ items: CLIENT_NAV, tabs: ['today', 'core', 'approvals', 'calendar', 'more'] });
     document.querySelectorAll('.hq-view').forEach(function (v) { if (v.id !== 'admin') v.hidden = !S.isAdmin; });
@@ -925,8 +935,48 @@
       q(sb.from('clients').select('*').order('created_at', { ascending: true })),
       q(sb.from('items').select('*').order('scheduled_at', { ascending: true, nullsFirst: false })),
       loadNotifs(),
-      q(sb.from('app_settings').select('*')).catch(function () { return null; })
+      q(sb.from('app_settings').select('*')).catch(function () { return null; }),
+      loadDrawings()
     ]).then(function (r) { S.clients = r[0] || []; S.all = r[1] || []; S.settings = {}; (r[3] || []).forEach(function (s2) { S.settings[s2.key] = s2.value; }); if (r[3] === null) S.settings.__missing = '1'; });
+  }
+  // drawing jobs (T-12): the HQ "Jobs · Drawings" section, the to-do and the Drawings view
+  function loadDrawings() {
+    return q(sb.from('drawing_jobs').select('id,name,company,status,work,parent_id,created_at,updated_at').neq('status', 'cancelled').order('created_at', { ascending: false }).limit(200))
+      .then(function (d) { S.dw = d || []; }).catch(function () { S.dw = S.dw || []; });
+  }
+  var DW_GROUP = { received: 'quote', check: 'check', confirmed: 'work', in_work: 'work', changes: 'work', quoted: 'cust', review: 'cust', approved: 'done' };
+  var DW_ORDER = ['received', 'check', 'changes', 'confirmed', 'in_work', 'quoted', 'review', 'approved'];
+  function dwWork(j) { return (j.work || []).map(function (w) { return t('p.dw.w.' + w); }).join(' · '); }
+  function renderJobs() {
+    var jobs = (S.dw || []).slice().sort(function (a, b) { return DW_ORDER.indexOf(a.status) - DW_ORDER.indexOf(b.status) || String(b.created_at).localeCompare(String(a.created_at)); });
+    var n = { quote: 0, check: 0, work: 0, cust: 0, done: 0 };
+    jobs.forEach(function (j) { if (DW_GROUP[j.status]) n[DW_GROUP[j.status]]++; });
+    var tile = function (k, hot) {
+      return '<button type="button" class="inst inst-num' + (hot && n[k] ? ' inst-need' : '') + '" data-nav="drawings"><span class="inst-tag">' + esc(t('p.dw.t.' + k)) + '</span><span class="big">' + n[k] + '</span><div class="inst-ruler" aria-hidden="true"></div></button>';
+    };
+    var tiles = tile('quote', true) + tile('check', true) + tile('work') + tile('cust');
+    var active = jobs.filter(function (j) { return j.status !== 'approved'; }).slice(0, 3);
+    var list = active.length ? '<ul class="todo-list hq-jobs-list">' + active.map(function (j) {
+      return '<li class="td"><span class="td-ic" data-kind="drawing">' + D.icon('drawings') + '</span><div class="td-main"><div class="td-top"><span class="td-type">' + esc(t('p.dw.s.' + j.status)) + '</span><span class="td-when">' + esc(ago(j.updated_at || j.created_at)) + '</span></div>' +
+        '<strong>' + esc(j.name) + (j.company ? ' · ' + esc(j.company) : '') + '</strong><p>' + (j.parent_id ? esc(t('p.dw.addon')) + ' · ' : '') + esc(dwWork(j)) + '</p></div>' +
+        '<div class="td-acts"><button class="btn btn-ghost btn-sm" type="button" data-action="dw-open" data-id="' + esc(j.id) + '">' + esc(t('p.td.dw.open')) + '</button></div></li>';
+    }).join('') + '</ul>' : '<p class="gcard portal-empty">' + esc(t('p.hq.jobs.none')) + '</p>';
+    if ($('hq-jobs')) $('hq-jobs').innerHTML = '<div class="instruments hq-sum">' + tiles + '</div>' + list;
+    if ($('dw-sum')) $('dw-sum').innerHTML = tiles + tile('done');
+    if ($('sbh-dw')) { $('sbh-dw').textContent = n.quote + n.check; $('sbh-dw').classList.toggle('hot', n.quote + n.check > 0); }
+  }
+  function ensureDrawings() {
+    if (S.dwHQ || !window.ZKJDrawingsHQ) return S.dwHQ;
+    S.dwHQ = window.ZKJDrawingsHQ.mount($('dw-board'), sb, { onChange: function (jobs) {
+      S.dw = jobs.filter(function (j) { return j.status !== 'cancelled'; });
+      if (S.mode === 'hq') renderHQ();
+    } });
+    return S.dwHQ;
+  }
+  function openDrawing(id) {
+    if (D.current() !== 'drawings') D.show('drawings', { force: true, focus: !id }); // the view hook mounts / reloads the list
+    var hq = ensureDrawings();
+    if (hq && id) hq.open(id);
   }
   function showHQ(view) {
     S.mode = 'hq'; S.client = null;
@@ -1276,6 +1326,7 @@
         if (window.console) console.warn('[portal] send back failed', err && err.message);
       });
     },
+    'dw-open': function (el) { closeModal(); openDrawing(el.getAttribute('data-id')); },
     'open-ws': function (el) { closeModal(); openWorkspace(el.getAttribute('data-id')).catch(loadError); },
     'back-hq': function () { backToHQ('hq'); },
     'save-brand': function (el) {
@@ -1338,6 +1389,7 @@
     closeNotif();
     if (S.mode === 'ws' && HQ_VIEWS.indexOf(id) > -1) { backToHQ(id); return; }
     if (id === 'week') setTimeout(function () { D.revealNow($('hq-cal')); }, 0);
+    if (id === 'drawings' && S.isAdmin) { var had = !!S.dwHQ; ensureDrawings(); if (had) S.dwHQ.reload(); }
     renderCore();
     if (id === 'approvals' && rowUpd) setTimeout(rowUpd, 0);
     if (id === 'calendar') setTimeout(function () { D.revealNow($('cal')); }, 0);
