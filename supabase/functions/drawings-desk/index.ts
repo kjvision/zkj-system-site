@@ -186,9 +186,11 @@ Deno.serve(async (req) => {
       });
     }
     if (req.method === 'POST' && action === 'start') {
-      if (!['confirmed', 'changes', 'in_work'].includes(job.status)) return json(409, { ok: false, error: 'not_confirmed', status: job.status });
-      await patch({ status: 'in_work', revision: job.status === 'in_work' ? job.revision : job.revision + 1 });
-      return json(200, { ok: true, status: 'in_work', revision: job.status === 'in_work' ? job.revision : job.revision + 1 });
+      if (!['confirmed', 'changes', 'in_work', 'check'].includes(job.status)) return json(409, { ok: false, error: 'not_confirmed', status: job.status });
+      // 'check' = KJ is looking, but the agent may reopen it to fix one file (same revision, other files stay untouched)
+      const keep = job.status === 'in_work' || job.status === 'check';
+      await patch({ status: 'in_work', revision: keep ? job.revision : job.revision + 1 });
+      return json(200, { ok: true, status: 'in_work', revision: keep ? job.revision : job.revision + 1 });
     }
     if (req.method === 'PUT' || (req.method === 'POST' && u.searchParams.get('name'))) {
       if (job.status !== 'in_work') return json(409, { ok: false, error: 'start_first', status: job.status });

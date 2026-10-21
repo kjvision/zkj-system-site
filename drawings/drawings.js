@@ -188,7 +188,8 @@
     var STATUS_ORDER = ['received', 'check', 'changes', 'confirmed', 'quoted', 'in_work', 'review', 'approved', 'cancelled'];
     var price = '';
     if (!SB) { root.innerHTML = '<p class="dw-msg err">Supabase not loaded.</p>'; return { reload: function () {}, open: function () {} }; }
-    var want = null;
+    var want = null, flash = '';
+    var FLASH = { quote: 'Price sent to the customer.', release: 'Sent to the customer.', back: 'Sent back to the agent with your note. Tell the agent chat to continue: it reads your note when it opens the job.', cancel: 'Order cancelled.' };
     function copyRow(label, value) { return '<div class="dw-field"><span>' + esc(label) + '</span><div class="dw-copy"><input readonly value="' + esc(value) + '"><button class="btn btn-sm" type="button" data-copy>Copy</button></div></div>'; }
     function signed(path) { return SB.storage.from('drawings').createSignedUrl(path, 3600).then(function (r) { return r.data ? r.data.signedUrl : '#'; }); }
     function drawJob(j) {
@@ -196,8 +197,8 @@
       var agent = 'https://usucmdjupfjuchfxnxpz.supabase.co/functions/v1/drawings-desk?job=' + j.id + '&agent=' + j.agent_key;
       var wa = j.phone ? 'https://wa.me/' + String(j.phone).replace(/[^\d]/g, '') + '?text=' + encodeURIComponent((j.lang === 'ar' ? 'رابط طلب الرسومات: ' : 'Your drawing order: ') + view) : '';
       var revOut = (j.outputs || []).filter(function (o) { return o.rev === j.revision; });
-      var h = '<details class="dw-job" data-id="' + j.id + '"' + (['received', 'check', 'changes', 'confirmed'].indexOf(j.status) > -1 ? ' open' : '') + '><summary><span><b>' + esc(j.name) + '</b>' + (j.company ? ' · ' + esc(j.company) : '') + ' <span class="dw-small">' + esc(new Date(j.created_at).toLocaleString()) + '</span></span><span class="dw-tag ' + j.status + '">' + esc(j.status) + '</span></summary><div class="body">' +
-        '<dl class="dw-kv">' + (j.parent_id ? '<dt>Add-on to</dt><dd>approved order ' + esc(j.parent_id.slice(0, 8)) + ' (the agent gets those drawings in its brief)</dd>' : '') + '<dt>Needs</dt><dd>' + esc((j.work || []).join(', ')) + '</dd><dt>Text</dt><dd>' + esc(j.labels) + ' · ' + esc(j.units) + ' · ' + esc(j.sheet) + (j.scale ? ' · ' + esc(j.scale) : '') + '</dd><dt>Contact</dt><dd>' + esc([j.email, j.phone].filter(Boolean).join(' · ')) + '</dd><dt>Brief</dt><dd>' + esc(j.details) + '</dd>' +
+      var h = '<details class="dw-job" data-id="' + j.id + '"' + (['received', 'check', 'changes', 'confirmed'].indexOf(j.status) > -1 ? ' open' : '') + '><summary><span><b>' + esc(j.name) + '</b>' + (j.company ? ' · ' + esc(j.company) : '') + ' <span class="dw-small">' + esc(new Date(j.created_at).toLocaleString()) + '</span></span><span class="dw-tag ' + j.status + '">' + esc(j.status === 'changes' ? 'sent back' : j.status) + (j.revision > 1 ? ' · rev ' + esc(j.revision) : '') + '</span></summary><div class="body">' +
+        '<dl class="dw-kv">' + (j.hq_note ? '<dt>Your note</dt><dd>' + esc(j.hq_note) + '</dd>' : '') + (j.parent_id ? '<dt>Add-on to</dt><dd>approved order ' + esc(j.parent_id.slice(0, 8)) + ' (the agent gets those drawings in its brief)</dd>' : '') + '<dt>Needs</dt><dd>' + esc((j.work || []).join(', ')) + '</dd><dt>Text</dt><dd>' + esc(j.labels) + ' · ' + esc(j.units) + ' · ' + esc(j.sheet) + (j.scale ? ' · ' + esc(j.scale) : '') + '</dd><dt>Contact</dt><dd>' + esc([j.email, j.phone].filter(Boolean).join(' · ')) + '</dd><dt>Brief</dt><dd>' + esc(j.details) + '</dd>' +
         (j.customer_note ? '<dt>Changes asked</dt><dd>' + esc(j.customer_note) + '</dd>' : '') + (j.sheets ? '<dt>Quote</dt><dd>' + esc(j.sheets) + ' × ' + esc(j.price_per_sheet) + ' ' + esc(j.currency) + '</dd>' : '') + '</dl>' +
         '<div><span class="dw-small">Customer files</span><div class="dw-out" data-files="in"></div></div>' +
         (revOut.length ? '<div><span class="dw-small">Agent output · revision ' + j.revision + '</span><div class="dw-out" data-files="out"></div></div>' : '');
@@ -223,7 +224,8 @@
           price = ((r[1].data || [])[0] || {}).value || '';
           jobs = (r[0].data || []).sort(function (a, b) { return STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) || (a.created_at < b.created_at ? 1 : -1); });
           root.removeAttribute('aria-busy');
-          root.innerHTML = jobs.length ? jobs.map(drawJob).join('') : '<p class="dw-small">No drawing orders yet.</p>';
+          root.innerHTML = (flash ? '<p class="dw-msg ok" role="status">' + esc(flash) + '</p>' : '') + (jobs.length ? jobs.map(drawJob).join('') : '<p class="dw-small">No drawing orders yet.</p>');
+          if (flash) { flash = ''; root.scrollIntoView({ block: 'start' }); }
           jobs.forEach(function (j) { fill(root.querySelector('[data-id="' + j.id + '"]'), j); });
           if (want) focusJob(want);
           if (opts.onChange) opts.onChange(jobs);
@@ -251,7 +253,7 @@
       else if (a === 'cancel') { if (!confirm('Cancel this order?')) return; patch = { status: 'cancelled' }; }
       if (!patch) return;
       patch.updated_at = now; b.disabled = true;
-      SB.from('drawing_jobs').update(patch).eq('id', id).then(function (r) { if (r.error) alert(r.error.message); load(); });
+      SB.from('drawing_jobs').update(patch).eq('id', id).then(function (r) { if (r.error) alert(r.error.message); else flash = FLASH[a] || ''; load(); });
     });
     load();
     return { reload: load, open: function (id) { want = id; if (root.querySelector('[data-id="' + id + '"]')) focusJob(id); } };
