@@ -3,17 +3,16 @@
 (function () {
   'use strict';
   var FN = 'https://usucmdjupfjuchfxnxpz.supabase.co/functions/v1/drawings-desk';
-  var NOTE_EN = 'For design and fabrication reference. Not stamped; authority submissions need a licensed engineer’s review.';
-  var NOTE_AR = 'للتصميم والتصنيع فقط. غير مختومة، وتقديمها للجهات الرسمية يحتاج مراجعة مهندس مرخّص.';
   var S = {
     en: {
       'title': '2D Engineering Drawings', 'eyebrow': '◆ T-12 · ZKJ SYSTEM',
-      'lead': 'Send your sketch, photo, PDF or CAD file. We return clean, dimensioned drawings in Arabic, English or both — plans, sections, elevations and details.',
+      'lead': 'Send your sketch, photo, PDF or CAD file. We return clean, dimensioned drawings in Arabic, English or both — plans, sections, elevations and details — plus the installation method statement and a 3D model when you need them.',
       'f.price': 'Price', 'f.price.v': 'Per sheet. You see the price for your job and confirm it before any work starts.',
       'f.time': 'Delivery', 'f.time.v': 'As soon as it is ready. Your order page shows every step.',
-      'f.files': 'You receive', 'f.files.v': 'PDF + DXF (opens in AutoCAD) + PNG, with a title block on every sheet.',
+      'f.files': 'You receive', 'f.files.v': 'PDF + DXF (opens in AutoCAD) + PNG, with a title block on every sheet. Method statement in PDF + Word. 3D model in SketchUp.',
       'o.sample': 'Sample sheet: plan with Arabic and English labels, dimensions, title block and the reference note.', 'o.name': 'Your name', 'o.company': 'Company (optional)', 'o.email': 'Email', 'o.phone': 'WhatsApp / phone', 'o.contact': 'Email or WhatsApp — at least one.',
-      'o.work': 'What do you need?', 'w.redraw': 'Clean redraw of my sketch / file', 'w.plans': 'Plans', 'w.sections': 'Sections', 'w.elevations': 'Elevations', 'w.details': 'Details',
+      'o.work': 'What do you need?', 'w.redraw': 'Clean redraw of my sketch / file', 'w.plans': 'Plans', 'w.sections': 'Sections', 'w.elevations': 'Elevations', 'w.details': 'Details', 'w.method': 'Method statement (installation, scaffolding, crane / lifting)', 'w.model3d': '3D model (SketchUp)',
+      'o.work.hint': 'Method statement: how it gets installed from your drawing — work sequence, scaffolding, crane and lifting, equipment, safety. You can also add a 3D model or a method statement later, after you approve your drawings.',
       'o.labels': 'Text on the drawings', 'l.en': 'English', 'l.ar': 'Arabic', 'l.both': 'Arabic + English',
       'o.units': 'Units', 'o.sheet': 'Sheet size', 'o.scale': 'Scale (optional)', 'o.scale.ph': 'e.g. 1:50',
       'o.details': 'Describe the job', 'o.details.ph': 'What it is, the sizes you know, what each sheet should show, anything that must not change.',
@@ -29,16 +28,20 @@
       'v.final': 'Final files', 'v.final.lead': 'Download links stay valid for one hour — reopen this page for fresh ones.',
       'v.wait': 'We will message you when the next step is ready. You can also check this page any time.',
       'v.notfound': 'This order link is not valid. Check the link you received.', 'v.wa': 'Questions? Message us on WhatsApp',
+      'a.title': 'Add to this order', 'a.lead': 'Built on the drawings you approved. You get a separate price and confirm it before work starts.', 'a.note': 'Anything we should know (optional)',
+      'a.note.ph': 'e.g. site access, crane position, height, weight of the heaviest part, views you want…', 'a.send': 'Request', 'a.pick': 'Choose at least one.', 'a.list': 'Your add-on orders', 'a.open': 'Open',
+      'a.of': 'Add-on to your approved drawings',
       'h.title': 'Drawings · HQ'
     },
     ar: {
       'title': 'الرسومات الهندسية ثنائية الأبعاد', 'eyebrow': '◆ T-12 · ZKJ SYSTEM',
-      'lead': 'أرسل الرسم اليدوي أو الصورة أو ملف PDF أو CAD. نعيده لك رسومات نظيفة بالأبعاد، بالعربية أو الإنجليزية أو باللغتين — مخططات ومقاطع وواجهات وتفاصيل.',
+      'lead': 'أرسل الرسم اليدوي أو الصورة أو ملف PDF أو CAD. نعيده لك رسومات نظيفة بالأبعاد، بالعربية أو الإنجليزية أو باللغتين — مخططات ومقاطع وواجهات وتفاصيل — ومعها بيان طريقة التركيب ونموذج ثلاثي الأبعاد عند الحاجة.',
       'f.price': 'السعر', 'f.price.v': 'باللوحة. ترى سعر طلبك وتوافق عليه قبل بدء أي عمل.',
       'f.time': 'التسليم', 'f.time.v': 'فور الجاهزية. صفحة طلبك تُظهر كل خطوة.',
-      'f.files': 'تستلم', 'f.files.v': 'PDF + DXF (يفتح في AutoCAD) + PNG، مع جدول عنوان في كل لوحة.',
+      'f.files': 'تستلم', 'f.files.v': 'PDF + DXF (يفتح في AutoCAD) + PNG، مع جدول عنوان في كل لوحة. بيان طريقة العمل بصيغتي PDF و Word. النموذج ثلاثي الأبعاد بصيغة SketchUp.',
       'o.sample': 'لوحة نموذجية: مخطط بتسميات عربية وإنجليزية وأبعاد وجدول عنوان.', 'o.name': 'الاسم', 'o.company': 'الشركة (اختياري)', 'o.email': 'البريد الإلكتروني', 'o.phone': 'واتساب / الهاتف', 'o.contact': 'البريد أو واتساب — واحد على الأقل.',
-      'o.work': 'ماذا تحتاج؟', 'w.redraw': 'إعادة رسم نظيفة لرسمي / ملفي', 'w.plans': 'مخططات', 'w.sections': 'مقاطع', 'w.elevations': 'واجهات', 'w.details': 'تفاصيل',
+      'o.work': 'ماذا تحتاج؟', 'w.redraw': 'إعادة رسم نظيفة لرسمي / ملفي', 'w.plans': 'مخططات', 'w.sections': 'مقاطع', 'w.elevations': 'واجهات', 'w.details': 'تفاصيل', 'w.method': 'بيان طريقة العمل (التركيب، السقالات، الرافعة والرفع)', 'w.model3d': 'نموذج ثلاثي الأبعاد (SketchUp)',
+      'o.work.hint': 'بيان طريقة العمل: كيف يُركَّب العمل حسب رسمك — تسلسل الأعمال، السقالات، الرافعة والرفع، المعدات، السلامة. ويمكنك إضافة نموذج ثلاثي الأبعاد أو بيان طريقة العمل لاحقًا بعد اعتماد رسوماتك.',
       'o.labels': 'لغة الكتابة على الرسومات', 'l.en': 'الإنجليزية', 'l.ar': 'العربية', 'l.both': 'عربي + إنجليزي',
       'o.units': 'الوحدات', 'o.sheet': 'مقاس اللوحة', 'o.scale': 'مقياس الرسم (اختياري)', 'o.scale.ph': 'مثلاً 1:50',
       'o.details': 'صف المطلوب', 'o.details.ph': 'ما هو المشروع، المقاسات المعروفة، ماذا تُظهر كل لوحة، وما لا يجب تغييره.',
@@ -54,6 +57,9 @@
       'v.final': 'الملفات النهائية', 'v.final.lead': 'روابط التحميل صالحة لساعة — افتح الصفحة مجددًا لروابط جديدة.',
       'v.wait': 'سنراسلك عندما تجهز الخطوة التالية. ويمكنك متابعة هذه الصفحة في أي وقت.',
       'v.notfound': 'رابط الطلب غير صالح. تحقق من الرابط الذي وصلك.', 'v.wa': 'لديك سؤال؟ راسلنا على واتساب',
+      'a.title': 'أضف إلى هذا الطلب', 'a.lead': 'مبني على الرسومات التي اعتمدتها. يصلك سعر مستقل وتوافق عليه قبل بدء العمل.', 'a.note': 'ما يجب أن نعرفه (اختياري)',
+      'a.note.ph': 'مثلاً: الوصول إلى الموقع، مكان الرافعة، الارتفاع، وزن أثقل قطعة، المناظر التي تريدها…', 'a.send': 'اطلب', 'a.pick': 'اختر خيارًا واحدًا على الأقل.', 'a.list': 'طلبات الإضافة', 'a.open': 'افتح',
+      'a.of': 'إضافة على رسوماتك المعتمدة',
       'h.title': 'الرسومات · المقر'
     }
   };
@@ -68,7 +74,6 @@
     document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = t(el.getAttribute('data-t')); });
     document.querySelectorAll('[data-tph]').forEach(function (el) { el.setAttribute('placeholder', t(el.getAttribute('data-tph'))); });
     var b = $('dw-lang'); if (b) b.textContent = lang === 'ar' ? 'English' : 'العربية';
-    var n = document.querySelector('[data-note]'); if (n) n.textContent = lang === 'ar' ? NOTE_AR : NOTE_EN;
   }
   document.addEventListener('click', function (e) {
     if (e.target && e.target.id === 'dw-lang') { lang = lang === 'ar' ? 'en' : 'ar'; try { localStorage.setItem('zkj-lang', lang); } catch (er) { /* ignore */ } applyLang(); if (window.__dwRender) window.__dwRender(); }
@@ -132,13 +137,23 @@
       }
       if ((j.status === 'review' || j.status === 'approved') && j.files.length) {
         h += '<section class="dw-card"><h2>' + esc(t(j.final ? 'v.final' : 'v.review')) + '</h2><p class="dw-small">' + esc(t(j.final ? 'v.final.lead' : 'v.review.lead')) + '</p><div class="dw-out">' +
-          j.files.map(function (f) { var img = /\.(png|jpe?g)$/i.test(f.name); return '<a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + (img ? '<img src="' + esc(f.url) + '" alt="" loading="lazy">' : '') + '<span class="ft">' + esc((f.name.split('.').pop() || '').toUpperCase()) + '</span>' + esc(f.name) + '</a>'; }).join('') + '</div>';
+          j.files.map(function (f) { var img = /\.(png|jpe?g|webp)$/i.test(f.name); return '<a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + (img ? '<img src="' + esc(f.url) + '" alt="" loading="lazy">' : '') + '<span class="ft">' + esc((f.name.split('.').pop() || '').toUpperCase()) + '</span>' + esc(f.name) + '</a>'; }).join('') + '</div>';
         if (j.status === 'review') h += '<div class="dw-actions"><button class="btn btn-primary" type="button" data-do="approve">' + esc(t('v.approve')) + '</button></div>' +
           '<label class="dw-field" style="margin-top:14px"><span>' + esc(t('v.changes')) + '</span><textarea class="dw-note" id="dw-note" placeholder="' + esc(t('v.changes.ph')) + '"></textarea></label><div class="dw-actions"><button class="btn" type="button" data-do="changes">' + esc(t('v.send')) + '</button></div>';
         h += '</section>';
       }
       if (['received', 'confirmed', 'in_work', 'check', 'changes'].indexOf(j.status) > -1) h += '<p class="dw-small">' + esc(t('v.wait')) + '</p>';
-      h += '<p class="dw-small"><a href="https://wa.me/971541668700" target="_blank" rel="noopener">' + esc(t('v.wa')) + '</a></p><p class="dw-legal" data-note></p>';
+      if (j.addon) h = '<p class="dw-small">' + esc(t('a.of')) + ': ' + esc((j.work || []).map(function (w) { return t('w.' + w); }).join(' · ')) + '</p>' + h;
+      if (j.status === 'approved' && !j.addon) {
+        var have = (j.work || []).concat.apply(j.work || [], (j.addons || []).map(function (a) { return a.work || []; }));
+        var opts = ['model3d', 'method'].filter(function (w) { return have.indexOf(w) < 0; });
+        if ((j.addons || []).length) h += '<section class="dw-card"><h2>' + esc(t('a.list')) + '</h2>' + j.addons.map(function (a) { return '<p class="dw-small">' + esc((a.work || []).map(function (w) { return t('w.' + w); }).join(' · ')) + ' — ' + esc(t('s.' + a.status)) + ' · <a href="' + esc(a.view + '&lang=' + lang) + '">' + esc(t('a.open')) + '</a></p>'; }).join('') + '</section>';
+        if (opts.length) h += '<section class="dw-card" id="dw-add"><h2>' + esc(t('a.title')) + '</h2><p class="dw-small">' + esc(t('a.lead')) + '</p><div class="dw-checks">' +
+          opts.map(function (w) { return '<label><input type="checkbox" name="addon" value="' + w + '"><span>' + esc(t('w.' + w)) + '</span></label>'; }).join('') + '</div>' +
+          '<label class="dw-field" style="margin-top:14px"><span>' + esc(t('a.note')) + '</span><textarea class="dw-note" id="dw-addnote" placeholder="' + esc(t('a.note.ph')) + '"></textarea></label><p class="dw-msg" id="dw-addmsg" hidden role="alert"></p>' +
+          '<div class="dw-actions"><button class="btn btn-primary" type="button" data-do="addon">' + esc(t('a.send')) + '</button></div></section>';
+      }
+      h += '<p class="dw-small"><a href="https://wa.me/971541668700" target="_blank" rel="noopener">' + esc(t('v.wa')) + '</a></p>';
       box.innerHTML = h; applyLang();
     }
     window.__dwRender = render;
@@ -152,6 +167,14 @@
       var b = e.target.closest('[data-do]'); if (!b) return;
       var a = b.getAttribute('data-do'), body = null;
       if (a === 'changes') { var n = ($('dw-note').value || '').trim(); if (!n) { $('dw-note').focus(); return; } body = { note: n }; }
+      if (a === 'addon') {
+        var picked = Array.prototype.map.call(box.querySelectorAll('input[name="addon"]:checked'), function (i) { return i.value; });
+        if (!picked.length) return msg($('dw-addmsg'), t('a.pick'), 'err');
+        b.disabled = true;
+        return api('POST', '?action=addon&job=' + job + '&key=' + key, { work: picked, note: $('dw-addnote').value || '' }).then(function (r) {
+          if (r.ok && r.view) location.href = r.view + '&new=1&lang=' + lang; else { b.disabled = false; msg($('dw-addmsg'), t('o.err.net'), 'err'); }
+        });
+      }
       b.disabled = true;
       api('POST', '?action=' + a + '&job=' + job + '&key=' + key, body || {}).then(load);
     });
@@ -172,11 +195,11 @@
       var wa = j.phone ? 'https://wa.me/' + String(j.phone).replace(/[^\d]/g, '') + '?text=' + encodeURIComponent((j.lang === 'ar' ? 'رابط طلب الرسومات: ' : 'Your drawing order: ') + view) : '';
       var revOut = (j.outputs || []).filter(function (o) { return o.rev === j.revision; });
       var h = '<details class="dw-job" data-id="' + j.id + '"' + (['received', 'check', 'changes', 'confirmed'].indexOf(j.status) > -1 ? ' open' : '') + '><summary><span><b>' + esc(j.name) + '</b>' + (j.company ? ' · ' + esc(j.company) : '') + ' <span class="dw-small">' + esc(new Date(j.created_at).toLocaleString()) + '</span></span><span class="dw-tag ' + j.status + '">' + esc(j.status) + '</span></summary><div class="body">' +
-        '<dl class="dw-kv"><dt>Needs</dt><dd>' + esc((j.work || []).join(', ')) + '</dd><dt>Text</dt><dd>' + esc(j.labels) + ' · ' + esc(j.units) + ' · ' + esc(j.sheet) + (j.scale ? ' · ' + esc(j.scale) : '') + '</dd><dt>Contact</dt><dd>' + esc([j.email, j.phone].filter(Boolean).join(' · ')) + '</dd><dt>Brief</dt><dd>' + esc(j.details) + '</dd>' +
+        '<dl class="dw-kv">' + (j.parent_id ? '<dt>Add-on to</dt><dd>approved order ' + esc(j.parent_id.slice(0, 8)) + ' (the agent gets those drawings in its brief)</dd>' : '') + '<dt>Needs</dt><dd>' + esc((j.work || []).join(', ')) + '</dd><dt>Text</dt><dd>' + esc(j.labels) + ' · ' + esc(j.units) + ' · ' + esc(j.sheet) + (j.scale ? ' · ' + esc(j.scale) : '') + '</dd><dt>Contact</dt><dd>' + esc([j.email, j.phone].filter(Boolean).join(' · ')) + '</dd><dt>Brief</dt><dd>' + esc(j.details) + '</dd>' +
         (j.customer_note ? '<dt>Changes asked</dt><dd>' + esc(j.customer_note) + '</dd>' : '') + (j.sheets ? '<dt>Quote</dt><dd>' + esc(j.sheets) + ' × ' + esc(j.price_per_sheet) + ' ' + esc(j.currency) + '</dd>' : '') + '</dl>' +
         '<div><span class="dw-small">Customer files</span><div class="dw-out" data-files="in"></div></div>' +
         (revOut.length ? '<div><span class="dw-small">Agent output · revision ' + j.revision + '</span><div class="dw-out" data-files="out"></div></div>' : '');
-      if (j.status === 'received' || j.status === 'quoted') h += '<div class="dw-row"><label class="dw-field"><span>Sheets</span><input type="number" min="1" data-f="sheets" value="' + esc(j.sheets || '') + '"></label><label class="dw-field"><span>Price per sheet (' + esc(j.currency) + ')</span><input type="number" min="0" step="1" data-f="price" value="' + esc(j.price_per_sheet || price) + '"></label></div><div class="dw-actions"><button class="btn btn-primary" type="button" data-a="quote">' + (j.status === 'quoted' ? 'Update quote' : 'Send quote to customer') + '</button></div>';
+      if (j.status === 'received' || j.status === 'quoted') h += '<div class="dw-row"><label class="dw-field"><span>Sheets (method statement / 3D: count each document or view sheet)</span><input type="number" min="1" data-f="sheets" value="' + esc(j.sheets || '') + '"></label><label class="dw-field"><span>Price per sheet (' + esc(j.currency) + ')</span><input type="number" min="0" step="1" data-f="price" value="' + esc(j.price_per_sheet || price) + '"></label></div><div class="dw-actions"><button class="btn btn-primary" type="button" data-a="quote">' + (j.status === 'quoted' ? 'Update quote' : 'Send quote to customer') + '</button></div>';
       if (j.status === 'check') h += '<label class="dw-field"><span>Note back to the agent (only if it needs fixing)</span><textarea class="dw-note" data-f="hq"></textarea></label><div class="dw-actions"><button class="btn btn-primary" type="button" data-a="release">Send to customer</button><button class="btn" type="button" data-a="back">Back to the agent</button></div>';
       h += copyRow('Customer page (send this to the customer)', view) + (wa ? '<div class="dw-actions"><a class="btn btn-sm" target="_blank" rel="noopener" href="' + esc(wa) + '">Send link on WhatsApp</a></div>' : '') +
         copyRow('Agent brief (give this to your drawings agent — never to the customer)', agent) +

@@ -7,10 +7,12 @@
 //   GET  ?job&key                             status, quote, previews; final files once approved
 //   POST ?action=confirm|approve&job&key      accept the quote · approve the drawings
 //   POST ?action=changes&job&key  {note}      ask for changes
+//   POST ?action=addon&job&key {work,note}    after approval: order a 3D model or a method statement built on these drawings
+//                                             → a new linked job (parent_id) with its own quote and its own order page
 // Agent (KJ's drawings agent, key = agent_key, only on KJ's private board / HQ page):
 //   GET  ?job&agent                           brief + signed links to the customer's files
 //   POST ?action=start&job&agent              work started
-//   PUT  ?job&agent&name=<file>               upload one output sheet (pdf, dxf, dwg, png, jpg)
+//   PUT  ?job&agent&name=<file>               upload one output (pdf, dxf, dwg, png, jpg, webp, skp, docx, mp4)
 //   POST ?action=ready&job&agent              done → status "check": KJ looks first, then releases it to the customer in HQ
 // Quotes and releases are set by KJ on /drawings/hq.html (admin login, row-level security), never here.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
@@ -21,8 +23,14 @@ const BUCKET = 'drawings';
 const SITE = 'https://system.zkjverse.com';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const IN_TYPES = /\.(pdf|jpe?g|png|webp|heic|dxf|dwg)$/i;
-const OUT_TYPES: Record<string, string> = { pdf: 'application/pdf', dxf: 'application/dxf', dwg: 'application/acad', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg' };
-const WORK = ['redraw', 'plans', 'sections', 'elevations', 'details'];
+const OUT_TYPES: Record<string, string> = {
+  pdf: 'application/pdf', dxf: 'application/dxf', dwg: 'application/acad', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp',
+  skp: 'application/octet-stream', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', mp4: 'video/mp4',
+};
+const PREVIEW = /\.(pdf|png|jpe?g|webp|mp4)$/i;
+// method = installation method statement (sequence, scaffolding, crane / lifting, equipment, safety); model3d = SketchUp model + views
+const WORK = ['redraw', 'plans', 'sections', 'elevations', 'details', 'method', 'model3d'];
+const ADDONS = ['model3d', 'method'];
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS', 'Access-Control-Allow-Headers': 'content-type' };
 
 async function sb(path: string, init: RequestInit = {}) {
@@ -58,7 +66,7 @@ Deno.serve(async (req) => {
         lang: b.lang === 'ar' ? 'ar' : 'en', labels: ['en', 'ar', 'both'].includes(b.labels) ? b.labels : 'en',
         units: ['mm', 'cm', 'm', 'in', 'ft'].includes(b.units) ? b.units : 'mm', scale: str(b.scale, 30),
         sheet: ['A4', 'A3', 'A2', 'A1', 'A0'].includes(b.sheet) ? b.sheet : 'A3',
-        work: (Array.isArray(b.work) ? b.work : []).filter((w: string) => WORK.includes(w)).slice(0, 5),
+        work: (Array.isArray(b.work) ? b.work : []).filter((w: string) => WORK.includes(w)).slice(0, WORK.length),
         details: str(b.details, 4000),
       };
       if (!order.name || !order.details || (!order.email && !order.phone) || !order.work.length) return json(400, { ok: false, error: 'missing_fields' });
@@ -107,6 +115,21 @@ Deno.serve(async (req) => {
         await notify(`Quote accepted: ${job.name}`, `تمت الموافقة على العرض: ${job.name}`, `${job.sheets} sheet(s). The agent can start.`);
         return json(200, { ok: true, status: 'confirmed' });
       }
+      if (req.method === 'POST' && action === 'addon') {
+        if (job.status !== 'approved') return json(409, { ok: false, error: 'not_approved' });
+        const b = await req.json().catch(() => ({}));
+        const work = (Array.isArray(b?.work) ? b.work : []).filter((w: string) => ADDONS.includes(w));
+        if (!work.length) return json(400, { ok: false, error: 'missing_fields' });
+        const kids: { id: string }[] = await sb(`drawing_jobs?select=id&parent_id=eq.${id}&status=neq.cancelled`);
+        if (kids.length >= 5) return json(429, { ok: false, error: 'busy' });
+        const note = str(b?.note, 2000);
+        const child = (await sb('drawing_jobs', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
+          parent_id: id, name: job.name, company: job.company, email: job.email, phone: job.phone, lang: job.lang, labels: job.labels, units: job.units, scale: job.scale, sheet: job.sheet,
+          work, details: `Add-on to the approved drawings (order ${id.slice(0, 8)}).` + (note ? `\n${note}` : ''),
+        }) }))[0];
+        await notify(`Add-on ordered: ${job.name}`, `طلب إضافة: ${job.name}`, `${work.join(', ')} on approved order ${id.slice(0, 8)}. Open /drawings/hq.html to quote it.`);
+        return json(200, { ok: true, job: child.id, view: `${SITE}/drawings/view.html?job=${child.id}&k=${child.customer_key}&lang=${job.lang}` });
+      }
       if (req.method === 'POST' && (action === 'approve' || action === 'changes')) {
         if (job.status !== 'review') return json(409, { ok: false, error: 'not_in_review' });
         if (action === 'approve') {
@@ -128,26 +151,37 @@ Deno.serve(async (req) => {
       const outs = show ? (job.outputs ?? []).filter((o: any) => o.rev === rev) : [];
       const files = [];
       for (const o of outs) {
-        const preview = /\.(pdf|png|jpe?g)$/i.test(o.name);
-        if (job.status !== 'approved' && !preview) continue;
+        if (job.status !== 'approved' && !PREVIEW.test(o.name)) continue;
         files.push({ name: o.name, url: await signDownload(o.path, 3600) });
       }
-      return json(200, { ok: true, job: { id, status: job.status, name: job.name, work: job.work, sheet: job.sheet, labels: job.labels, created_at: job.created_at, sheets: job.sheets, price_per_sheet: job.price_per_sheet, currency: job.currency, total, revision: rev, files, final: job.status === 'approved' } });
+      const addons = job.status === 'approved'
+        ? ((await sb(`drawing_jobs?select=id,customer_key,work,status&parent_id=eq.${id}&status=neq.cancelled&order=created_at`)) ?? []).map((c: any) => ({ work: c.work, status: c.status, view: `${SITE}/drawings/view.html?job=${c.id}&k=${c.customer_key}` }))
+        : [];
+      return json(200, { ok: true, job: { id, status: job.status, name: job.name, work: job.work, sheet: job.sheet, labels: job.labels, created_at: job.created_at, sheets: job.sheets, price_per_sheet: job.price_per_sheet, currency: job.currency, total, revision: rev, files, final: job.status === 'approved', addon: !!job.parent_id, addons } });
     }
 
     // ---------- agent ----------
     if (req.method === 'GET') {
       const inputs = [];
       for (const f of job.inputs ?? []) inputs.push({ name: f.name, url: await signDownload(`inputs/${id}/${f.name}`, 6 * 3600) });
+      // add-on job: the approved 2D drawings it builds on, plus the original customer files
+      const parent_files = [];
+      if (job.parent_id) {
+        const p = (await sb(`drawing_jobs?id=eq.${job.parent_id}&select=id,revision,inputs,outputs,details`))?.[0];
+        if (p) {
+          for (const o of (p.outputs ?? []).filter((o: any) => o.rev === p.revision)) parent_files.push({ name: o.name, from: 'approved drawings', url: await signDownload(o.path, 6 * 3600) });
+          for (const f of p.inputs ?? []) parent_files.push({ name: f.name, from: 'original customer file', url: await signDownload(`inputs/${p.id}/${f.name}`, 6 * 3600) });
+        }
+      }
       const self = `${SB_URL}/functions/v1/drawings-desk?job=${id}&agent=${ak}`;
       return json(200, {
         ok: true,
-        job: { id, status: job.status, revision: job.revision, work: job.work, labels: job.labels, units: job.units, scale: job.scale, sheet: job.sheet, details: job.details, customer_note: job.customer_note, hq_note: job.hq_note, sheets: job.sheets, inputs },
+        job: { id, status: job.status, revision: job.revision, work: job.work, labels: job.labels, units: job.units, scale: job.scale, sheet: job.sheet, details: job.details, customer_note: job.customer_note, hq_note: job.hq_note, sheets: job.sheets, inputs, parent_id: job.parent_id, parent_files },
         deliver: {
           started: `curl -X POST "${self}&action=start"`,
-          upload: `curl -X PUT --data-binary @<file> "${self}&name=<A101.pdf|A101.dxf|A101.png>"`,
+          upload: `curl -X PUT --data-binary @<file> "${self}&name=<A101.pdf|A101.dxf|A101.png|MS-01.pdf|MS-01.docx|M3D-01.skp|M3D-01.png>"`,
           ready: `curl -X POST "${self}&action=ready"`,
-          rules: 'One upload per file. Same sheet number in every format (A101.pdf, A101.dxf, A101.png). Every sheet carries the title block and the note "For design and fabrication reference. Not stamped; authority submissions need a licensed engineer\'s review." Ready sends it to KJ, not to the customer.',
+          rules: 'One upload per file. Same sheet number in every format (A101.pdf, A101.dxf, A101.png). Every sheet carries the title block and the note "For design and fabrication reference. Not stamped; authority submissions need a licensed engineer\'s review." in one corner only. Method statement = MS-01.pdf + MS-01.docx (+ A6xx method sheets). 3D model = M3D-01.skp + view images + a PDF of the views. Ready sends it to KJ, not to the customer.',
         },
       });
     }
@@ -160,7 +194,7 @@ Deno.serve(async (req) => {
       if (job.status !== 'in_work') return json(409, { ok: false, error: 'start_first', status: job.status });
       const name = safeName(u.searchParams.get('name') ?? '');
       const ext = (name.split('.').pop() ?? '').toLowerCase();
-      if (!OUT_TYPES[ext]) return json(400, { ok: false, error: 'pdf, dxf, dwg, png or jpg only' });
+      if (!OUT_TYPES[ext]) return json(400, { ok: false, error: 'pdf, dxf, dwg, png, jpg, webp, skp, docx or mp4 only' });
       if (!req.body) return json(400, { ok: false, error: 'empty' });
       const path = `outputs/${id}/r${job.revision}/${name}`;
       const up = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`, {
@@ -176,7 +210,7 @@ Deno.serve(async (req) => {
     if (req.method === 'POST' && action === 'ready') {
       if (job.status !== 'in_work') return json(409, { ok: false, error: 'start_first', status: job.status });
       const mine = (job.outputs ?? []).filter((o: any) => o.rev === job.revision);
-      if (!mine.some((o: any) => /\.pdf$/i.test(o.name))) return json(400, { ok: false, error: 'upload at least one PDF sheet first' });
+      if (!mine.some((o: any) => /\.(pdf|skp)$/i.test(o.name))) return json(400, { ok: false, error: 'upload at least one PDF (or the .skp model) first' });
       await patch({ status: 'check', delivered_at: new Date().toISOString() });
       await notify(`Drawings ready to check: ${job.name}`, `الرسومات جاهزة للمراجعة: ${job.name}`, `${mine.length} file(s), revision ${job.revision}. Check them in /drawings/hq.html, then send to the customer.`);
       return json(200, { ok: true, status: 'check' });
