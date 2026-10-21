@@ -293,6 +293,7 @@
       'gal.view': 'View {title}',
       'gal.count': 'Work {n} of {total}',
       'ex.cta': 'Enquire',
+      'ex.order': 'Order a drawing',
       'ex.room': 'Room {n}',
       'act.1.era': 'Past · Act I',
       'act.1.t': 'Enquire, and bring your light',
@@ -470,6 +471,7 @@
       'gal.view': 'عرض {title}',
       'gal.count': 'العمل {n} من {total}',
       'ex.cta': 'استفسر',
+      'ex.order': 'اطلب رسمًا',
       'ex.room': 'القاعة {n}',
       'act.1.era': 'الماضي · الفصل الأول',
       'act.1.t': 'استفسر، وأحضر ضوءك',
@@ -688,7 +690,7 @@
       '<p class="tool-desc">' + esc(d.desc) + '</p>' +
       '<ul>' + d.points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
       '<div class="ex-actions"><button type="button" class="btn btn-sm btn-primary btn-try" data-try="' + tl.id + '">' + esc(t('try.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></button>' +
-      '<a class="btn btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('ex.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a></div>' +
+      (tl.id === 'drawings' ? '<a class="btn btn-sm" href="drawings/">' + esc(t('ex.order')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a>' : '<a class="btn btn-sm" href="#enquire" data-enquire="tool:' + tl.id + '">' + esc(t('ex.cta')) + '<span class="sr-only"> — ' + esc(d.name) + '</span></a>') + '</div>' +
       '</article></li>';
   }
   function renderTools() {

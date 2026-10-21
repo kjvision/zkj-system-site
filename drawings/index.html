@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index,follow">
+  <title>2D Engineering Drawings · ZKJ SYSTEM</title>
+  <link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Kufi+Arabic:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="drawings.css">
+</head>
+<body class="dw" data-page="order">
+  <header class="dw-top"><a class="dw-brand" href="/"><img src="../assets/brand/favicon.svg" alt="">ZKJ SYSTEM</a><button class="dw-lang" id="dw-lang" type="button">العربية</button></header>
+  <main class="dw-main">
+    <span class="label" data-t="eyebrow">◆ T-12 · ZKJ SYSTEM</span>
+    <h1 data-t="title">2D Engineering Drawings</h1>
+    <p class="dw-lead" data-t="lead"></p>
+    <ul class="dw-facts">
+      <li><b data-t="f.price">Price</b><span data-t="f.price.v"></span></li>
+      <li><b data-t="f.time">Delivery</b><span data-t="f.time.v"></span></li>
+      <li><b data-t="f.files">You receive</b><span data-t="f.files.v"></span></li>
+    </ul>
+    <figure class="dw-card" style="padding:10px"><img src="sample-A101.webp" alt="Sample sheet: bilingual ground floor plan with dimensions and title block" style="width:100%;height:auto;background:#fff" loading="lazy" width="1400" height="989"><figcaption class="dw-small" data-t="o.sample" style="margin-top:8px"></figcaption></figure>
+    <form class="dw-form" id="dw-form" novalidate>
+      <div class="dw-row">
+        <label class="dw-field"><span data-t="o.name">Your name</span><input type="text" name="name" required autocomplete="name"></label>
+        <label class="dw-field"><span data-t="o.company">Company</span><input type="text" name="company" autocomplete="organization"></label>
+      </div>
+      <div class="dw-row">
+        <label class="dw-field"><span data-t="o.email">Email</span><input type="email" name="email" autocomplete="email" dir="ltr"></label>
+        <label class="dw-field"><span data-t="o.phone">WhatsApp / phone</span><input type="tel" name="phone" autocomplete="tel" dir="ltr"></label>
+      </div>
+      <small class="dw-small" data-t="o.contact"></small>
+      <fieldset class="dw-field"><legend data-t="o.work">What do you need?</legend>
+        <div class="dw-checks">
+          <label><input type="checkbox" name="work" value="redraw"><span data-t="w.redraw"></span></label>
+          <label><input type="checkbox" name="work" value="plans"><span data-t="w.plans"></span></label>
+          <label><input type="checkbox" name="work" value="sections"><span data-t="w.sections"></span></label>
+          <label><input type="checkbox" name="work" value="elevations"><span data-t="w.elevations"></span></label>
+          <label><input type="checkbox" name="work" value="details"><span data-t="w.details"></span></label>
+        </div>
+      </fieldset>
+      <div class="dw-row">
+        <label class="dw-field"><span data-t="o.labels"></span><select name="labels"><option value="en" data-t="l.en"></option><option value="ar" data-t="l.ar"></option><option value="both" data-t="l.both"></option></select></label>
+        <label class="dw-field"><span data-t="o.units"></span><select name="units" dir="ltr"><option>mm</option><option>cm</option><option>m</option><option>in</option><option>ft</option></select></label>
+        <label class="dw-field"><span data-t="o.sheet"></span><select name="sheet" dir="ltr"><option>A3</option><option>A4</option><option>A2</option><option>A1</option><option>A0</option></select></label>
+        <label class="dw-field"><span data-t="o.scale"></span><input type="text" name="scale" dir="ltr" data-tph="o.scale.ph"></label>
+      </div>
+      <label class="dw-field"><span data-t="o.details"></span><textarea name="details" required data-tph="o.details.ph"></textarea></label>
+      <label class="dw-field"><span data-t="o.upload"></span>
+        <div class="dw-drop"><input type="file" id="dw-in" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.dxf,.dwg"><br><small data-t="o.upload.hint"></small></div>
+        <ul class="dw-files" id="dw-list"></ul>
+      </label>
+      <div class="dw-hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <p class="dw-legal" data-note></p>
+      <p class="dw-msg" id="dw-msg" hidden role="alert"></p>
+      <div class="dw-actions"><button class="btn btn-primary" id="dw-send" type="submit" data-t="o.send">Send my order</button></div>
+    </form>
+  </main>
+  <script src="drawings.js"></script>
+</body>
+</html>
