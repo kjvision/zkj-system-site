@@ -1385,6 +1385,12 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && !$('notif-panel').hidden) { closeNotif(); $('bell').focus(); }
   });
+  // phone: while typing, the on-screen keyboard leaves a short screen; the tab bar and dock would cover the field
+  (function () {
+    var typing = function (el) { return el && el.matches && el.matches('textarea, input:not([type=checkbox]):not([type=radio]):not([type=button]), select'); };
+    document.addEventListener('focusin', function (e) { if (typing(e.target)) { document.body.classList.add('kb-open'); setTimeout(function () { try { e.target.scrollIntoView({ block: 'center' }); } catch (er) { /* old browser */ } }, 250); } });
+    document.addEventListener('focusout', function (e) { if (typing(e.target)) setTimeout(function () { if (!typing(document.activeElement)) document.body.classList.remove('kb-open'); }, 100); });
+  })();
   D.onView(function (id) {
     closeNotif();
     if (S.mode === 'ws' && HQ_VIEWS.indexOf(id) > -1) { backToHQ(id); return; }

@@ -148,6 +148,10 @@ html[lang="ar"] .cc-pkg { font-family: var(--f-body); letter-spacing: 0; font-si
 .hq-jobs .hq-sum { margin: 0; }
 .hq-jobs-list { margin: 0; }
 .dw-in-app { display: grid; gap: 0; margin-top: 18px; }
+.dw-in-app .dw-out img { max-height: 260px; object-fit: contain; }
+.dw-in-app textarea, .dw-in-app input { scroll-margin: 90px 0 120px; }
+/* typing on a phone: hide the bars that would sit on top of the field */
+body.kb-open .tabbar, body.kb-open .dock, body.kb-open .dock-scrim, body.kb-open #dock-line { display: none !important; }
 .dw-in-app[aria-busy="true"] { opacity: .6; }
 .td-main { min-width: 0; display: grid; gap: 3px; }
 .td-main strong { color: #fff; font-size: 14.5px; font-weight: 600; }
