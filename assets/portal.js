@@ -941,7 +941,7 @@
   }
   // drawing jobs (T-12): the HQ "Jobs · Drawings" section, the to-do and the Drawings view
   function loadDrawings() {
-    return q(sb.from('drawing_jobs').select('id,name,company,status,work,parent_id,created_at,updated_at').neq('status', 'cancelled').order('created_at', { ascending: false }).limit(200))
+    return q(sb.from('drawing_jobs').select('id,name,company,status,revision,work,parent_id,created_at,updated_at').neq('status', 'cancelled').order('created_at', { ascending: false }).limit(200))
       .then(function (d) { S.dw = d || []; }).catch(function () { S.dw = S.dw || []; });
   }
   var DW_GROUP = { received: 'quote', check: 'check', confirmed: 'work', in_work: 'work', changes: 'work', quoted: 'cust', review: 'cust', approved: 'done' };
@@ -957,7 +957,7 @@
     var tiles = tile('quote', true) + tile('check', true) + tile('work') + tile('cust');
     var active = jobs.filter(function (j) { return j.status !== 'approved'; }).slice(0, 3);
     var list = active.length ? '<ul class="todo-list hq-jobs-list">' + active.map(function (j) {
-      return '<li class="td"><span class="td-ic" data-kind="drawing">' + D.icon('drawings') + '</span><div class="td-main"><div class="td-top"><span class="td-type">' + esc(t('p.dw.s.' + j.status)) + '</span><span class="td-when">' + esc(ago(j.updated_at || j.created_at)) + '</span></div>' +
+      return '<li class="td"><span class="td-ic" data-kind="drawing">' + D.icon('drawings') + '</span><div class="td-main"><div class="td-top"><span class="td-type">' + esc(t('p.dw.s.' + j.status)) + (j.revision > 1 ? ' · rev ' + esc(j.revision) : '') + '</span><span class="td-when">' + esc(ago(j.updated_at || j.created_at)) + '</span></div>' +
         '<strong>' + esc(j.name) + (j.company ? ' · ' + esc(j.company) : '') + '</strong><p>' + (j.parent_id ? esc(t('p.dw.addon')) + ' · ' : '') + esc(dwWork(j)) + '</p></div>' +
         '<div class="td-acts"><button class="btn btn-ghost btn-sm" type="button" data-action="dw-open" data-id="' + esc(j.id) + '">' + esc(t('p.td.dw.open')) + '</button></div></li>';
     }).join('') + '</ul>' : '<p class="gcard portal-empty">' + esc(t('p.hq.jobs.none')) + '</p>';
