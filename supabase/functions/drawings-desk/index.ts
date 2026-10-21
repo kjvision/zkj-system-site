@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
     const isCustomer = UUID.test(ck) && ck === job.customer_key, isAgent = UUID.test(ak) && ak === job.agent_key;
     if (!isCustomer && !isAgent) return json(404, { ok: false, error: 'not_found' });
     const patch = (p: Record<string, unknown>) => sb(`drawing_jobs?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ ...p, updated_at: new Date().toISOString() }) });
-    const total = job.sheets && job.price_per_sheet ? Number(job.sheets) * Number(job.price_per_sheet) : null;
+    const total = job.sheets && job.price_per_sheet != null ? Number(job.sheets) * Number(job.price_per_sheet) : null; // 0 is a valid price (trial)
 
     // ---------- customer ----------
     if (isCustomer) {
