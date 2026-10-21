@@ -56,7 +56,11 @@ html[dir="rtl"] .dw-steps li { padding: 10px 34px 10px 0; }
 .dw-job { border: 1px solid var(--line); background: var(--panel); margin: 0 0 14px; }
 .dw-job > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 14px 16px; }
 .dw-job > summary::-webkit-details-marker { display: none; }
-.dw-job .body { padding: 0 16px 16px; display: grid; gap: 14px; }
+.dw-job .body { padding: 0 16px 16px; display: grid; gap: 14px; min-width: 0; }
+.dw-job input[type=number], .dw-job textarea { width: 100%; min-width: 0; box-sizing: border-box; background: var(--charcoal); border: 1px solid var(--line-strong); color: var(--white); padding: 10px 12px; font: inherit; font-size: 15px; border-radius: 0; }
+.dw-job .dw-field { min-width: 0; }
+.dw-job .dw-row { align-items: start; }
+.dw-job .dw-field > span { font-size: 13px; color: var(--gold-light); }
 .dw-kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 14px; margin: 0; }
 .dw-kv dt { color: var(--silver); }
 .dw-kv dd { margin: 0; white-space: pre-wrap; }
