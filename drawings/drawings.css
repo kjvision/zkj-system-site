@@ -1,0 +1,64 @@
+/* Drawings desk pages (order · customer view · HQ). Built on the site's style.css tokens. */
+body.dw { background: var(--obsidian); color: var(--white); min-height: 100vh; }
+.dw-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.dw-brand { display: flex; align-items: center; gap: 10px; color: var(--white); text-decoration: none; font-family: "Cinzel", serif; letter-spacing: 3px; font-size: 13px; }
+.dw-brand img { width: 22px; height: 22px; }
+.dw-lang { background: none; border: 1px solid var(--hair); color: var(--gold-light); padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+.dw-main { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+.dw-main.wide { max-width: 1100px; }
+.dw-main h1 { font-family: "Cinzel", serif; font-weight: 600; font-size: clamp(26px, 5vw, 38px); letter-spacing: 2px; margin: 8px 0 10px; }
+html[lang="ar"] .dw-main h1 { font-family: "Noto Kufi Arabic", sans-serif; letter-spacing: 0; }
+.dw-lead { color: var(--silver); margin: 0 0 24px; line-height: 1.6; }
+.dw-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 0 0 28px; padding: 0; list-style: none; }
+.dw-facts li { border: 1px solid var(--line); background: var(--panel); padding: 12px 14px; font-size: 14px; color: var(--silver); }
+.dw-facts b { display: block; color: var(--gold-light); font-weight: 600; margin-bottom: 4px; }
+.dw-form { display: grid; gap: 18px; }
+.dw-field { display: grid; gap: 8px; }
+.dw-field > span, .dw-field legend { font-size: 13px; letter-spacing: .5px; color: var(--gold-light); }
+.dw-field small { color: var(--silver); font-size: 12px; }
+.dw-form input[type=text], .dw-form input[type=email], .dw-form input[type=tel], .dw-form input[type=number], .dw-form select, .dw-form textarea, .dw-note {
+  width: 100%; box-sizing: border-box; background: var(--charcoal); border: 1px solid var(--line-strong); color: var(--white); padding: 12px 14px; font: inherit; font-size: 15px; border-radius: 0; }
+.dw-form textarea, .dw-note { min-height: 130px; resize: vertical; }
+.dw-form input:focus, .dw-form select:focus, .dw-form textarea:focus, .dw-note:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+.dw-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+fieldset.dw-field { border: 0; padding: 0; margin: 0; }
+.dw-checks { display: flex; flex-wrap: wrap; gap: 8px; }
+.dw-checks label { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line-strong); padding: 10px 12px; cursor: pointer; font-size: 14px; }
+.dw-checks input { accent-color: var(--gold); }
+.dw-checks label:has(input:checked) { border-color: var(--gold); background: var(--gold-wash); }
+.dw-drop { border: 1px dashed var(--hair); padding: 18px; text-align: center; color: var(--silver); font-size: 14px; }
+.dw-files { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; font-size: 13px; color: var(--silver); }
+.dw-files li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); padding: 6px 0; }
+.dw-hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.dw-msg { padding: 12px 14px; border: 1px solid var(--line-strong); font-size: 14px; }
+.dw-msg.err { border-color: #a5483f; color: #ffb4ab; }
+.dw-msg.ok { border-color: var(--gold); color: var(--gold-light); }
+.dw-steps { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 0; counter-reset: s; }
+.dw-steps li { position: relative; padding: 10px 0 10px 34px; color: var(--silver); border-inline-start: 1px solid var(--line); margin-inline-start: 10px; }
+html[dir="rtl"] .dw-steps li { padding: 10px 34px 10px 0; }
+.dw-steps li::before { content: ""; position: absolute; inset-inline-start: -6px; top: 15px; width: 11px; height: 11px; border-radius: 50%; background: var(--line-strong); }
+.dw-steps li.done { color: var(--white); }
+.dw-steps li.done::before { background: var(--gold); }
+.dw-steps li.now { color: var(--gold-light); font-weight: 600; }
+.dw-steps li.now::before { background: var(--gold); box-shadow: 0 0 0 4px var(--gold-wash); }
+.dw-card { border: 1px solid var(--line); background: var(--panel); padding: 18px; margin: 0 0 18px; }
+.dw-card h2 { font-size: 16px; margin: 0 0 10px; color: var(--gold-light); font-weight: 600; letter-spacing: .5px; }
+.dw-quote { font-size: 22px; font-weight: 600; margin: 6px 0 14px; }
+.dw-out { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 10px 0 14px; }
+.dw-out a { display: grid; gap: 6px; border: 1px solid var(--line-strong); padding: 10px; color: var(--white); text-decoration: none; font-size: 13px; word-break: break-all; }
+.dw-out a:hover { border-color: var(--gold); }
+.dw-out img { width: 100%; aspect-ratio: 1.414; object-fit: contain; background: #fff; }
+.dw-out .ft { color: var(--gold-light); font-size: 11px; letter-spacing: 1px; }
+.dw-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.dw-small { font-size: 13px; color: var(--silver); }
+.dw-tag { display: inline-block; font-size: 11px; letter-spacing: 1px; padding: 3px 8px; border: 1px solid var(--hair); color: var(--gold-light); text-transform: uppercase; }
+.dw-tag.check, .dw-tag.received, .dw-tag.changes { border-color: var(--gold); background: var(--gold-wash); }
+.dw-job { border: 1px solid var(--line); background: var(--panel); margin: 0 0 14px; }
+.dw-job > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 14px 16px; }
+.dw-job > summary::-webkit-details-marker { display: none; }
+.dw-job .body { padding: 0 16px 16px; display: grid; gap: 14px; }
+.dw-kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 14px; margin: 0; }
+.dw-kv dt { color: var(--silver); }
+.dw-kv dd { margin: 0; white-space: pre-wrap; }
+.dw-copy { display: flex; gap: 8px; }
+.dw-copy input { flex: 1; min-width: 0; background: var(--charcoal); border: 1px solid var(--line-strong); color: var(--silver); padding: 8px 10px; font-size: 12px; }
