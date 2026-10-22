@@ -30,3 +30,6 @@ update storage.buckets set allowed_mime_types = array['application/pdf','image/j
 alter table public.drawing_jobs alter column currency set default 'USD';
 update public.drawing_jobs set currency = 'USD' where currency = 'AED';
 update public.app_settings set value = 'USD' where key = 'drawings_currency';
+
+-- 22 Oct 2026 · the agent's inbox: one permanent private key (value = a random uuid, set once in app_settings) lists every job that needs the agent.
+insert into public.app_settings (key, value) values ('drawings_agent_inbox_key', gen_random_uuid()::text) on conflict (key) do nothing;

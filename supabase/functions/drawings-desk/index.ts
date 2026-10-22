@@ -14,6 +14,8 @@
 //   POST ?action=start&job&agent              work started
 //   PUT  ?job&agent&name=<file>               upload one output (pdf, dxf, dwg, png, jpg, webp, skp, docx, mp4)
 //   POST ?action=ready&job&agent              done → status "check": KJ looks first, then releases it to the customer in HQ
+//   GET  ?inbox=<inbox key>                   the agent's inbox: every job that needs the agent, each with its own agent link
+//                                             (key = app_settings.drawings_agent_inbox_key; one permanent link for the agent chat)
 // Quotes and releases are set by KJ on /drawings/hq.html (admin login, row-level security), never here.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
@@ -88,6 +90,27 @@ Deno.serve(async (req) => {
         uploads.push({ name: n, url: SB_URL + '/storage/v1' + s.url });
       }
       return json(200, { ok: true, job: job.id, key: job.customer_key, uploads, view: `${SITE}/drawings/view.html?job=${job.id}&k=${job.customer_key}` });
+    }
+
+    // ---------- agent inbox: one permanent link, no per-job copying ----------
+    const inbox = u.searchParams.get('inbox') ?? '';
+    if (inbox) {
+      const row = (await sb(`app_settings?key=eq.drawings_agent_inbox_key&select=value`))?.[0];
+      if (!row?.value || !UUID.test(inbox) || inbox !== row.value) return json(404, { ok: false, error: 'not_found' });
+      const jobs = await sb(`drawing_jobs?status=in.(received,quoted,confirmed,changes,in_work,check)&order=created_at.asc&select=id,agent_key,name,company,status,revision,work,labels,units,sheet,sheets,price_per_sheet,currency,details,customer_note,hq_note,parent_id,inputs,outputs,created_at,updated_at`);
+      const self = `${SB_URL}/functions/v1/drawings-desk`;
+      const todo = (jobs ?? []).map((j: any) => ({
+        id: j.id, customer: j.name + (j.company ? ' · ' + j.company : ''), status: j.status, revision: j.revision, work: j.work, labels: j.labels, units: j.units, sheet: j.sheet,
+        sheets: j.sheets, files: (j.inputs ?? []).length, delivered: (j.outputs ?? []).filter((o: any) => o.rev === j.revision).map((o: any) => o.name),
+        brief: j.details, customer_note: j.customer_note, hq_note: j.hq_note, addon: !!j.parent_id, created_at: j.created_at, updated_at: j.updated_at,
+        agent_link: `${self}?job=${j.id}&agent=${j.agent_key ?? ''}`,
+        next: j.status === 'received' || j.status === 'quoted' ? 'Read the brief and files now; list the TBC questions; drawing starts only after the customer confirms the price (KJ sets it).'
+          : j.status === 'confirmed' ? 'Start: POST &action=start, then draw.'
+          : j.status === 'changes' ? 'KJ or the customer sent it back: read hq_note / customer_note, POST &action=start, fix only what is named.'
+          : j.status === 'in_work' ? 'You are on it: finish, upload, POST &action=ready.'
+          : 'Waiting for KJ\'s check. Nothing to do unless KJ sends it back.',
+      }));
+      return json(200, { ok: true, jobs: todo, rules: 'Each job has its own private agent link (never share it). Work the oldest first. Never invent a number: TBC. Never redo approved sheets. Nothing goes to the customer: ready = KJ checks.' });
     }
 
     const id = u.searchParams.get('job') ?? '';
