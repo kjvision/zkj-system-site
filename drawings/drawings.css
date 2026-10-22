@@ -66,3 +66,16 @@ html[dir="rtl"] .dw-steps li { padding: 10px 34px 10px 0; }
 .dw-kv dd { margin: 0; white-space: pre-wrap; }
 .dw-copy { display: flex; gap: 8px; }
 .dw-copy input { flex: 1; min-width: 0; background: var(--charcoal); border: 1px solid var(--line-strong); color: var(--silver); padding: 8px 10px; font-size: 12px; }
+
+/* HQ job cards: actions first, small file thumbnails, links tucked away */
+.dw-job .dw-out { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; margin: 8px 0 4px; }
+.dw-job .dw-out a { padding: 6px; font-size: 11px; gap: 4px; }
+.dw-job .dw-out img { height: 84px; object-fit: contain; aspect-ratio: auto; }
+.dw-job .dw-kv { font-size: 13px; gap: 4px 12px; }
+.dw-job .dw-kv dd { word-break: break-word; }
+.dw-links { border-top: 1px solid var(--line); padding-top: 10px; }
+.dw-links > summary { cursor: pointer; color: var(--gold-light); font-size: 13px; letter-spacing: .5px; list-style: none; }
+.dw-links > summary::-webkit-details-marker { display: none; }
+.dw-links > summary::before { content: "▸ "; }
+.dw-links[open] > summary::before { content: "▾ "; }
+.dw-links-body { display: grid; gap: 12px; margin-top: 10px; }
