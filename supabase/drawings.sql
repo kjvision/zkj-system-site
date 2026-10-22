@@ -7,7 +7,7 @@ create table if not exists public.drawing_jobs (
   name text not null, company text, email text, phone text, lang text not null default 'en',
   work text[] not null default '{}', labels text not null default 'en', units text not null default 'mm', scale text, sheet text not null default 'A3',
   details text not null, inputs jsonb not null default '[]', outputs jsonb not null default '[]',
-  sheets int, price_per_sheet numeric, currency text not null default 'AED',
+  sheets int, price_per_sheet numeric, currency text not null default 'USD',
   status text not null default 'received' check (status in ('received','quoted','confirmed','in_work','check','review','changes','approved','cancelled')),
   revision int not null default 0, customer_note text, hq_note text,
   quoted_at timestamptz, confirmed_at timestamptz, delivered_at timestamptz, approved_at timestamptz
@@ -19,9 +19,14 @@ insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 values ('drawings', 'drawings', false, 52428800, array['application/pdf','image/jpeg','image/png','image/webp','image/heic','application/dxf','image/vnd.dxf','application/acad','image/vnd.dwg','application/octet-stream'])
 on conflict (id) do nothing;
 create policy drawings_files_admin_read on storage.objects for select to authenticated using (bucket_id = 'drawings' and public.is_admin());
-insert into public.app_settings (key, value) values ('drawings_price_per_sheet', ''), ('drawings_currency', 'AED') on conflict (key) do nothing;
+insert into public.app_settings (key, value) values ('drawings_price_per_sheet', ''), ('drawings_currency', 'USD') on conflict (key) do nothing;
 
 -- 21 Oct 2026 · add-ons after approval (3D model, method statement): a linked job with its own quote; agents may upload .skp, .docx and .mp4.
 alter table public.drawing_jobs add column if not exists parent_id uuid references public.drawing_jobs(id) on delete set null;
 create index if not exists drawing_jobs_parent_idx on public.drawing_jobs(parent_id);
 update storage.buckets set allowed_mime_types = array['application/pdf','image/jpeg','image/png','image/webp','image/heic','application/dxf','image/vnd.dxf','application/acad','image/vnd.dwg','application/octet-stream','application/vnd.openxmlformats-officedocument.wordprocessingml.document','video/mp4'] where id = 'drawings';
+
+-- 22 Oct 2026 · KJ: "change the AED" — drawings are priced in USD (the account currency), not AED. Applied live.
+alter table public.drawing_jobs alter column currency set default 'USD';
+update public.drawing_jobs set currency = 'USD' where currency = 'AED';
+update public.app_settings set value = 'USD' where key = 'drawings_currency';
