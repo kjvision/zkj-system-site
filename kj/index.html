@@ -390,7 +390,7 @@ html[lang="ar"] .block h2,html[lang="ar"] .sheet h2{font-size:15px}
       <p class="d-role" data-i18n="role">Artist &amp; Founder</p>
       <div class="d-lines">
         <span dir="ltr">+971 54 ••• 8700</span><span dir="ltr">kj@zkjverse.com</span>
-        <span dir="ltr">zkjverse.com</span><span dir="ltr">@zkj.verse</span>
+        <span dir="ltr">zkjverse.com</span><span dir="ltr">@zkjverse</span>
       </div>
     </div></div>
   </div>
@@ -415,7 +415,7 @@ html[lang="ar"] .block h2,html[lang="ar"] .sheet h2{font-size:15px}
       <div class="v" dir="ltr" id="v-site"><a href="https://zkjverse.com" target="_blank" rel="noopener">zkjverse.com</a></div>
       <button class="btn copy" data-for="v-site" aria-label="Copy the website address" title="Copy the website address" data-i18n-aria="copySite" data-i18n-title="copySite"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.6 1.6h8.8v8.8"/><rect x="1.6" y="5.6" width="8.8" height="8.8"/></svg></button></div>
     <div class="row"><div class="k" data-i18n="ig">Instagram</div>
-      <div class="v" dir="ltr" id="v-ig"><a href="https://instagram.com/zkj.verse" target="_blank" rel="noopener">@zkj.verse</a></div>
+      <div class="v" dir="ltr" id="v-ig"><a href="https://instagram.com/zkjverse" target="_blank" rel="noopener">@zkjverse</a></div>
       <button class="btn copy" data-for="v-ig" aria-label="Copy the Instagram name" title="Copy the Instagram name" data-i18n-aria="copyIg" data-i18n-title="copyIg"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.6 1.6h8.8v8.8"/><rect x="1.6" y="5.6" width="8.8" height="8.8"/></svg></button></div>
   </div>
 
@@ -458,7 +458,7 @@ html[lang="ar"] .block h2,html[lang="ar"] .sheet h2{font-size:15px}
     <div class="all" id="allText">
       <span>KJ</span><span data-i18n="roleLine">Artist &amp; Founder &middot; ZKJ VERSE</span>
       <span dir="ltr">+971 54 ••• 8700</span><span dir="ltr">kj@zkjverse.com</span>
-      <span dir="ltr">zkjverse.com</span><span dir="ltr">@zkj.verse</span>
+      <span dir="ltr">zkjverse.com</span><span dir="ltr">@zkjverse</span>
     </div>
     <div class="bar">
       <button class="btn primary" id="copyAll" data-i18n="copyAll">Copy all details</button>
@@ -474,7 +474,7 @@ html[lang="ar"] .block h2,html[lang="ar"] .sheet h2{font-size:15px}
   "use strict";
   var TAU=Math.PI*2, N=5, RINGS=10, TWIST=72*Math.PI/180, SHRINK=0.72;
   var RK=0.855, BAND=0.050, INSET=0.015, TICKS=300, ROT=-Math.PI/2, BUCKETS=16;
-  var VCARD="BEGIN:VCARD\r\nVERSION:3.0\r\nN:;KJ;;;\r\nFN:KJ\r\nORG:ZKJ VERSE\r\nTITLE:Artist & Founder\r\nTEL;TYPE=CELL:+971541668700\r\nEMAIL;TYPE=INTERNET:kj@zkjverse.com\r\nURL:https://zkjverse.com\r\nX-SOCIALPROFILE;TYPE=instagram:https://instagram.com/zkj.verse\r\nNOTE:Where Engineering Meets Light\r\nEND:VCARD\r\n";
+  var VCARD="BEGIN:VCARD\r\nVERSION:3.0\r\nN:;KJ;;;\r\nFN:KJ\r\nORG:ZKJ VERSE\r\nTITLE:Artist & Founder\r\nTEL;TYPE=CELL:+971541668700\r\nEMAIL;TYPE=INTERNET:kj@zkjverse.com\r\nURL:https://zkjverse.com\r\nX-SOCIALPROFILE;TYPE=instagram:https://instagram.com/zkjverse\r\nNOTE:Where Engineering Meets Light\r\nEND:VCARD\r\n";
 
   var cv=document.getElementById("fan"), ctx=cv.getContext("2d");
   var stage=document.getElementById("stage"), note=document.getElementById("note");
@@ -709,7 +709,7 @@ html[lang="ar"] .block h2,html[lang="ar"] .sheet h2{font-size:15px}
   }
   document.getElementById("copyAll").addEventListener("click",function(){
     var t=["KJ",ZL.t("copyRole"),"+971 54 166 8700","kj@zkjverse.com",
-           "zkjverse.com","@zkj.verse"].join("\n");
+           "zkjverse.com","@zkjverse"].join("\n");
     copyText(t,this,ZL.t("copyAll"));
   });
   document.querySelectorAll(".copy").forEach(function(btn){
