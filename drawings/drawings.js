@@ -25,7 +25,7 @@
       'v.quote': 'Your price', 'v.sheets': 'sheet(s)', 'v.per': 'per sheet', 'v.confirm': 'Confirm and start',
       'v.review': 'Your drawings', 'v.review.lead': 'Check every sheet. Approve to receive the final files (including DXF), or tell us what to change.',
       'v.approve': 'Approve drawings', 'v.changes': 'Request changes', 'v.changes.ph': 'Sheet number and what to change…', 'v.send': 'Send changes',
-      'v.final': 'Final files', 'v.final.lead': 'Download links stay valid for one hour — reopen this page for fresh ones.',
+      'v.study': 'Open the study (phone or desktop)', 'v.final': 'Final files', 'v.final.lead': 'Download links stay valid for one hour — reopen this page for fresh ones.',
       'v.wait': 'We will message you when the next step is ready. You can also check this page any time.',
       'v.notfound': 'This order link is not valid. Check the link you received.', 'v.wa': 'Questions? Message us on WhatsApp',
       'a.title': 'Add to this order', 'a.lead': 'Built on the drawings you approved. You get a separate price and confirm it before work starts.', 'a.note': 'Anything we should know (optional)',
@@ -54,7 +54,7 @@
       'v.quote': 'سعر طلبك', 'v.sheets': 'لوحة', 'v.per': 'للوحة', 'v.confirm': 'أؤكّد وابدأوا',
       'v.review': 'رسوماتك', 'v.review.lead': 'راجع كل لوحة. اعتمدها لتستلم الملفات النهائية (مع DXF)، أو أخبرنا بما تريد تعديله.',
       'v.approve': 'اعتمد الرسومات', 'v.changes': 'اطلب تعديلات', 'v.changes.ph': 'رقم اللوحة وما يجب تعديله…', 'v.send': 'أرسل التعديلات',
-      'v.final': 'الملفات النهائية', 'v.final.lead': 'روابط التحميل صالحة لساعة — افتح الصفحة مجددًا لروابط جديدة.',
+      'v.study': 'افتح الدراسة (هاتف أو كمبيوتر)', 'v.final': 'الملفات النهائية', 'v.final.lead': 'روابط التحميل صالحة لساعة — افتح الصفحة مجددًا لروابط جديدة.',
       'v.wait': 'سنراسلك عندما تجهز الخطوة التالية. ويمكنك متابعة هذه الصفحة في أي وقت.',
       'v.notfound': 'رابط الطلب غير صالح. تحقق من الرابط الذي وصلك.', 'v.wa': 'لديك سؤال؟ راسلنا على واتساب',
       'a.title': 'أضف إلى هذا الطلب', 'a.lead': 'مبني على الرسومات التي اعتمدتها. يصلك سعر مستقل وتوافق عليه قبل بدء العمل.', 'a.note': 'ما يجب أن نعرفه (اختياري)',
@@ -154,8 +154,10 @@
           '<div class="dw-actions"><button class="btn btn-primary" type="button" data-do="confirm">' + esc(t('v.confirm')) + '</button></div></section>';
       }
       if ((j.status === 'review' || j.status === 'approved') && j.files.length) {
-        h += '<section class="dw-card"><h2>' + esc(t(j.final ? 'v.final' : 'v.review')) + '</h2><p class="dw-small">' + esc(t(j.final ? 'v.final.lead' : 'v.review.lead')) + '</p><div class="dw-out">' +
-          j.files.map(function (f) { var img = /\.(png|jpe?g|webp)$/i.test(f.name); return '<a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + (img ? '<img src="' + esc(f.url) + '" alt="" loading="lazy">' : '') + '<span class="ft">' + esc((f.name.split('.').pop() || '').toUpperCase()) + '</span>' + esc(f.name) + '</a>'; }).join('') + '</div>';
+        var study = j.files.filter(function (f) { return /\.html$/i.test(f.name); });
+        h += '<section class="dw-card"><h2>' + esc(t(j.final ? 'v.final' : 'v.review')) + '</h2><p class="dw-small">' + esc(t(j.final ? 'v.final.lead' : 'v.review.lead')) + '</p>' +
+          study.map(function (f) { return '<a class="btn btn-primary dw-study" href="' + esc(f.url) + '" target="_blank" rel="noopener">' + esc(t('v.study')) + '</a>'; }).join('') + '<div class="dw-out">' +
+          j.files.filter(function (f) { return !/\.html$/i.test(f.name); }).map(function (f) { var img = /\.(png|jpe?g|webp)$/i.test(f.name); return '<a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + (img ? '<img src="' + esc(f.url) + '" alt="" loading="lazy">' : '') + '<span class="ft">' + esc((f.name.split('.').pop() || '').toUpperCase()) + '</span>' + esc(f.name) + '</a>'; }).join('') + '</div>';
         if (j.status === 'review') h += '<div class="dw-actions"><button class="btn btn-primary" type="button" data-do="approve">' + esc(t('v.approve')) + '</button></div>' +
           '<label class="dw-field" style="margin-top:14px"><span>' + esc(t('v.changes')) + '</span><textarea class="dw-note" id="dw-note" placeholder="' + esc(t('v.changes.ph')) + '"></textarea></label><div class="dw-actions"><button class="btn" type="button" data-do="changes">' + esc(t('v.send')) + '</button></div>';
         h += '</section>';
@@ -219,7 +221,9 @@
         '<dl class="dw-kv">' + (j.hq_note ? '<dt>Your note</dt><dd>' + esc(j.hq_note) + '</dd>' : '') + (j.parent_id ? '<dt>Add-on to</dt><dd>approved order ' + esc(j.parent_id.slice(0, 8)) + ' (the agent gets those drawings in its brief)</dd>' : '') + '<dt>Needs</dt><dd>' + esc((j.work || []).join(', ')) + '</dd><dt>Text</dt><dd>' + esc(j.labels) + ' · ' + esc(j.units) + ' · ' + esc(j.sheet) + (j.scale ? ' · ' + esc(j.scale) : '') + '</dd><dt>Contact</dt><dd>' + esc([j.email, j.phone].filter(Boolean).join(' · ')) + '</dd><dt>Brief</dt><dd>' + esc(j.details) + '</dd>' +
         (j.customer_note ? '<dt>Changes asked</dt><dd>' + esc(j.customer_note) + '</dd>' : '') + (j.sheets ? '<dt>Quote</dt><dd>' + esc(j.sheets) + ' × ' + esc(j.price_per_sheet) + ' ' + esc(j.currency) + '</dd>' : '') + '</dl>' +
         '';
-      var filesHtml = '<div><span class="dw-small">Customer files</span><div class="dw-out" data-files="in"></div></div>' +
+      var studies = revOut.filter(function (o) { return /\.html$/i.test(o.name); });
+      var filesHtml = (studies.length ? '<div class="dw-actions" data-study>' + studies.map(function (o) { return '<a class="btn btn-primary" data-path="' + esc(o.path) + '" href="#" target="_blank" rel="noopener">Open the study · ' + esc(o.name) + '</a>'; }).join('') + '</div>' : '') +
+        '<div><span class="dw-small">Customer files</span><div class="dw-out" data-files="in"></div></div>' +
         (revOut.length ? '<div><span class="dw-small">Agent output · revision ' + j.revision + '</span><div class="dw-out" data-files="out"></div></div>' : '');
       if (j.status === 'received' || j.status === 'quoted') h += '<div class="dw-row"><label class="dw-field"><span>Sheets</span><input type="number" min="1" data-f="sheets" value="' + esc(j.sheets || '') + '"><small>Method statement or 3D: count each document page set or view sheet.</small></label><label class="dw-field"><span>Price per sheet (' + esc(j.currency) + ')</span><input type="number" min="0" step="1" data-f="price" value="' + esc(j.price_per_sheet || price) + '"></label></div><div class="dw-actions"><button class="btn btn-primary" type="button" data-a="quote">' + (j.status === 'quoted' ? 'Update quote' : 'Send quote to customer') + '</button></div>';
       if (j.status === 'check') h += '<label class="dw-field"><span>Note back to the agent (only if it needs fixing)</span><textarea class="dw-note" data-f="hq"></textarea></label><div class="dw-actions"><button class="btn btn-primary" type="button" data-a="release">Send to customer</button><button class="btn" type="button" data-a="back">Back to the agent</button></div>';
@@ -231,6 +235,7 @@
     function fill(el, j) {
       var ins = el.querySelector('[data-files="in"]'), outs = el.querySelector('[data-files="out"]');
       (j.inputs || []).forEach(function (f) { signed('inputs/' + j.id + '/' + f.name).then(function (u) { ins.insertAdjacentHTML('beforeend', '<a target="_blank" rel="noopener" href="' + esc(u) + '">' + (/\.(png|jpe?g|webp)$/i.test(f.name) ? '<img src="' + esc(u) + '" alt="">' : '') + '<span class="ft">' + esc((f.name.split('.').pop() || '').toUpperCase()) + '</span>' + esc(f.name) + '</a>'); }); });
+      el.querySelectorAll('[data-study] a[data-path]').forEach(function (a) { signed(a.getAttribute('data-path')).then(function (u) { a.href = u; }); });
       if (outs) (j.outputs || []).filter(function (o) { return o.rev === j.revision; }).forEach(function (o) { signed(o.path).then(function (u) { outs.insertAdjacentHTML('beforeend', '<a target="_blank" rel="noopener" href="' + esc(u) + '">' + (/\.(png|jpe?g)$/i.test(o.name) ? '<img src="' + esc(u) + '" alt="">' : '') + '<span class="ft">' + esc((o.name.split('.').pop() || '').toUpperCase()) + '</span>' + esc(o.name) + '</a>'); }); });
     }
     var jobs = [];

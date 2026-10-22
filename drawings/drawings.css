@@ -52,6 +52,7 @@ html[dir="rtl"] .dw-steps li { padding: 10px 34px 10px 0; }
 .dw-out a:hover { border-color: var(--gold); }
 .dw-out img { width: 100%; aspect-ratio: 1.414; object-fit: contain; background: #fff; }
 .dw-out .ft { color: var(--gold-light); font-size: 11px; letter-spacing: 1px; }
+.dw-study { display: inline-block; margin: 6px 0 12px; }
 .dw-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
 .dw-small { font-size: 13px; color: var(--silver); }
 .dw-tag { display: inline-block; font-size: 11px; letter-spacing: 1px; padding: 3px 8px; border: 1px solid var(--hair); color: var(--gold-light); text-transform: uppercase; }

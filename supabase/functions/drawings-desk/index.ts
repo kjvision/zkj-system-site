@@ -28,8 +28,9 @@ const IN_TYPES = /\.(pdf|jpe?g|png|webp|heic|dxf|dwg)$/i;
 const OUT_TYPES: Record<string, string> = {
   pdf: 'application/pdf', dxf: 'application/dxf', dwg: 'application/acad', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp',
   skp: 'application/octet-stream', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', mp4: 'video/mp4',
+  html: 'text/html', // the interactive study (one self-contained file): opens in any phone or desktop browser from its signed link
 };
-const PREVIEW = /\.(pdf|png|jpe?g|webp|mp4)$/i;
+const PREVIEW = /\.(pdf|png|jpe?g|webp|mp4|html)$/i;
 // method = installation method statement (sequence, scaffolding, crane / lifting, equipment, safety); model3d = SketchUp model + views
 const WORK = ['redraw', 'plans', 'sections', 'elevations', 'details', 'method', 'model3d'];
 const ADDONS = ['model3d', 'method'];
@@ -202,9 +203,9 @@ Deno.serve(async (req) => {
         job: { id, status: job.status, revision: job.revision, work: job.work, labels: job.labels, units: job.units, scale: job.scale, sheet: job.sheet, details: job.details, customer_note: job.customer_note, hq_note: job.hq_note, sheets: job.sheets, inputs, parent_id: job.parent_id, parent_files },
         deliver: {
           started: `curl -X POST "${self}&action=start"`,
-          upload: `curl -X PUT --data-binary @<file> "${self}&name=<A101.pdf|A101.dxf|A101.png|MS-01.pdf|MS-01.docx|M3D-01.skp|M3D-01.png>"`,
+          upload: `curl -X PUT --data-binary @<file> "${self}&name=<STUDY-01.html|A101.pdf|A101.dxf|A101.png|MS-01.pdf|MS-01.docx|M3D-01.skp|M3D-01.png>"`,
           ready: `curl -X POST "${self}&action=ready"`,
-          rules: 'One upload per file. Same sheet number in every format (A101.pdf, A101.dxf, A101.png). Every sheet carries the title block and the note "For design and fabrication reference. Not stamped; authority submissions need a licensed engineer\'s review." in one corner only. Method statement = MS-01.pdf + MS-01.docx (+ A6xx method sheets). 3D model = M3D-01.skp + view images + a PDF of the views. Ready sends it to KJ, not to the customer.',
+          rules: 'One upload per file. Same sheet number in every format (A101.pdf, A101.dxf, A101.png). Every sheet carries the title block and the note "For design and fabrication reference. Not stamped; authority submissions need a licensed engineer\'s review." in one corner only. Method statement = MS-01.pdf + MS-01.docx (+ A6xx method sheets). 3D model = M3D-01.skp + view images + a PDF of the views. The interactive study = ONE self-contained STUDY-01.html (all images, fonts and 3D inline, no outside links, phone-first: no sideways scroll, side panel becomes a drawer on phones); it is opened from its signed link on any phone or desktop, never from a claude.ai artifact. Ready sends it to KJ, not to the customer.',
         },
       });
     }
@@ -219,7 +220,7 @@ Deno.serve(async (req) => {
       if (job.status !== 'in_work') return json(409, { ok: false, error: 'start_first', status: job.status });
       const name = safeName(u.searchParams.get('name') ?? '');
       const ext = (name.split('.').pop() ?? '').toLowerCase();
-      if (!OUT_TYPES[ext]) return json(400, { ok: false, error: 'pdf, dxf, dwg, png, jpg, webp, skp, docx or mp4 only' });
+      if (!OUT_TYPES[ext]) return json(400, { ok: false, error: 'pdf, dxf, dwg, png, jpg, webp, skp, docx, mp4 or html only' });
       if (!req.body) return json(400, { ok: false, error: 'empty' });
       const path = `outputs/${id}/r${job.revision}/${name}`;
       const up = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`, {
