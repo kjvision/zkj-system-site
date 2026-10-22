@@ -16,7 +16,7 @@
       'o.labels': 'Text on the drawings', 'l.en': 'English', 'l.ar': 'Arabic', 'l.both': 'Arabic + English',
       'o.units': 'Units', 'o.sheet': 'Sheet size', 'o.scale': 'Scale (optional)', 'o.scale.ph': 'e.g. 1:50',
       'o.details': 'Describe the job', 'o.details.ph': 'What it is, the sizes you know, what each sheet should show, anything that must not change.',
-      'o.upload': 'Your files', 'o.upload.hint': 'PDF, JPG, PNG, HEIC, DXF or DWG · up to 10 files · 50 MB each',
+      'o.upload': 'Your files', 'o.upload.hint': 'PDF, photos (JPG, PNG, HEIC), DXF or DWG · up to 10 files in total · 50 MB each. You can add files in several steps: they stay in the list.', 'o.files.max': 'Maximum 10 files. Remove one, or send the rest on WhatsApp after the order.', 'o.files.rm': 'Remove', 'o.files.n': 'files selected',
       'o.send': 'Send my order', 'o.sending': 'Sending…', 'o.uploading': 'Uploading', 'o.done': 'Order received. Keep this page — it is your private order page.',
       'o.err': 'Something is missing or wrong. Check the fields and try again.', 'o.err.file': 'One file is not a supported type or is over 50 MB.', 'o.err.net': 'Could not send. Check your connection and try again.',
       'v.title': 'Your drawing order', 'v.lead': 'Save this page. It is private to you and shows your order from start to delivery.',
@@ -45,7 +45,7 @@
       'o.labels': 'لغة الكتابة على الرسومات', 'l.en': 'الإنجليزية', 'l.ar': 'العربية', 'l.both': 'عربي + إنجليزي',
       'o.units': 'الوحدات', 'o.sheet': 'مقاس اللوحة', 'o.scale': 'مقياس الرسم (اختياري)', 'o.scale.ph': 'مثلاً 1:50',
       'o.details': 'صف المطلوب', 'o.details.ph': 'ما هو المشروع، المقاسات المعروفة، ماذا تُظهر كل لوحة، وما لا يجب تغييره.',
-      'o.upload': 'ملفاتك', 'o.upload.hint': 'PDF أو JPG أو PNG أو HEIC أو DXF أو DWG · حتى 10 ملفات · 50 ميجا لكل ملف',
+      'o.upload': 'ملفاتك', 'o.upload.hint': 'PDF أو صور (JPG وPNG وHEIC) أو DXF أو DWG · حتى 10 ملفات بالمجموع · 50 ميجا لكل ملف. يمكنك إضافة الملفات على دفعات: تبقى كلها في القائمة.', 'o.files.max': 'الحد الأقصى 10 ملفات. احذف ملفًا، أو أرسل الباقي على واتساب بعد الطلب.', 'o.files.rm': 'حذف', 'o.files.n': 'ملفات مختارة',
       'o.send': 'أرسل طلبي', 'o.sending': 'جارٍ الإرسال…', 'o.uploading': 'جارٍ الرفع', 'o.done': 'وصل طلبك. احتفظ بهذه الصفحة — هي صفحة طلبك الخاصة.',
       'o.err': 'هناك حقل ناقص أو غير صحيح. راجع الحقول وحاول مجددًا.', 'o.err.file': 'أحد الملفات بنوع غير مدعوم أو أكبر من 50 ميجا.', 'o.err.net': 'تعذّر الإرسال. تحقق من الاتصال وحاول مجددًا.',
       'v.title': 'طلب الرسومات', 'v.lead': 'احتفظ بهذه الصفحة. هي خاصة بك وتُظهر طلبك من البداية حتى التسليم.',
@@ -90,15 +90,33 @@
   if (page === 'order') {
     var form = $('dw-form'), fileIn = $('dw-in'), list = $('dw-list'), out = $('dw-msg'), btn = $('dw-send');
     var OK_EXT = /\.(pdf|jpe?g|png|webp|heic|dxf|dwg)$/i;
+    // files accumulate across several picks (photos first, then PDFs); a new pick adds to the list, it never replaces it
+    var picked = [];
+    function drawList() {
+      list.innerHTML = picked.map(function (f, i) { return '<li><span>' + esc(f.name) + ' · ' + (f.size / 1048576).toFixed(1) + ' MB</span><button type="button" data-rm="' + i + '" aria-label="' + esc(t('o.files.rm') + ' ' + f.name) + '">×</button></li>'; }).join('') +
+        (picked.length ? '<li class="dw-small"><span>' + picked.length + ' / 10 ' + esc(t('o.files.n')) + '</span></li>' : '');
+    }
+    window.__dwRender = drawList;
     fileIn.addEventListener('change', function () {
-      list.innerHTML = Array.prototype.slice.call(fileIn.files, 0, 10).map(function (f) { return '<li><span>' + esc(f.name) + '</span><span>' + (f.size / 1048576).toFixed(1) + ' MB</span></li>'; }).join('');
+      var over = false;
+      Array.prototype.forEach.call(fileIn.files, function (f) {
+        if (picked.some(function (p) { return p.name === f.name && p.size === f.size; })) return;
+        if (picked.length >= 10) { over = true; return; }
+        picked.push(f);
+      });
+      fileIn.value = ''; // so the same file can be picked again after removing it
+      drawList();
+      if (over) msg(out, t('o.files.max'), 'err'); else msg(out, '');
     });
+    list.addEventListener('click', function (e) { var b = e.target.closest('[data-rm]'); if (!b) return; picked.splice(+b.getAttribute('data-rm'), 1); drawList(); msg(out, ''); });
     form.addEventListener('submit', function (e) {
       e.preventDefault(); msg(out, '');
       var fd = new FormData(form);
-      var files = Array.prototype.slice.call(fileIn.files, 0, 10);
+      var files = picked.slice(0, 10);
       if (files.some(function (f) { return !OK_EXT.test(f.name) || f.size > 50 * 1048576; })) return msg(out, t('o.err.file'), 'err');
-      var body = { name: fd.get('name'), company: fd.get('company'), email: fd.get('email'), phone: fd.get('phone'), website: fd.get('website'), lang: lang,
+      var num = String(fd.get('phone') || '').replace(/[^\d+]/g, '');
+      var phone = !num ? '' : num.charAt(0) === '+' ? num : String(fd.get('cc') || '') + ' ' + num.replace(/^0+/, ''); // country code from the list + the number without its leading 0
+      var body = { name: fd.get('name'), company: fd.get('company'), email: fd.get('email'), phone: phone, website: fd.get('website'), lang: lang,
         work: fd.getAll('work'), labels: fd.get('labels'), units: fd.get('units'), sheet: fd.get('sheet'), scale: fd.get('scale'), details: fd.get('details'),
         files: files.map(function (f) { return { name: f.name, size: f.size }; }) };
       if (!body.name || !body.details || !body.work.length || (!body.email && !body.phone)) return msg(out, t('o.err'), 'err');
