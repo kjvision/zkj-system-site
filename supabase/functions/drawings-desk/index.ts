@@ -14,6 +14,8 @@
 //   POST ?action=start&job&agent              work started
 //   PUT  ?job&agent&name=<file>               upload one output (pdf, dxf, dwg, png, jpg, webp, skp, docx, mp4)
 //   POST ?action=ready&job&agent              done → status "check": KJ looks first, then releases it to the customer in HQ
+//   GET  ?inbox=<inbox key>                   the agent's inbox: every job that needs the agent, each with its own agent link
+//                                             (key = app_settings.drawings_agent_inbox_key; one permanent link for the agent chat)
 // Quotes and releases are set by KJ on /drawings/hq.html (admin login, row-level security), never here.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
@@ -26,8 +28,9 @@ const IN_TYPES = /\.(pdf|jpe?g|png|webp|heic|dxf|dwg)$/i;
 const OUT_TYPES: Record<string, string> = {
   pdf: 'application/pdf', dxf: 'application/dxf', dwg: 'application/acad', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp',
   skp: 'application/octet-stream', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', mp4: 'video/mp4',
+  html: 'text/html', // the interactive study (one self-contained file): opens in any phone or desktop browser from its signed link
 };
-const PREVIEW = /\.(pdf|png|jpe?g|webp|mp4)$/i;
+const PREVIEW = /\.(pdf|png|jpe?g|webp|mp4|html)$/i;
 // method = installation method statement (sequence, scaffolding, crane / lifting, equipment, safety); model3d = SketchUp model + views
 const WORK = ['redraw', 'plans', 'sections', 'elevations', 'details', 'method', 'model3d'];
 const ADDONS = ['model3d', 'method'];
@@ -88,6 +91,27 @@ Deno.serve(async (req) => {
         uploads.push({ name: n, url: SB_URL + '/storage/v1' + s.url });
       }
       return json(200, { ok: true, job: job.id, key: job.customer_key, uploads, view: `${SITE}/drawings/view.html?job=${job.id}&k=${job.customer_key}` });
+    }
+
+    // ---------- agent inbox: one permanent link, no per-job copying ----------
+    const inbox = u.searchParams.get('inbox') ?? '';
+    if (inbox) {
+      const row = (await sb(`app_settings?key=eq.drawings_agent_inbox_key&select=value`))?.[0];
+      if (!row?.value || !UUID.test(inbox) || inbox !== row.value) return json(404, { ok: false, error: 'not_found' });
+      const jobs = await sb(`drawing_jobs?status=in.(received,quoted,confirmed,changes,in_work,check)&order=created_at.asc&select=id,agent_key,name,company,status,revision,work,labels,units,sheet,sheets,price_per_sheet,currency,details,customer_note,hq_note,parent_id,inputs,outputs,created_at,updated_at`);
+      const self = `${SB_URL}/functions/v1/drawings-desk`;
+      const todo = (jobs ?? []).map((j: any) => ({
+        id: j.id, customer: j.name + (j.company ? ' · ' + j.company : ''), status: j.status, revision: j.revision, work: j.work, labels: j.labels, units: j.units, sheet: j.sheet,
+        sheets: j.sheets, files: (j.inputs ?? []).length, delivered: (j.outputs ?? []).filter((o: any) => o.rev === j.revision).map((o: any) => o.name),
+        brief: j.details, customer_note: j.customer_note, hq_note: j.hq_note, addon: !!j.parent_id, created_at: j.created_at, updated_at: j.updated_at,
+        agent_link: `${self}?job=${j.id}&agent=${j.agent_key ?? ''}`,
+        next: j.status === 'received' || j.status === 'quoted' ? 'Read the brief and files now; list the TBC questions; drawing starts only after the customer confirms the price (KJ sets it).'
+          : j.status === 'confirmed' ? 'Start: POST &action=start, then draw.'
+          : j.status === 'changes' ? 'KJ or the customer sent it back: read hq_note / customer_note, POST &action=start, fix only what is named.'
+          : j.status === 'in_work' ? 'You are on it: finish, upload, POST &action=ready.'
+          : 'Waiting for KJ\'s check. Nothing to do unless KJ sends it back.',
+      }));
+      return json(200, { ok: true, jobs: todo, rules: 'Each job has its own private agent link (never share it). Work the oldest first. Never invent a number: TBC. Never redo approved sheets. Nothing goes to the customer: ready = KJ checks.' });
     }
 
     const id = u.searchParams.get('job') ?? '';
@@ -179,9 +203,9 @@ Deno.serve(async (req) => {
         job: { id, status: job.status, revision: job.revision, work: job.work, labels: job.labels, units: job.units, scale: job.scale, sheet: job.sheet, details: job.details, customer_note: job.customer_note, hq_note: job.hq_note, sheets: job.sheets, inputs, parent_id: job.parent_id, parent_files },
         deliver: {
           started: `curl -X POST "${self}&action=start"`,
-          upload: `curl -X PUT --data-binary @<file> "${self}&name=<A101.pdf|A101.dxf|A101.png|MS-01.pdf|MS-01.docx|M3D-01.skp|M3D-01.png>"`,
+          upload: `curl -X PUT --data-binary @<file> "${self}&name=<STUDY-01.html|A101.pdf|A101.dxf|A101.png|MS-01.pdf|MS-01.docx|M3D-01.skp|M3D-01.png>"`,
           ready: `curl -X POST "${self}&action=ready"`,
-          rules: 'One upload per file. Same sheet number in every format (A101.pdf, A101.dxf, A101.png). Every sheet carries the title block and the note "For design and fabrication reference. Not stamped; authority submissions need a licensed engineer\'s review." in one corner only. Method statement = MS-01.pdf + MS-01.docx (+ A6xx method sheets). 3D model = M3D-01.skp + view images + a PDF of the views. Ready sends it to KJ, not to the customer.',
+          rules: 'One upload per file. Same sheet number in every format (A101.pdf, A101.dxf, A101.png). Every sheet carries the title block and the note "For design and fabrication reference. Not stamped; authority submissions need a licensed engineer\'s review." in one corner only. Method statement = MS-01.pdf + MS-01.docx (+ A6xx method sheets). 3D model = M3D-01.skp + view images + a PDF of the views. The interactive study = ONE self-contained STUDY-01.html (all images, fonts and 3D inline, no outside links, phone-first: no sideways scroll, side panel becomes a drawer on phones); it is opened from its signed link on any phone or desktop, never from a claude.ai artifact. Ready sends it to KJ, not to the customer.',
         },
       });
     }
@@ -196,7 +220,7 @@ Deno.serve(async (req) => {
       if (job.status !== 'in_work') return json(409, { ok: false, error: 'start_first', status: job.status });
       const name = safeName(u.searchParams.get('name') ?? '');
       const ext = (name.split('.').pop() ?? '').toLowerCase();
-      if (!OUT_TYPES[ext]) return json(400, { ok: false, error: 'pdf, dxf, dwg, png, jpg, webp, skp, docx or mp4 only' });
+      if (!OUT_TYPES[ext]) return json(400, { ok: false, error: 'pdf, dxf, dwg, png, jpg, webp, skp, docx, mp4 or html only' });
       if (!req.body) return json(400, { ok: false, error: 'empty' });
       const path = `outputs/${id}/r${job.revision}/${name}`;
       const up = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`, {

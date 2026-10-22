@@ -30,3 +30,9 @@ update storage.buckets set allowed_mime_types = array['application/pdf','image/j
 alter table public.drawing_jobs alter column currency set default 'USD';
 update public.drawing_jobs set currency = 'USD' where currency = 'AED';
 update public.app_settings set value = 'USD' where key = 'drawings_currency';
+
+-- 22 Oct 2026 · the agent's inbox: one permanent private key (value = a random uuid, set once in app_settings) lists every job that needs the agent.
+insert into public.app_settings (key, value) values ('drawings_agent_inbox_key', gen_random_uuid()::text) on conflict (key) do nothing;
+
+-- 22 Oct 2026 · the interactive study (one self-contained STUDY-01.html) is uploaded like any other output and opened from its signed link on phone or desktop.
+update storage.buckets set allowed_mime_types = array_append(allowed_mime_types, 'text/html') where id = 'drawings' and not ('text/html' = any(allowed_mime_types));
