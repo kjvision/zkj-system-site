@@ -30,7 +30,8 @@ const OUT_TYPES: Record<string, string> = {
   skp: 'application/octet-stream', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', mp4: 'video/mp4',
   html: 'text/html', // the interactive study (one self-contained file): opens in any phone or desktop browser from its signed link
 };
-const PREVIEW = /\.(pdf|png|jpe?g|webp|mp4|html)$/i;
+const PREVIEW = /\.(pdf|png|jpe?g|webp|mp4|html)$/i; // HQ previews
+const STUDY = /^STUDY-01\.html$/i; // the only file a customer ever receives (KJ, 23 Oct 2026)
 // method = installation method statement (sequence, scaffolding, crane / lifting, equipment, safety); model3d = SketchUp model + views
 const WORK = ['redraw', 'plans', 'sections', 'elevations', 'details', 'method', 'model3d'];
 const ADDONS = ['model3d', 'method'];
@@ -100,7 +101,8 @@ Deno.serve(async (req) => {
       if (!row?.value || !UUID.test(inbox) || inbox !== row.value) return json(404, { ok: false, error: 'not_found' });
       // approved jobs stay on the list until the current revision has its STUDY-01.html (KJ, 23 Oct: the customer got PDFs and PNGs only)
       const all = await sb(`drawing_jobs?status=in.(received,quoted,confirmed,changes,in_work,check,approved,review)&order=created_at.asc&select=id,agent_key,name,company,status,revision,work,labels,units,sheet,sheets,price_per_sheet,currency,details,customer_note,hq_note,parent_id,inputs,outputs,created_at,updated_at`);
-      const hasStudy = (j: any) => (j.outputs ?? []).some((o: any) => o.rev === j.revision && /^STUDY-01\.html$/i.test(o.name));
+      const hasStudy = (j: any) => (j.outputs ?? []).some((o: any) => o.rev === j.revision && STUDY.test(o.name));
+      const ONE = 'Deliver ONE file only: STUDY-01.html (self-contained, phone-first, every sheet and the 3D inside it). Do not upload PDFs, PNGs or sheet files; the customer never sees them.';
       const jobs = (all ?? []).filter((j: any) => !['approved', 'review'].includes(j.status) || !hasStudy(j));
       const self = `${SB_URL}/functions/v1/drawings-desk`;
       const todo = (jobs ?? []).map((j: any) => ({
@@ -108,11 +110,11 @@ Deno.serve(async (req) => {
         sheets: j.sheets, files: (j.inputs ?? []).length, delivered: (j.outputs ?? []).filter((o: any) => o.rev === j.revision).map((o: any) => o.name),
         brief: j.details, customer_note: j.customer_note, hq_note: j.hq_note, addon: !!j.parent_id, created_at: j.created_at, updated_at: j.updated_at,
         agent_link: `${self}?job=${j.id}&agent=${j.agent_key ?? ''}`,
-        next: (j.status === 'approved' || j.status === 'review') && !hasStudy(j) ? `No study page yet: upload ONE self-contained STUDY-01.html now (phone-first, revision ${j.revision} content, same sheets): curl -X PUT --data-binary @STUDY-01.html "<agent_link>&name=STUDY-01.html". No start, no new revision; nothing else changes.`
+        next: (j.status === 'approved' || j.status === 'review') && !hasStudy(j) ? `${ONE} The customer has no study page yet: upload it now with revision ${j.revision} content: curl -X PUT --data-binary @STUDY-01.html "<agent_link>&name=STUDY-01.html". No start, no new revision; nothing else changes.`
           : j.status === 'received' || j.status === 'quoted' ? 'Read the brief and files now; list the TBC questions; drawing starts only after the customer confirms the price (KJ sets it).'
-          : j.status === 'confirmed' ? 'Start: POST &action=start, then draw.'
-          : j.status === 'changes' ? 'KJ or the customer sent it back: read hq_note / customer_note, POST &action=start, fix only what is named.'
-          : j.status === 'in_work' ? 'You are on it: finish, upload, POST &action=ready.'
+          : j.status === 'confirmed' ? `Start: POST &action=start, then build. ${ONE}`
+          : j.status === 'changes' ? `KJ or the customer sent it back: read hq_note / customer_note, POST &action=start, fix only what is named. ${ONE}`
+          : j.status === 'in_work' ? `You are on it: finish, upload STUDY-01.html, POST &action=ready. ${ONE}`
           : 'Waiting for KJ\'s check. Nothing to do unless KJ sends it back.',
       }));
       return json(200, { ok: true, jobs: todo, rules: 'Each job has its own private agent link (never share it). Work the oldest first. Never invent a number: TBC. Never redo approved sheets. Nothing goes to the customer: ready = KJ checks.' });
@@ -176,12 +178,10 @@ Deno.serve(async (req) => {
       // what the customer sees: never the agent key, previews only until approval
       const rev = job.revision;
       const show = ['review', 'changes', 'approved'].includes(job.status);
-      const outs = show ? (job.outputs ?? []).filter((o: any) => o.rev === rev) : [];
+      // KJ, 23 Oct: the customer gets ONE file, the study page STUDY-01.html. Sheets, PDFs, PNGs, DXF, SKP stay internal (HQ only); nothing is deleted.
+      const outs = show ? (job.outputs ?? []).filter((o: any) => o.rev === rev && STUDY.test(o.name)) : [];
       const files = [];
-      for (const o of outs) {
-        if (job.status !== 'approved' && !PREVIEW.test(o.name)) continue;
-        files.push({ name: o.name, url: await signDownload(o.path, 3600) });
-      }
+      for (const o of outs) files.push({ name: o.name, url: await signDownload(o.path, 3600) });
       const addons = job.status === 'approved'
         ? ((await sb(`drawing_jobs?select=id,customer_key,work,status&parent_id=eq.${id}&status=neq.cancelled&order=created_at`)) ?? []).map((c: any) => ({ work: c.work, status: c.status, view: `${SITE}/drawings/view.html?job=${c.id}&k=${c.customer_key}` }))
         : [];
@@ -209,7 +209,7 @@ Deno.serve(async (req) => {
           started: `curl -X POST "${self}&action=start"`,
           upload: `curl -X PUT --data-binary @<file> "${self}&name=<STUDY-01.html|A101.pdf|A101.dxf|A101.png|MS-01.pdf|MS-01.docx|M3D-01.skp|M3D-01.png>"`,
           ready: `curl -X POST "${self}&action=ready"`,
-          rules: 'One upload per file. Same sheet number in every format (A101.pdf, A101.dxf, A101.png). Every sheet carries the title block and the note "For design and fabrication reference. Not stamped; authority submissions need a licensed engineer\'s review." in one corner only. Method statement = MS-01.pdf + MS-01.docx (+ A6xx method sheets). 3D model = M3D-01.skp + view images + a PDF of the views. The interactive study = ONE self-contained STUDY-01.html (all images, fonts and 3D inline, no outside links, phone-first: no sideways scroll, side panel becomes a drawer on phones); it is opened from its signed link on any phone or desktop, never from a claude.ai artifact. Ready sends it to KJ, not to the customer.',
+          rules: 'THE DELIVERABLE IS ONE FILE: STUDY-01.html (KJ, 23 Oct 2026). The customer sees nothing else; do not upload PDFs, PNGs or sheet files unless KJ asks for internal copies. Every sheet inside it carries the title block and the note "For design and fabrication reference. Not stamped; authority submissions need a licensed engineer\'s review." in one corner only. Method statement = MS-01.pdf + MS-01.docx (+ A6xx method sheets). 3D model = M3D-01.skp + view images + a PDF of the views. The interactive study = ONE self-contained STUDY-01.html (all images, fonts and 3D inline, no outside links, phone-first: no sideways scroll, side panel becomes a drawer on phones); it is opened from its signed link on any phone or desktop, never from a claude.ai artifact. Ready sends it to KJ, not to the customer.',
         },
       });
     }
@@ -242,7 +242,7 @@ Deno.serve(async (req) => {
     if (req.method === 'POST' && action === 'ready') {
       if (job.status !== 'in_work') return json(409, { ok: false, error: 'start_first', status: job.status });
       const mine = (job.outputs ?? []).filter((o: any) => o.rev === job.revision);
-      if (!mine.some((o: any) => /\.(pdf|skp)$/i.test(o.name))) return json(400, { ok: false, error: 'upload at least one PDF (or the .skp model) first' });
+      if (!mine.some((o: any) => STUDY.test(o.name))) return json(400, { ok: false, error: 'upload STUDY-01.html first: it is the only file the customer receives' });
       await patch({ status: 'check', delivered_at: new Date().toISOString() });
       await notify(`Drawings ready to check: ${job.name}`, `الرسومات جاهزة للمراجعة: ${job.name}`, `${mine.length} file(s), revision ${job.revision}. Check them in /drawings/hq.html, then send to the customer.`);
       return json(200, { ok: true, status: 'check' });

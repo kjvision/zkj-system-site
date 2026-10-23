@@ -9,7 +9,7 @@
       'lead': 'Send your sketch, photo, PDF or CAD file. We return clean, dimensioned drawings in Arabic, English or both — plans, sections, elevations and details — plus the installation method statement and a 3D model when you need them.',
       'f.price': 'Price', 'f.price.v': 'Per sheet. You see the price for your job and confirm it before any work starts.',
       'f.time': 'Delivery', 'f.time.v': 'As soon as it is ready. Your order page shows every step.',
-      'f.files': 'You receive', 'f.files.v': 'PDF + DXF (opens in AutoCAD) + PNG, with a title block on every sheet. Method statement in PDF + Word. 3D model in SketchUp.',
+      'f.files': 'You receive', 'f.files.v': 'One interactive study page that opens on any phone or computer: every sheet with its title block, the method statement and the 3D views inside it, nothing to install.',
       'o.sample': 'Sample sheet: plan with Arabic and English labels, dimensions, title block and the reference note.', 'o.name': 'Your name', 'o.company': 'Company (optional)', 'o.email': 'Email', 'o.phone': 'WhatsApp / phone', 'o.contact': 'Email or WhatsApp — at least one.',
       'o.work': 'What do you need?', 'w.redraw': 'Clean redraw of my sketch / file', 'w.plans': 'Plans', 'w.sections': 'Sections', 'w.elevations': 'Elevations', 'w.details': 'Details', 'w.method': 'Method statement (installation, scaffolding, crane / lifting)', 'w.model3d': '3D model (SketchUp)',
       'o.work.hint': 'Method statement: how it gets installed from your drawing — work sequence, scaffolding, crane and lifting, equipment, safety. You can also add a 3D model or a method statement later, after you approve your drawings.',
@@ -38,7 +38,7 @@
       'lead': 'أرسل الرسم اليدوي أو الصورة أو ملف PDF أو CAD. نعيده لك رسومات نظيفة بالأبعاد، بالعربية أو الإنجليزية أو باللغتين — مخططات ومقاطع وواجهات وتفاصيل — ومعها بيان طريقة التركيب ونموذج ثلاثي الأبعاد عند الحاجة.',
       'f.price': 'السعر', 'f.price.v': 'باللوحة. ترى سعر طلبك وتوافق عليه قبل بدء أي عمل.',
       'f.time': 'التسليم', 'f.time.v': 'فور الجاهزية. صفحة طلبك تُظهر كل خطوة.',
-      'f.files': 'تستلم', 'f.files.v': 'PDF + DXF (يفتح في AutoCAD) + PNG، مع جدول عنوان في كل لوحة. بيان طريقة العمل بصيغتي PDF و Word. النموذج ثلاثي الأبعاد بصيغة SketchUp.',
+      'f.files': 'تستلم', 'f.files.v': 'صفحة دراسة تفاعلية واحدة تفتح على أي هاتف أو كمبيوتر: كل اللوحات بجدول عنوانها، وبيان طريقة العمل، والمشاهد ثلاثية الأبعاد داخلها، بلا أي تثبيت.',
       'o.sample': 'لوحة نموذجية: مخطط بتسميات عربية وإنجليزية وأبعاد وجدول عنوان.', 'o.name': 'الاسم', 'o.company': 'الشركة (اختياري)', 'o.email': 'البريد الإلكتروني', 'o.phone': 'واتساب / الهاتف', 'o.contact': 'البريد أو واتساب — واحد على الأقل.',
       'o.work': 'ماذا تحتاج؟', 'w.redraw': 'إعادة رسم نظيفة لرسمي / ملفي', 'w.plans': 'مخططات', 'w.sections': 'مقاطع', 'w.elevations': 'واجهات', 'w.details': 'تفاصيل', 'w.method': 'بيان طريقة العمل (التركيب، السقالات، الرافعة والرفع)', 'w.model3d': 'نموذج ثلاثي الأبعاد (SketchUp)',
       'o.work.hint': 'بيان طريقة العمل: كيف يُركَّب العمل حسب رسمك — تسلسل الأعمال، السقالات، الرافعة والرفع، المعدات، السلامة. ويمكنك إضافة نموذج ثلاثي الأبعاد أو بيان طريقة العمل لاحقًا بعد اعتماد رسوماتك.',
@@ -162,7 +162,8 @@
           '<label class="dw-field" style="margin-top:14px"><span>' + esc(t('v.changes')) + '</span><textarea class="dw-note" id="dw-note" placeholder="' + esc(t('v.changes.ph')) + '"></textarea></label><div class="dw-actions"><button class="btn" type="button" data-do="changes">' + esc(t('v.send')) + '</button></div>';
         h += '</section>';
       }
-      if (['received', 'confirmed', 'in_work', 'check', 'changes'].indexOf(j.status) > -1) h += '<p class="dw-small">' + esc(t('v.wait')) + '</p>';
+      // no study page yet (delivered before the one-file rule): the customer sees the wait line, never the internal sheets
+      if (['received', 'confirmed', 'in_work', 'check', 'changes'].indexOf(j.status) > -1 || ((j.status === 'review' || j.status === 'approved') && !j.files.length)) h += '<p class="dw-small">' + esc(t('v.wait')) + '</p>';
       if (j.addon) h = '<p class="dw-small">' + esc(t('a.of')) + ': ' + esc((j.work || []).map(function (w) { return t('w.' + w); }).join(' · ')) + '</p>' + h;
       if (j.status === 'approved' && !j.addon) {
         var have = (j.work || []).concat.apply(j.work || [], (j.addons || []).map(function (a) { return a.work || []; }));
