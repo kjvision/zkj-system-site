@@ -1,11 +1,12 @@
 // Social connect: links one YouTube channel / Pinterest account / LinkedIn Company Page to one client (brand) so the
 // social-publisher can post there (KJ, 22 Oct 2026: one account per brand per network; LinkedIn = Company Pages only, never a personal profile).
 // Tokens go from the network straight into public.social_accounts (server-only table); they never pass through chat or the repo.
-//   GET  ?client=<client name>&network=youtube|pinterest|linkedin&key=<app_settings.social_connect_key>  → login + allow at the network
+//   GET  ?client=<client name>&network=youtube|pinterest|tiktok|linkedin&key=<app_settings.social_connect_key>  → login + allow at the network
 //   GET  ?code=…&state=<network>.<client id>.<key>   → the network comes back here; token saved; page says what was linked
 //   GET  ?pick=<organization urn>&state=…            → LinkedIn only: KJ administers several Pages and picks the one for this brand
 //   POST ?refresh=1                                  → renews tokens that expire within 7 days (daily cron)
-// Secrets: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PINTEREST_CLIENT_ID, PINTEREST_CLIENT_SECRET, LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET.
+// Secrets: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PINTEREST_CLIENT_ID, PINTEREST_CLIENT_SECRET, TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET,
+// LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET (LinkedIn parked 23 Oct: code stays, nothing connects until KJ reopens it).
 // Redirect URI to register in all three apps: this function's URL.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
@@ -13,10 +14,11 @@ const SB_URL = (Deno.env.get('SUPABASE_URL') ?? '').replace(/\/$/, '');
 const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const SELF = `${SB_URL}/functions/v1/social-connect`;
 const env = (k: string) => (Deno.env.get(k) ?? '').trim();
-type Net = 'youtube' | 'pinterest' | 'linkedin';
+type Net = 'youtube' | 'pinterest' | 'tiktok' | 'linkedin';
 const NETS: Record<Net, { label: string; id: string; secret: string; auth: string; scope: string }> = {
   youtube: { label: 'YouTube', id: env('GOOGLE_CLIENT_ID'), secret: env('GOOGLE_CLIENT_SECRET'), auth: 'https://accounts.google.com/o/oauth2/v2/auth', scope: 'https://www.googleapis.com/auth/youtube' },
   pinterest: { label: 'Pinterest', id: env('PINTEREST_CLIENT_ID'), secret: env('PINTEREST_CLIENT_SECRET'), auth: 'https://www.pinterest.com/oauth/', scope: 'boards:read,boards:write,pins:read,pins:write,user_accounts:read' },
+  tiktok: { label: 'TikTok', id: env('TIKTOK_CLIENT_KEY'), secret: env('TIKTOK_CLIENT_SECRET'), auth: 'https://www.tiktok.com/v2/auth/authorize/', scope: 'user.info.basic,video.publish,video.upload' },
   linkedin: { label: 'LinkedIn', id: env('LINKEDIN_CLIENT_ID'), secret: env('LINKEDIN_CLIENT_SECRET'), auth: 'https://www.linkedin.com/oauth/v2/authorization', scope: 'openid profile w_organization_social r_organization_social rw_organization_admin' },
 };
 
@@ -31,7 +33,8 @@ async function tj(label: string, url: string, init: RequestInit = {}) {
   const txt = await r.text();
   let j: any = {};
   try { j = txt ? JSON.parse(txt) : {}; } catch { j = { raw: txt }; }
-  if (!r.ok || j.error) throw new Error(`${label}: ${j.error_description ?? j.error?.message ?? j.message ?? j.error ?? j.raw ?? r.status}`);
+  const okErr = j.error && typeof j.error === 'object' && j.error.code === 'ok';
+  if (!r.ok || (j.error && !okErr)) throw new Error(`${label}: ${j.error_description ?? j.error?.message ?? j.message ?? (typeof j.error === 'string' ? j.error : j.error?.code) ?? j.raw ?? r.status}`);
   return j;
 }
 async function setting(key: string) { return ((await sb(`app_settings?select=value&key=eq.${key}`))?.[0]?.value ?? '').trim(); }
@@ -48,12 +51,14 @@ async function exchange(net: Net, code: string) {
   const n = NETS[net];
   if (net === 'youtube') return tj('Google', 'https://oauth2.googleapis.com/token', { method: 'POST', body: new URLSearchParams({ code, client_id: n.id, client_secret: n.secret, redirect_uri: SELF, grant_type: 'authorization_code' }) });
   if (net === 'pinterest') return tj('Pinterest', 'https://api.pinterest.com/v5/oauth/token', { method: 'POST', headers: { Authorization: basic(n.id, n.secret), 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'authorization_code', code, redirect_uri: SELF }) });
+  if (net === 'tiktok') return tj('TikTok', 'https://open.tiktokapis.com/v2/oauth/token/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_key: n.id, client_secret: n.secret, code, grant_type: 'authorization_code', redirect_uri: SELF }) });
   return tj('LinkedIn', 'https://www.linkedin.com/oauth/v2/accessToken', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'authorization_code', code, redirect_uri: SELF, client_id: n.id, client_secret: n.secret }) });
 }
 export async function refreshToken(net: Net, refresh: string) {
   const n = NETS[net];
   if (net === 'youtube') return tj('Google', 'https://oauth2.googleapis.com/token', { method: 'POST', body: new URLSearchParams({ refresh_token: refresh, client_id: n.id, client_secret: n.secret, grant_type: 'refresh_token' }) });
   if (net === 'pinterest') return tj('Pinterest', 'https://api.pinterest.com/v5/oauth/token', { method: 'POST', headers: { Authorization: basic(n.id, n.secret), 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, scope: n.scope }) });
+  if (net === 'tiktok') return tj('TikTok', 'https://open.tiktokapis.com/v2/oauth/token/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_key: n.id, client_secret: n.secret, grant_type: 'refresh_token', refresh_token: refresh }) });
   return tj('LinkedIn', 'https://www.linkedin.com/oauth/v2/accessToken', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh, client_id: n.id, client_secret: n.secret }) });
 }
 
@@ -72,6 +77,12 @@ async function identity(net: Net, token: string, clientName: string) {
     let board = (boards.items ?? []).find((b: any) => String(b.name).toLowerCase() === clientName.toLowerCase()) ?? (boards.items ?? [])[0];
     if (!board) board = await tj('Pinterest', 'https://api.pinterest.com/v5/boards', { method: 'POST', headers: { ...H, 'Content-Type': 'application/json' }, body: JSON.stringify({ name: clientName, privacy: 'PUBLIC' }) });
     return { external_id: String(me.id ?? me.username), name: '@' + me.username, url: `https://www.pinterest.com/${me.username}/`, extra: { board_id: board.id, board_name: board.name, account_type: me.account_type ?? null } };
+  }
+  if (net === 'tiktok') {
+    const j = await tj('TikTok', 'https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,username,profile_deep_link', { headers: H });
+    const me = j.data?.user ?? {};
+    if (!me.open_id) throw new Error('TikTok gave no account details; connect again.');
+    return { external_id: String(me.open_id), name: me.username ? '@' + me.username : (me.display_name ?? 'TikTok'), url: me.profile_deep_link ?? (me.username ? `https://www.tiktok.com/@${me.username}` : ''), extra: { display_name: me.display_name ?? null } };
   }
   const V = await setting('linkedin_version') || '202509';
   const LH = { ...H, 'LinkedIn-Version': V, 'X-Restli-Protocol-Version': '2.0.0' };
@@ -128,7 +139,7 @@ Deno.serve(async (req) => {
       const client = (await sb(`clients?select=id,name&name=eq.${encodeURIComponent(name)}`))?.[0];
       if (!client) return page('Unknown brand', esc(name), false);
       const auth = new URL(n.auth);
-      const p: Record<string, string> = { client_id: n.id, redirect_uri: SELF, response_type: 'code', scope: n.scope, state: `${net}.${client.id}.${key}` };
+      const p: Record<string, string> = { [net === 'tiktok' ? 'client_key' : 'client_id']: n.id, redirect_uri: SELF, response_type: 'code', scope: n.scope, state: `${net}.${client.id}.${key}` };
       if (net === 'youtube') Object.assign(p, { access_type: 'offline', prompt: 'consent', include_granted_scopes: 'true' });
       auth.search = new URLSearchParams(p).toString();
       return Response.redirect(auth.toString(), 302);
@@ -164,6 +175,7 @@ Deno.serve(async (req) => {
     }
     if (net === 'pinterest') more = `<br><br>Pins go to the board <b>${esc((me.extra as any).board_name)}</b>. While the Pinterest app is on Trial access, pins are visible only in this account, not to the public.`;
     if (net === 'youtube') more = '<br><br>Until Google’s audit passes, uploads land as <b>private</b> and you make them public with one tap in the portal.';
+    if (net === 'tiktok') more = '<br><br>Until TikTok’s audit passes, every post lands as <b>private</b> (only this account sees it); the Publish tap in the portal opens the post so you set it to Everyone in the TikTok app.';
     return page('Connected', `${n.label} <b>${esc(me.name)}</b> is now linked to <b>${esc(client.name)}</b>. Approved items for ${n.label} will go there.${more}<br><br>You can close this page.`);
   } catch (e) {
     return page('Something went wrong', esc((e as Error).message), false);

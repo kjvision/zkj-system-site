@@ -605,7 +605,8 @@
   }
   // Connect · YouTube / Pinterest / LinkedIn: one account per brand per network (KJ, 22 Oct). Tokens never reach the browser;
   // social_links() returns only name/status. The Connect link opens the network's own login (social-connect function).
-  var SOC_NETS = [{ id: 'youtube', en: 'YouTube', ar: 'يوتيوب' }, { id: 'pinterest', en: 'Pinterest', ar: 'بنترست' }, { id: 'linkedin', en: 'LinkedIn', ar: 'لينكدإن' }];
+  // LinkedIn parked (KJ, 23 Oct): it comes back in this list the day KJ reopens it
+  var SOC_NETS = [{ id: 'youtube', en: 'YouTube', ar: 'يوتيوب' }, { id: 'pinterest', en: 'Pinterest', ar: 'بنترست' }, { id: 'tiktok', en: 'TikTok', ar: 'تيك توك' }];
   function renderSocial() {
     var box = $('cc-social-list'), note = $('cc-social-note'); if (!box || !note) return;
     var key = S.settings.social_connect_key || '';
@@ -1134,7 +1135,7 @@
     if (S.isAdmin && x.status === 'changes_requested') acts.push({ action: 'sendback', id: x.id, label: t('p.sb.btn'), cls: 'btn-primary' });
     if (S.isAdmin && x.status === 'draft' && draftReady(x)) acts.push({ action: 'to-approval', id: x.id, label: t('p.dr.btn'), cls: 'btn-primary' });
     // YouTube before Google's audit: uploaded private, KJ makes it public with one tap
-    if (S.isAdmin && x.platform === 'youtube' && x.publish_state === 'private' && x.external_id) acts.push({ action: 'yt-publish', id: x.id, label: t('p.soc.publish'), cls: 'btn-primary' });
+    if (S.isAdmin && (x.platform === 'youtube' || x.platform === 'tiktok') && x.publish_state === 'private' && x.external_id) acts.push({ action: 'yt-publish', id: x.id, label: t(x.platform === 'tiktok' ? 'p.soc.publish.tt' : 'p.soc.publish'), cls: 'btn-primary' });
     if (x.published_url && safeUrl(x.published_url)) acts.push({ href: safeUrl(x.published_url), label: t('p.item.openpost'), cls: x.publish_state === 'private' ? 'btn-ghost' : 'btn-primary' });
     if (m) acts.push({ href: m, label: t('p.item.media') });
     acts.push({ action: 'modal-close', label: t('p.close') });
@@ -1151,7 +1152,7 @@
         (S.isAdmin && x.status === 'draft' && !draftReady(x) ? '<dt>' + esc(t('p.item.status')) + '</dt><dd class="status-warn">' + esc(t(draftBlock(x))) + '</dd>' : '') +
         (x.revised_at ? '<dt>' + esc(t('p.item.revised')) + '</dt><dd><span class="mono">' + esc(fmtWhen(x.revised_at)) + '</span>' + (x.revision_note ? ' — ' + esc(x.revision_note) : '') + '</dd>' : '') +
         (x.published_at ? '<dt>' + esc(t('p.item.published')) + '</dt><dd class="mono">' + esc(fmtWhen(x.published_at)) + '</dd>' : '') +
-        (x.publish_state === 'private' ? '<dt>' + esc(t('p.item.status')) + '</dt><dd class="status-warn">' + esc(t('p.soc.yt.private')) + '</dd>' : '') +
+        (x.publish_state === 'private' ? '<dt>' + esc(t('p.item.status')) + '</dt><dd class="status-warn">' + esc(t(x.platform === 'tiktok' ? 'p.soc.tt.private' : 'p.soc.yt.private')) + '</dd>' : '') +
         (x.publish_error && x.status !== 'published' ? '<dt>' + esc(t('p.item.puberr')) + '</dt><dd class="status-bad">' + esc(x.publish_error) + '</dd>' : '') + '</dl>',
       actions: acts
     });
@@ -1370,8 +1371,9 @@
     'set-mood': function (el) { D.setMood(el.getAttribute('data-mood')); renderMood(); },
     'yt-publish': function (el) {
       var id = el.getAttribute('data-id'); if (!id || !S.isAdmin) return;
+      var isTT = (S.all || []).concat(S.items || []).some(function (x) { return x.id === id && x.platform === 'tiktok'; });
       el.disabled = true; el.textContent = t('p.soc.publishing');
-      var reset = function () { el.disabled = false; el.textContent = t('p.soc.publish'); };
+      var reset = function () { el.disabled = false; el.textContent = t(isTT ? 'p.soc.publish.tt' : 'p.soc.publish'); };
       sb.auth.getSession().then(function (r) {
         var tok = r && r.data && r.data.session && r.data.session.access_token;
         return fetch(((window.ZKJ_SB && window.ZKJ_SB.url) || '') + '/functions/v1/social-publisher?publish=' + encodeURIComponent(id), { method: 'POST', headers: { Authorization: 'Bearer ' + (tok || '') } }).then(function (res) { return res.json(); });
@@ -1381,7 +1383,7 @@
           Z.toast(t('p.soc.public'), 'ok'); closeModal(); if (S.isAdmin) renderHQ();
           return;
         }
-        if (j && j.studio) { Z.toast(t('p.soc.studio'), 'warn'); window.open(j.studio, '_blank', 'noopener'); }
+        if (j && j.studio) { Z.toast(t(isTT ? 'p.soc.tt.open' : 'p.soc.studio'), 'warn'); window.open(j.studio, '_blank', 'noopener'); }
         else Z.toast(t('p.soc.fail', { err: (j && j.error) || '?' }), 'warn');
         reset();
       }).catch(function (e) { Z.toast(t('p.soc.fail', { err: e.message })); reset(); });

@@ -6,7 +6,8 @@
 // (default 36 h); at most 3 attempts per item; app_settings.publisher_paused pauses everything. Nothing else is ever posted.
 // Waiting-time mode (KJ, 22 Oct 2026): YouTube uploads land PRIVATE until app_settings.youtube_public_allowed = 'true' (the day Google's audit
 // passes); items then carry publish_state = 'private' and KJ taps Publish in the portal. Pinterest: on Trial access pins are visible only to the
-// account itself; nothing here can change that. LinkedIn: Company Page posts only (needs the Community Management API on the app).
+// account itself; nothing here can change that. TikTok: before TikTok's audit every post is private (SELF_ONLY) until app_settings.tiktok_public_allowed = 'true';
+// the Publish tap opens the post (TikTok has no API to change privacy). LinkedIn: Company Page posts only (parked 23 Oct; code kept).
 // Tokens come from public.social_accounts (filled by social-connect); SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected by Supabase.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
@@ -15,7 +16,7 @@ const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const env = (k: string) => (Deno.env.get(k) ?? '').trim();
 const MAX_ATTEMPTS = 3;
 const LOCK_MIN = 15;
-const NETS = ['youtube', 'pinterest', 'linkedin'];
+const NETS = ['youtube', 'pinterest', 'tiktok', 'linkedin'];
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 
 type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; external_id: string | null; publish_state: string | null; clients: { id: string; name: string; website: string | null; active: boolean } };
@@ -33,7 +34,8 @@ async function api(label: string, url: string, init: RequestInit = {}) {
   const txt = await r.text();
   let j: any = {};
   try { j = txt ? JSON.parse(txt) : {}; } catch { j = { raw: txt }; }
-  if (!r.ok || j.error) throw new Error(`${label}: ${j.error?.message ?? j.error_description ?? j.message ?? (typeof j.error === 'string' ? j.error : null) ?? j.raw ?? r.status}` + (j.code ? ` (code ${j.code})` : ''));
+  const okErr = j.error && typeof j.error === 'object' && j.error.code === 'ok'; // TikTok answers carry error.code = 'ok' on success
+  if (!r.ok || (j.error && !okErr)) throw new Error(`${label}: ${j.error?.message ?? j.error_description ?? j.message ?? (typeof j.error === 'string' ? j.error : j.error?.code) ?? j.raw ?? r.status}` + (j.code ? ` (code ${j.code})` : ''));
   return { j, headers: r.headers };
 }
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -72,6 +74,7 @@ async function fresh(acc: Account): Promise<string> {
   if (!acc.refresh_token) throw new Error(`${acc.network} token expired and cannot be renewed: reconnect from the portal.`);
   let j: any;
   if (acc.network === 'youtube') j = (await api('Google', 'https://oauth2.googleapis.com/token', { method: 'POST', body: new URLSearchParams({ refresh_token: acc.refresh_token, client_id: env('GOOGLE_CLIENT_ID'), client_secret: env('GOOGLE_CLIENT_SECRET'), grant_type: 'refresh_token' }) })).j;
+  else if (acc.network === 'tiktok') j = (await api('TikTok', 'https://open.tiktokapis.com/v2/oauth/token/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_key: env('TIKTOK_CLIENT_KEY'), client_secret: env('TIKTOK_CLIENT_SECRET'), grant_type: 'refresh_token', refresh_token: acc.refresh_token }) })).j;
   else if (acc.network === 'pinterest') j = (await api('Pinterest', 'https://api.pinterest.com/v5/oauth/token', { method: 'POST', headers: { Authorization: basic(env('PINTEREST_CLIENT_ID'), env('PINTEREST_CLIENT_SECRET')), 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: acc.refresh_token }) })).j;
   else j = (await api('LinkedIn', 'https://www.linkedin.com/oauth/v2/accessToken', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: acc.refresh_token, client_id: env('LINKEDIN_CLIENT_ID'), client_secret: env('LINKEDIN_CLIENT_SECRET') }) })).j;
   const patch: Record<string, unknown> = { access_token: j.access_token, expires_at: new Date(Date.now() + (Number(j.expires_in) || 3600) * 1000).toISOString(), refreshed_at: new Date().toISOString(), status: 'ok', last_error: null };
@@ -137,6 +140,55 @@ async function publishPinterest(x: Item, token: string, media: Media[], acc: Acc
   else media_source = { source_type: 'image_url', url: first.url };
   const j = (await api('Pinterest', 'https://api.pinterest.com/v5/pins', { method: 'POST', headers: H, body: JSON.stringify({ ...base, media_source }) })).j;
   return { url: `https://www.pinterest.com/pin/${j.id}/`, external_id: String(j.id), state: 'public' };
+}
+
+
+// ---- TikTok: direct post through the Content Posting API; private (SELF_ONLY) until TikTok's audit passes ----
+const TT = 'https://open.tiktokapis.com/v2';
+async function publishTikTok(x: Item, token: string, media: Media[], acc: Account, publicAllowed: boolean) {
+  const H = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json; charset=UTF-8' };
+  const title = [x.title, captionOf(x, 2000)].filter(Boolean).join('\n\n').slice(0, 2200);
+  const info = (await api('TikTok', `${TT}/post/publish/creator_info/query/`, { method: 'POST', headers: H })).j.data ?? {};
+  const options: string[] = info.privacy_level_options ?? [];
+  const privacy = publicAllowed && options.includes('PUBLIC_TO_EVERYONE') ? 'PUBLIC_TO_EVERYONE' : 'SELF_ONLY';
+  const v = media.find((m) => m.video);
+  let publishId: string;
+  if (v) {
+    const file = await bytes(v.url);
+    const size = file.buf.byteLength;
+    if (info.max_video_post_duration_sec && size > 4 * 1024 * 1024 * 1024) throw new Error('TikTok: video larger than 4 GB.');
+    // chunks: 5–64 MB each; one chunk when the file is small; the last chunk takes the remainder
+    const chunk = size <= 64 * 1024 * 1024 ? size : 20 * 1024 * 1024;
+    const count = Math.max(1, Math.floor(size / chunk));
+    const init = (await api('TikTok', `${TT}/post/publish/video/init/`, { method: 'POST', headers: H, body: JSON.stringify({
+      post_info: { title, privacy_level: privacy, disable_duet: false, disable_comment: false, disable_stitch: false, video_cover_timestamp_ms: 1000 },
+      source_info: { source: 'FILE_UPLOAD', video_size: size, chunk_size: chunk, total_chunk_count: count } }) })).j.data;
+    publishId = init.publish_id;
+    for (let i = 0; i < count; i++) {
+      const start = i * chunk, end = i === count - 1 ? size - 1 : (i + 1) * chunk - 1;
+      const r = await fetch(init.upload_url, { method: 'PUT', headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(end - start + 1), 'Content-Range': `bytes ${start}-${end}/${size}` }, body: file.buf.slice(start, end + 1) });
+      if (!r.ok && r.status !== 206) throw new Error(`TikTok upload: ${r.status} ${(await r.text()).slice(0, 200)}`);
+    }
+  } else {
+    const photos = media.filter((m) => !m.video).slice(0, 35).map((m) => m.url);
+    if (!photos.length) throw new Error('TikTok needs a video (mp4) or images in the media link.');
+    const init = (await api('TikTok', `${TT}/post/publish/content/init/`, { method: 'POST', headers: H, body: JSON.stringify({
+      post_info: { title: x.title.slice(0, 90), description: captionOf(x, 4000), privacy_level: privacy, disable_comment: false, auto_add_music: true },
+      source_info: { source: 'PULL_FROM_URL', photo_cover_index: 0, photo_images: photos }, post_mode: 'DIRECT_POST', media_type: 'PHOTO' }) })).j.data;
+    publishId = init.publish_id;
+  }
+  // wait for TikTok to process; the post id arrives when it is complete
+  let status = '', postId = '';
+  for (let i = 0; i < 30; i++) {
+    await sleep(3000);
+    const st = (await api('TikTok', `${TT}/post/publish/status/fetch/`, { method: 'POST', headers: H, body: JSON.stringify({ publish_id: publishId }) })).j.data ?? {};
+    status = st.status ?? '';
+    if (status === 'FAILED') throw new Error(`TikTok: ${st.fail_reason ?? 'publish failed'}`);
+    if (status === 'PUBLISH_COMPLETE') { postId = String((st.publicaly_available_post_id ?? st.publicly_available_post_id ?? [])[0] ?? ''); break; }
+  }
+  const handle = (acc.name ?? '').replace(/^@/, '');
+  const url = postId && handle ? `https://www.tiktok.com/@${handle}/video/${postId}` : (acc.url || `https://www.tiktok.com/@${handle}`);
+  return { url, external_id: postId || publishId, state: privacy === 'PUBLIC_TO_EVERYONE' ? 'public' : 'private' };
 }
 
 // ---- LinkedIn Company Page: text + image(s) or video ----
@@ -210,6 +262,7 @@ Deno.serve(async (req) => {
     const get = (k: string, d: string) => settings.find((s) => s.key === k)?.value ?? d;
     const version = get('linkedin_version', '202509');
     const ytPublic = get('youtube_public_allowed', 'false') === 'true';
+    const ttPublic = get('tiktok_public_allowed', 'false') === 'true';
 
     // the Publish tap from the portal (YouTube private → public)
     const pub = u.searchParams.get('publish');
@@ -217,7 +270,8 @@ Deno.serve(async (req) => {
       await adminFromRequest(req);
       const x: Item | undefined = (await sb(`items?select=*,clients!inner(id,name,website,active)&id=eq.${pub}`))?.[0];
       if (!x) return json(404, { ok: false, error: 'Item not found.' });
-      if (x.platform !== 'youtube' || !x.external_id) return json(400, { ok: false, error: 'Only uploaded YouTube videos can be published from here.' });
+      if (x.platform === 'tiktok') return json(200, { ok: false, studio: x.published_url || 'https://www.tiktok.com/', error: 'TikTok has no API switch: open the post and set “Who can watch” to Everyone.' });
+      if (x.platform !== 'youtube' || !x.external_id) return json(400, { ok: false, error: 'Only uploaded YouTube or TikTok videos can be published from here.' });
       const studio = `https://studio.youtube.com/video/${x.external_id}/edit`;
       const acc: Account | undefined = (await sb(`social_accounts?select=*&client_id=eq.${x.client_id}&network=eq.youtube`))?.[0];
       if (!acc) return json(200, { ok: false, studio, error: 'YouTube is not connected for this brand.' });
@@ -247,15 +301,16 @@ Deno.serve(async (req) => {
         const acc = accs.find((a) => a.client_id === x.client_id && a.network === x.platform);
         if (!acc) throw new Error(`${x.platform} is not connected for ${x.clients.name}: HQ → Control Center → Connect.`);
         if (acc.status === 'revoked') throw new Error(`${x.platform} access was revoked for ${x.clients.name}: reconnect from the portal.`);
-        const media = await mediaOf(x, x.platform !== 'youtube');
+        const media = await mediaOf(x, x.platform !== 'youtube' && x.platform !== 'tiktok');
         if (dry) { say(`DRY ${tag} → ${acc.name} · ${media.length} media`); results.push({ id: x.id, title: x.title, ok: true }); continue; }
         const claimed = await sb(`items?id=eq.${x.id}&status=eq.approved&or=(publish_lock.is.null,publish_lock.lt.${new Date(now.getTime() - LOCK_MIN * 60000).toISOString()})`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ publish_lock: now.toISOString() }) });
         if (!claimed?.length) { say(`skip ${tag}: being handled by another run`); continue; }
         const token = await fresh(acc);
-        const r = x.platform === 'youtube' ? await publishYouTube(x, token, media, ytPublic) : x.platform === 'pinterest' ? await publishPinterest(x, token, media, acc) : await publishLinkedIn(x, token, media, acc, version);
+        const r = x.platform === 'youtube' ? await publishYouTube(x, token, media, ytPublic) : x.platform === 'pinterest' ? await publishPinterest(x, token, media, acc) : x.platform === 'tiktok' ? await publishTikTok(x, token, media, acc, ttPublic) : await publishLinkedIn(x, token, media, acc, version);
         await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'published', published_at: new Date().toISOString(), published_url: r.url, external_id: r.external_id, publish_state: r.state, publish_error: null, publish_lock: null }) });
         const priv = r.state === 'private';
-        await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: priv ? 'admin' : 'client', title: priv ? `Uploaded to YouTube (private) · tap Publish: ${x.title}` : `Published: ${x.title}`, title_ar: priv ? `رُفع إلى يوتيوب (خاص) · اضغط نشر: ${x.title}` : `نُشر: ${x.title}`, body: r.url, body_ar: r.url }) }).catch(() => null);
+        const netName = x.platform === 'tiktok' ? 'TikTok' : 'YouTube', netAr = x.platform === 'tiktok' ? 'تيك توك' : 'يوتيوب';
+        await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: priv ? 'admin' : 'client', title: priv ? `Uploaded to ${netName} (private) · tap Publish: ${x.title}` : `Published: ${x.title}`, title_ar: priv ? `رُفع إلى ${netAr} (خاص) · اضغط نشر: ${x.title}` : `نُشر: ${x.title}`, body: r.url, body_ar: r.url }) }).catch(() => null);
         say(`✓ ${tag} → ${r.url} (${r.state})`); results.push({ id: x.id, title: x.title, ok: true, url: r.url, state: r.state });
       } catch (e) {
         const msg = (e as Error).message;

@@ -57,3 +57,8 @@ select cron.schedule('social-refresh', '10 3 * * *', $$
     body := '{"source": "pg_cron"}'::jsonb,
     timeout_milliseconds := 120000)
 $$);
+
+-- 23 Oct 2026 (KJ): TikTok now, LinkedIn later. Before TikTok's audit every post is private (SELF_ONLY).
+alter table public.social_accounts drop constraint if exists social_accounts_network_check;
+alter table public.social_accounts add constraint social_accounts_network_check check (network in ('youtube', 'pinterest', 'tiktok', 'linkedin'));
+insert into public.app_settings (key, value) values ('tiktok_public_allowed', 'false') on conflict (key) do nothing;
