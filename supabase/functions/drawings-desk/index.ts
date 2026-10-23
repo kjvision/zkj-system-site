@@ -98,14 +98,18 @@ Deno.serve(async (req) => {
     if (inbox) {
       const row = (await sb(`app_settings?key=eq.drawings_agent_inbox_key&select=value`))?.[0];
       if (!row?.value || !UUID.test(inbox) || inbox !== row.value) return json(404, { ok: false, error: 'not_found' });
-      const jobs = await sb(`drawing_jobs?status=in.(received,quoted,confirmed,changes,in_work,check)&order=created_at.asc&select=id,agent_key,name,company,status,revision,work,labels,units,sheet,sheets,price_per_sheet,currency,details,customer_note,hq_note,parent_id,inputs,outputs,created_at,updated_at`);
+      // approved jobs stay on the list until the current revision has its STUDY-01.html (KJ, 23 Oct: the customer got PDFs and PNGs only)
+      const all = await sb(`drawing_jobs?status=in.(received,quoted,confirmed,changes,in_work,check,approved,review)&order=created_at.asc&select=id,agent_key,name,company,status,revision,work,labels,units,sheet,sheets,price_per_sheet,currency,details,customer_note,hq_note,parent_id,inputs,outputs,created_at,updated_at`);
+      const hasStudy = (j: any) => (j.outputs ?? []).some((o: any) => o.rev === j.revision && /^STUDY-01\.html$/i.test(o.name));
+      const jobs = (all ?? []).filter((j: any) => !['approved', 'review'].includes(j.status) || !hasStudy(j));
       const self = `${SB_URL}/functions/v1/drawings-desk`;
       const todo = (jobs ?? []).map((j: any) => ({
         id: j.id, customer: j.name + (j.company ? ' · ' + j.company : ''), status: j.status, revision: j.revision, work: j.work, labels: j.labels, units: j.units, sheet: j.sheet,
         sheets: j.sheets, files: (j.inputs ?? []).length, delivered: (j.outputs ?? []).filter((o: any) => o.rev === j.revision).map((o: any) => o.name),
         brief: j.details, customer_note: j.customer_note, hq_note: j.hq_note, addon: !!j.parent_id, created_at: j.created_at, updated_at: j.updated_at,
         agent_link: `${self}?job=${j.id}&agent=${j.agent_key ?? ''}`,
-        next: j.status === 'received' || j.status === 'quoted' ? 'Read the brief and files now; list the TBC questions; drawing starts only after the customer confirms the price (KJ sets it).'
+        next: (j.status === 'approved' || j.status === 'review') && !hasStudy(j) ? `No study page yet: upload ONE self-contained STUDY-01.html now (phone-first, revision ${j.revision} content, same sheets): curl -X PUT --data-binary @STUDY-01.html "<agent_link>&name=STUDY-01.html". No start, no new revision; nothing else changes.`
+          : j.status === 'received' || j.status === 'quoted' ? 'Read the brief and files now; list the TBC questions; drawing starts only after the customer confirms the price (KJ sets it).'
           : j.status === 'confirmed' ? 'Start: POST &action=start, then draw.'
           : j.status === 'changes' ? 'KJ or the customer sent it back: read hq_note / customer_note, POST &action=start, fix only what is named.'
           : j.status === 'in_work' ? 'You are on it: finish, upload, POST &action=ready.'
@@ -217,8 +221,10 @@ Deno.serve(async (req) => {
       return json(200, { ok: true, status: 'in_work', revision: keep ? job.revision : job.revision + 1 });
     }
     if (req.method === 'PUT' || (req.method === 'POST' && u.searchParams.get('name'))) {
-      if (job.status !== 'in_work') return json(409, { ok: false, error: 'start_first', status: job.status });
       const name = safeName(u.searchParams.get('name') ?? '');
+      // the study page may be added to a delivered job (review/approved) without reopening it; everything else needs start
+      const studyOnly = ['review', 'approved'].includes(job.status) && /^STUDY-01\.html$/i.test(name);
+      if (job.status !== 'in_work' && !studyOnly) return json(409, { ok: false, error: 'start_first', status: job.status });
       const ext = (name.split('.').pop() ?? '').toLowerCase();
       if (!OUT_TYPES[ext]) return json(400, { ok: false, error: 'pdf, dxf, dwg, png, jpg, webp, skp, docx, mp4 or html only' });
       if (!req.body) return json(400, { ok: false, error: 'empty' });
