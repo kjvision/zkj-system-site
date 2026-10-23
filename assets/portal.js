@@ -603,6 +603,26 @@
     btn.disabled = false; btn.textContent = t(paused ? 'p.pub.resume' : 'p.pub.pause'); btn.setAttribute('aria-pressed', paused ? 'false' : 'true');
     st.className = 'form-status show ' + (paused ? 'error' : 'ok'); st.textContent = t(paused ? 'p.pub.off' : 'p.pub.on');
   }
+  // Connect · YouTube / Pinterest / LinkedIn: one account per brand per network (KJ, 22 Oct). Tokens never reach the browser;
+  // social_links() returns only name/status. The Connect link opens the network's own login (social-connect function).
+  // LinkedIn parked (KJ, 23 Oct): it comes back in this list the day KJ reopens it
+  var SOC_NETS = [{ id: 'youtube', en: 'YouTube', ar: 'يوتيوب' }, { id: 'pinterest', en: 'Pinterest', ar: 'بنترست' }, { id: 'tiktok', en: 'TikTok', ar: 'تيك توك' }];
+  function renderSocial() {
+    var box = $('cc-social-list'), note = $('cc-social-note'); if (!box || !note) return;
+    var key = S.settings.social_connect_key || '';
+    var base = ((window.ZKJ_SB && window.ZKJ_SB.url) || '') + '/functions/v1/social-connect';
+    note.textContent = key ? t('p.soc.help') : t('p.soc.nokey');
+    box.innerHTML = S.clients.filter(function (c) { return c.active !== false; }).map(function (c) {
+      return '<li class="soc-row"><span class="soc-client">' + miniLogo(c) + esc(cName(c)) + '</span><div class="soc-nets">' + SOC_NETS.map(function (n) {
+        var a = (S.social || []).filter(function (s2) { return s2.client_id === c.id && s2.network === n.id; })[0];
+        var st = !a ? 'none' : a.status !== 'ok' ? 'expired' : 'ok';
+        var label = st === 'ok' ? (a.name || t('p.soc.ok')) : t('p.soc.' + st);
+        var href = key ? base + '?client=' + encodeURIComponent(c.name) + '&network=' + n.id + '&key=' + encodeURIComponent(key) : '';
+        return '<div class="soc-net" data-st="' + st + '"><b>' + esc(n[L()]) + '</b><span class="soc-st">' + esc(label) + '</span>' +
+          (href ? '<a class="btn btn-sm ' + (st === 'ok' ? 'btn-ghost' : 'btn-primary') + '" href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(t(st === 'ok' ? 'p.soc.reconnect' : 'p.soc.connect')) + '</a>' : '') + '</div>';
+      }).join('') + '</div></li>';
+    }).join('');
+  }
   function renderMood() {
     var m = $('dash').getAttribute('data-mood');
     document.querySelectorAll('[data-action="set-mood"]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mood') === m ? 'true' : 'false'); });
@@ -821,6 +841,7 @@
     if (document.activeElement !== $('cc-covers-input')) $('cc-covers-input').value = coversOf(target).join(',\n');
     renderMood();
     renderPub();
+    renderSocial();
     renderBrandEditor(target);
     $('client-switch').innerHTML = S.clients.map(function (c) {
       var on = c.id === target.id;
@@ -936,8 +957,9 @@
       q(sb.from('items').select('*').order('scheduled_at', { ascending: true, nullsFirst: false })),
       loadNotifs(),
       q(sb.from('app_settings').select('*')).catch(function () { return null; }),
-      loadDrawings()
-    ]).then(function (r) { S.clients = r[0] || []; S.all = r[1] || []; S.settings = {}; (r[3] || []).forEach(function (s2) { S.settings[s2.key] = s2.value; }); if (r[3] === null) S.settings.__missing = '1'; });
+      loadDrawings(),
+      q(sb.rpc('social_links')).catch(function () { return []; })
+    ]).then(function (r) { S.clients = r[0] || []; S.all = r[1] || []; S.settings = {}; (r[3] || []).forEach(function (s2) { S.settings[s2.key] = s2.value; }); if (r[3] === null) S.settings.__missing = '1'; S.social = r[5] || []; });
   }
   // drawing jobs (T-12): the HQ "Jobs · Drawings" section, the to-do and the Drawings view
   function loadDrawings() {
@@ -1112,7 +1134,9 @@
     }
     if (S.isAdmin && x.status === 'changes_requested') acts.push({ action: 'sendback', id: x.id, label: t('p.sb.btn'), cls: 'btn-primary' });
     if (S.isAdmin && x.status === 'draft' && draftReady(x)) acts.push({ action: 'to-approval', id: x.id, label: t('p.dr.btn'), cls: 'btn-primary' });
-    if (x.published_url && safeUrl(x.published_url)) acts.push({ href: safeUrl(x.published_url), label: t('p.item.openpost'), cls: 'btn-primary' });
+    // YouTube before Google's audit: uploaded private, KJ makes it public with one tap
+    if (S.isAdmin && (x.platform === 'youtube' || x.platform === 'tiktok') && x.publish_state === 'private' && x.external_id) acts.push({ action: 'yt-publish', id: x.id, label: t(x.platform === 'tiktok' ? 'p.soc.publish.tt' : 'p.soc.publish'), cls: 'btn-primary' });
+    if (x.published_url && safeUrl(x.published_url)) acts.push({ href: safeUrl(x.published_url), label: t('p.item.openpost'), cls: x.publish_state === 'private' ? 'btn-ghost' : 'btn-primary' });
     if (m) acts.push({ href: m, label: t('p.item.media') });
     acts.push({ action: 'modal-close', label: t('p.close') });
     var dot = STATUS_DOT[x.status] || 'off';
@@ -1128,6 +1152,7 @@
         (S.isAdmin && x.status === 'draft' && !draftReady(x) ? '<dt>' + esc(t('p.item.status')) + '</dt><dd class="status-warn">' + esc(t(draftBlock(x))) + '</dd>' : '') +
         (x.revised_at ? '<dt>' + esc(t('p.item.revised')) + '</dt><dd><span class="mono">' + esc(fmtWhen(x.revised_at)) + '</span>' + (x.revision_note ? ' — ' + esc(x.revision_note) : '') + '</dd>' : '') +
         (x.published_at ? '<dt>' + esc(t('p.item.published')) + '</dt><dd class="mono">' + esc(fmtWhen(x.published_at)) + '</dd>' : '') +
+        (x.publish_state === 'private' ? '<dt>' + esc(t('p.item.status')) + '</dt><dd class="status-warn">' + esc(t(x.platform === 'tiktok' ? 'p.soc.tt.private' : 'p.soc.yt.private')) + '</dd>' : '') +
         (x.publish_error && x.status !== 'published' ? '<dt>' + esc(t('p.item.puberr')) + '</dt><dd class="status-bad">' + esc(x.publish_error) + '</dd>' : '') + '</dl>',
       actions: acts
     });
@@ -1344,6 +1369,25 @@
         .then(function () { el.disabled = false; });
     },
     'set-mood': function (el) { D.setMood(el.getAttribute('data-mood')); renderMood(); },
+    'yt-publish': function (el) {
+      var id = el.getAttribute('data-id'); if (!id || !S.isAdmin) return;
+      var isTT = (S.all || []).concat(S.items || []).some(function (x) { return x.id === id && x.platform === 'tiktok'; });
+      el.disabled = true; el.textContent = t('p.soc.publishing');
+      var reset = function () { el.disabled = false; el.textContent = t(isTT ? 'p.soc.publish.tt' : 'p.soc.publish'); };
+      sb.auth.getSession().then(function (r) {
+        var tok = r && r.data && r.data.session && r.data.session.access_token;
+        return fetch(((window.ZKJ_SB && window.ZKJ_SB.url) || '') + '/functions/v1/social-publisher?publish=' + encodeURIComponent(id), { method: 'POST', headers: { Authorization: 'Bearer ' + (tok || '') } }).then(function (res) { return res.json(); });
+      }).then(function (j) {
+        if (j && j.ok) {
+          (S.all || []).concat(S.items || []).forEach(function (x) { if (x.id === id) x.publish_state = j.state || 'public'; });
+          Z.toast(t('p.soc.public'), 'ok'); closeModal(); if (S.isAdmin) renderHQ();
+          return;
+        }
+        if (j && j.studio) { Z.toast(t(isTT ? 'p.soc.tt.open' : 'p.soc.studio'), 'warn'); window.open(j.studio, '_blank', 'noopener'); }
+        else Z.toast(t('p.soc.fail', { err: (j && j.error) || '?' }), 'warn');
+        reset();
+      }).catch(function (e) { Z.toast(t('p.soc.fail', { err: e.message })); reset(); });
+    },
     'pub-toggle': function (el) {
       if (!S.isAdmin || S.settings.publisher_paused === undefined) return;
       var next = S.settings.publisher_paused === 'true' ? 'false' : 'true'; el.disabled = true;
