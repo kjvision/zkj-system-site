@@ -16,7 +16,7 @@ const SELF = `${SB_URL}/functions/v1/social-connect`;
 const env = (k: string) => (Deno.env.get(k) ?? '').trim();
 type Net = 'youtube' | 'pinterest' | 'tiktok' | 'x' | 'linkedin';
 const NETS: Record<Net, { label: string; id: string; secret: string; auth: string; scope: string }> = {
-  youtube: { label: 'YouTube', id: env('GOOGLE_CLIENT_ID'), secret: env('GOOGLE_CLIENT_SECRET'), auth: 'https://accounts.google.com/o/oauth2/v2/auth', scope: 'https://www.googleapis.com/auth/youtube' },
+  youtube: { label: 'YouTube', id: env('GOOGLE_CLIENT_ID'), secret: env('GOOGLE_CLIENT_SECRET'), auth: 'https://accounts.google.com/o/oauth2/v2/auth', scope: 'https://www.googleapis.com/auth/youtube.force-ssl' } // force-ssl covers upload, update, channel read and comment replies (social-replies),
   pinterest: { label: 'Pinterest', id: env('PINTEREST_CLIENT_ID'), secret: env('PINTEREST_CLIENT_SECRET'), auth: 'https://www.pinterest.com/oauth/', scope: 'boards:read,boards:write,pins:read,pins:write,user_accounts:read' },
   tiktok: { label: 'TikTok', id: env('TIKTOK_CLIENT_KEY'), secret: env('TIKTOK_CLIENT_SECRET'), auth: 'https://www.tiktok.com/v2/auth/authorize/', scope: 'user.info.basic,video.publish,video.upload' },
   x: { label: 'X', id: env('X_CLIENT_ID'), secret: env('X_CLIENT_SECRET'), auth: 'https://x.com/i/oauth2/authorize', scope: 'tweet.read tweet.write users.read media.write offline.access' },

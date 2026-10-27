@@ -66,3 +66,14 @@ insert into public.app_settings (key, value) values ('tiktok_public_allowed', 'f
 -- 27 Oct 2026 (KJ): X added, ahead of LinkedIn. Pay-per-use API; posts are public at once (no audit).
 alter table public.social_accounts drop constraint if exists social_accounts_network_check;
 alter table public.social_accounts add constraint social_accounts_network_check check (network in ('youtube', 'pinterest', 'tiktok', 'x', 'linkedin'));
+
+-- 27 Oct 2026 (KJ): YouTube comment replies, same bank and rules as Meta (replies.sql). comment_replies takes the new platforms.
+alter table public.comment_replies drop constraint if exists comment_replies_platform_check;
+alter table public.comment_replies add constraint comment_replies_platform_check check (platform in ('instagram', 'facebook', 'youtube', 'x', 'tiktok'));
+select cron.schedule('social-replies', '7,27,47 * * * *', $$
+  select net.http_post(
+    url := 'https://usucmdjupfjuchfxnxpz.supabase.co/functions/v1/social-replies',
+    headers := '{"Content-Type": "application/json"}'::jsonb,
+    body := '{"source": "pg_cron"}'::jsonb,
+    timeout_milliseconds := 120000)
+$$);
