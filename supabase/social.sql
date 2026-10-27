@@ -62,3 +62,7 @@ $$);
 alter table public.social_accounts drop constraint if exists social_accounts_network_check;
 alter table public.social_accounts add constraint social_accounts_network_check check (network in ('youtube', 'pinterest', 'tiktok', 'linkedin'));
 insert into public.app_settings (key, value) values ('tiktok_public_allowed', 'false') on conflict (key) do nothing;
+
+-- 27 Oct 2026 (KJ): X added, ahead of LinkedIn. Pay-per-use API; posts are public at once (no audit).
+alter table public.social_accounts drop constraint if exists social_accounts_network_check;
+alter table public.social_accounts add constraint social_accounts_network_check check (network in ('youtube', 'pinterest', 'tiktok', 'x', 'linkedin'));

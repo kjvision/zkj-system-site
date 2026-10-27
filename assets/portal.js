@@ -606,7 +606,7 @@
   // Connect · YouTube / Pinterest / LinkedIn: one account per brand per network (KJ, 22 Oct). Tokens never reach the browser;
   // social_links() returns only name/status. The Connect link opens the network's own login (social-connect function).
   // LinkedIn parked (KJ, 23 Oct): it comes back in this list the day KJ reopens it
-  var SOC_NETS = [{ id: 'youtube', en: 'YouTube', ar: 'يوتيوب' }, { id: 'pinterest', en: 'Pinterest', ar: 'بنترست' }, { id: 'tiktok', en: 'TikTok', ar: 'تيك توك' }];
+  var SOC_NETS = [{ id: 'youtube', en: 'YouTube', ar: 'يوتيوب' }, { id: 'pinterest', en: 'Pinterest', ar: 'بنترست' }, { id: 'tiktok', en: 'TikTok', ar: 'تيك توك' }, { id: 'x', en: 'X', ar: 'إكس' }];
   function renderSocial() {
     var box = $('cc-social-list'), note = $('cc-social-note'); if (!box || !note) return;
     var key = S.settings.social_connect_key || '';
