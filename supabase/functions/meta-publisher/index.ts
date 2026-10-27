@@ -225,14 +225,15 @@ Deno.serve(async (req) => {
     if (get('publisher_paused', 'false') === 'true' && !one) return json(200, { ok: true, paused: true, note: 'Publisher is paused (app_settings.publisher_paused = true).' });
     const hours = Number(get('publisher_window_hours', '36')) || 36;
     const now = new Date();
+    // YouTube / Pinterest / LinkedIn items belong to the social-publisher function; this one touches Instagram and Facebook only.
     let q = `items?select=*,clients!inner(id,name,instagram,active,mirror_facebook,mirror_threads)&status=eq.approved&clients.active=eq.true&order=scheduled_at.asc&limit=10`;
     if (one) q += `&id=eq.${one}`;
-    else q += `&scheduled_at=lte.${now.toISOString()}&publish_attempts=lt.${MAX_ATTEMPTS}`;
+    else q += `&scheduled_at=lte.${now.toISOString()}&publish_attempts=lt.${MAX_ATTEMPTS}&platform=not.in.(youtube,pinterest,tiktok,x,linkedin)`;
     if (!one && !force) q += `&scheduled_at=gte.${new Date(now.getTime() - hours * 3600e3).toISOString()}`;
     const due: Item[] = await sb(q);
     // approved items whose time passed by more than the window: say so once on the card, never post them silently late
     if (!one) {
-      const late: { id: string; title: string }[] = await sb(`items?select=id,title&status=eq.approved&publish_error=is.null&scheduled_at=lt.${new Date(now.getTime() - hours * 3600e3).toISOString()}`).catch(() => []);
+      const late: { id: string; title: string }[] = await sb(`items?select=id,title&status=eq.approved&publish_error=is.null&platform=not.in.(youtube,pinterest,tiktok,x,linkedin)&scheduled_at=lt.${new Date(now.getTime() - hours * 3600e3).toISOString()}`).catch(() => []);
       for (const l of late) await sb(`items?id=eq.${l.id}`, { method: 'PATCH', body: JSON.stringify({ publish_error: `Scheduled time passed by more than ${hours} hours, so it was not posted. Give it a new date in the Control Center, or post it by hand.` }) }).catch(() => null);
       if (late.length) say(`late, not posted: ${late.map((l) => l.title).join(' | ')}`);
     }

@@ -262,3 +262,14 @@ html.reduce-motion .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-
 
 /* draft that cannot go to approval yet (reel without its video, post without an image) */
 .td-block { align-self: center; font-size: 12.5px; color: var(--muted); max-width: 220px; line-height: 1.35; }
+
+/* Connect · YouTube / Pinterest / LinkedIn (Control Center) */
+.soc-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+.soc-row { display: grid; gap: 8px; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, .08); }
+.soc-client { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.soc-nets { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.soc-net { display: grid; gap: 6px; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, .04); font-size: 13px; }
+.soc-net .soc-st { color: #9a948a; overflow-wrap: anywhere; }
+.soc-net[data-st="ok"] .soc-st { color: #7fd79a; }
+.soc-net[data-st="expired"] .soc-st { color: #e6a23c; }
+.soc-net .btn { justify-self: start; }
