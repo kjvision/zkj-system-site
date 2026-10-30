@@ -382,7 +382,8 @@
     return '<li><article class="appr row-card' + (x.status !== 'needs_approval' ? ' is-done' : '') + '" id="' + (prefix || 'appr-') + esc(x.id) + '">' +
       '<div class="rc-thumb">' + thumb(x) + '</div><div class="rc-body"><h3>' + esc(title) + '</h3>' +
       '<div class="rc-line">' + platChip(x.platform) + '<span class="mono" style="font-size:12px;color:var(--muted)">' + esc(x.scheduled_at ? fmtWhen(x.scheduled_at) : t('p.appr.nowhen')) + '</span></div>' +
-      (prefix ? '<p class="rc-caption">' + esc(pick(x, 'caption', 'caption_ar')) + '</p>' : '') + note + editedTag(x, 'rc-edited') +
+      (prefix ? '<p class="rc-caption">' + esc(pick(x, 'caption', 'caption_ar')) + '</p>' : '') +
+      (prefix && x.first_comment ? '<p class="rc-caption rc-fc"><b>' + esc(t('p.item.fc')) + ':</b> ' + esc(x.first_comment) + '</p>' : '') + note + editedTag(x, 'rc-edited') +
       '<div class="appr-actions">' + actions + '<button class="link-btn" type="button" data-action="preview" data-id="' + esc(x.id) + '">' + esc(t('p.appr.preview')) + '<span class="sr-only"> — ' + esc(title) + '</span></button></div></div>' +
       '</article></li>';
   }
@@ -1152,6 +1153,8 @@
         (S.isAdmin && x.status === 'draft' && !draftReady(x) ? '<dt>' + esc(t('p.item.status')) + '</dt><dd class="status-warn">' + esc(t(draftBlock(x))) + '</dd>' : '') +
         (x.revised_at ? '<dt>' + esc(t('p.item.revised')) + '</dt><dd><span class="mono">' + esc(fmtWhen(x.revised_at)) + '</span>' + (x.revision_note ? ' — ' + esc(x.revision_note) : '') + '</dd>' : '') +
         (x.published_at ? '<dt>' + esc(t('p.item.published')) + '</dt><dd class="mono">' + esc(fmtWhen(x.published_at)) + '</dd>' : '') +
+        (x.first_comment ? '<dt>' + esc(t('p.item.fc')) + '</dt><dd class="rc-fc">' + esc(x.first_comment) + (x.first_comment_at ? ' <span class="status-ok">· ' + esc(t('p.item.fcposted')) + '</span>' : '') + '</dd>' : '') +
+        (S.isAdmin && x.first_comment_error ? '<dt>' + esc(t('p.item.fcerr')) + '</dt><dd class="status-bad">' + esc(x.first_comment_error) + '</dd>' : '') +
         (x.publish_state === 'private' ? '<dt>' + esc(t('p.item.status')) + '</dt><dd class="status-warn">' + esc(t(x.platform === 'tiktok' ? 'p.soc.tt.private' : 'p.soc.yt.private')) + '</dd>' : '') +
         (x.publish_error && x.status !== 'published' ? '<dt>' + esc(t('p.item.puberr')) + '</dt><dd class="status-bad">' + esc(x.publish_error) + '</dd>' : '') + '</dl>',
       actions: acts
@@ -1494,7 +1497,7 @@
     var when = val(f, 'scheduled_at');
     return {
       kind: val(f, 'kind') || 'post', title: val(f, 'title'), title_ar: val(f, 'title_ar'),
-      caption: val(f, 'caption'), caption_ar: val(f, 'caption_ar'), media_url: val(f, 'media_url'),
+      caption: val(f, 'caption'), caption_ar: val(f, 'caption_ar'), first_comment: val(f, 'first_comment'), media_url: val(f, 'media_url'),
       platform: val(f, 'platform'), scheduled_at: when ? new Date(when).toISOString() : null,
       status: val(f, 'status') || 'needs_approval'
     };
