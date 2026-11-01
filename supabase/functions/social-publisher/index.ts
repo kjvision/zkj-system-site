@@ -19,7 +19,7 @@ const LOCK_MIN = 15;
 const NETS = ['youtube', 'pinterest', 'tiktok', 'x', 'linkedin'];
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 
-type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; external_id: string | null; publish_state: string | null; clients: { id: string; name: string; website: string | null; active: boolean } };
+type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; external_id: string | null; publish_state: string | null; first_comment: string | null; first_comment_at: string | null; clients: { id: string; name: string; website: string | null; active: boolean } };
 type Account = { id: string; client_id: string; network: string; external_id: string; name: string | null; access_token: string; refresh_token: string | null; expires_at: string | null; extra: Record<string, any>; status: string };
 type Media = { url: string; video: boolean };
 
@@ -47,6 +47,11 @@ function captionOf(x: Item, max: number) {
   const both = en && ar && en !== ar ? en + '\n\n' + ar : (en || ar);
   return both.slice(0, max);
 }
+// Guard (KJ, 31 Oct 2026): internal production notes must never reach a platform. An item whose caption, Arabic caption or first comment
+// holds "[To produce" or "Script:" is not posted; the card shows the error and the owner fixes the caption.
+const INTERNAL_NOTE = /\[\s*to produce|\bscript\s*:/i;
+const hasInternalNote = (x: { caption: string | null; caption_ar: string | null; first_comment?: string | null }) => INTERNAL_NOTE.test(`${x.caption ?? ''}\n${x.caption_ar ?? ''}\n${x.first_comment ?? ''}`);
+const NOTE_ERROR = 'Blocked: the caption contains an internal production note ("[To produce" or "Script:"). Edit the caption in the Control Center, then approve it again.';
 // Pinterest and LinkedIn take JPEG/PNG; the site keeps .webp with a .jpg twin next to it when one was made. Video = mp4/mov.
 async function mediaOf(x: Item, preferJpg: boolean): Promise<Media[]> {
   const list = String(x.media_url ?? '').split(/[\s,]+/).filter((u) => /^https:\/\//i.test(u));
@@ -106,6 +111,19 @@ async function youtubePublic(videoId: string, token: string) {
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(`YouTube: ${j.error?.message ?? r.status}`);
   return j.status?.privacyStatus ?? 'public';
+}
+
+// ---- First comment (KJ, 29 Oct 2026): posted right after the post is public. YouTube: a top-level comment on the video (only once it is public,
+// so for private uploads it goes up at the Publish tap). X: a reply to the post (a paid post, small credit). TikTok, Pinterest, LinkedIn: none. ----
+async function youtubeComment(token: string, videoId: string, text: string) {
+  await api('YouTube', 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ snippet: { videoId, topLevelComment: { snippet: { textOriginal: text.slice(0, 10000) } } } }) });
+}
+async function xReply(token: string, postId: string, text: string) {
+  await api('X', 'https://api.x.com/2/tweets', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text.slice(0, 280), reply: { in_reply_to_tweet_id: postId } }) });
+}
+async function markComment(id: string, err: string | null) {
+  await sb(`items?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify(err ? { first_comment_error: err.slice(0, 500) } : { first_comment_at: new Date().toISOString(), first_comment_error: null }) }).catch(() => null);
 }
 
 // ---- Pinterest: image pin, carousel pin or video pin on the brand's board ----
@@ -317,9 +335,16 @@ Deno.serve(async (req) => {
       const acc: Account | undefined = (await sb(`social_accounts?select=*&client_id=eq.${x.client_id}&network=eq.youtube`))?.[0];
       if (!acc) return json(200, { ok: false, studio, error: 'YouTube is not connected for this brand.' });
       try {
-        const state = await youtubePublic(x.external_id, await fresh(acc));
+        const tok = await fresh(acc);
+        const state = await youtubePublic(x.external_id, tok);
         await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ publish_state: state, publish_error: null }) });
-        return json(200, { ok: true, state, url: x.published_url ?? `https://youtu.be/${x.external_id}` });
+        const fc = (x.first_comment ?? '').trim();
+        let commentNote = '';
+        if (fc && !x.first_comment_at && state === 'public') {
+          try { await youtubeComment(tok, x.external_id, fc); await markComment(x.id, null); commentNote = 'First comment posted.'; }
+          catch (e) { await markComment(x.id, (e as Error).message); commentNote = 'First comment not posted: ' + (e as Error).message; }
+        }
+        return json(200, { ok: true, state, url: x.published_url ?? `https://youtu.be/${x.external_id}`, note: commentNote });
       } catch (e) {
         return json(200, { ok: false, studio, error: (e as Error).message });
       }
@@ -342,6 +367,7 @@ Deno.serve(async (req) => {
         const acc = accs.find((a) => a.client_id === x.client_id && a.network === x.platform);
         if (!acc) throw new Error(`${x.platform} is not connected for ${x.clients.name}: HQ → Control Center → Connect.`);
         if (acc.status === 'revoked') throw new Error(`${x.platform} access was revoked for ${x.clients.name}: reconnect from the portal.`);
+        if (hasInternalNote(x)) throw new Error(NOTE_ERROR);
         const media = await mediaOf(x, !['youtube', 'tiktok', 'x'].includes(x.platform ?? ''));
         if (dry) { say(`DRY ${tag} → ${acc.name} · ${media.length} media`); results.push({ id: x.id, title: x.title, ok: true }); continue; }
         const claimed = await sb(`items?id=eq.${x.id}&status=eq.approved&or=(publish_lock.is.null,publish_lock.lt.${new Date(now.getTime() - LOCK_MIN * 60000).toISOString()})`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ publish_lock: now.toISOString() }) });
@@ -353,6 +379,13 @@ Deno.serve(async (req) => {
         const netName = x.platform === 'tiktok' ? 'TikTok' : 'YouTube', netAr = x.platform === 'tiktok' ? 'تيك توك' : 'يوتيوب';
         await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: priv ? 'admin' : 'client', title: priv ? `Uploaded to ${netName} (private) · tap Publish: ${x.title}` : `Published: ${x.title}`, title_ar: priv ? `رُفع إلى ${netAr} (خاص) · اضغط نشر: ${x.title}` : `نُشر: ${x.title}`, body: r.url, body_ar: r.url }) }).catch(() => null);
         say(`✓ ${tag} → ${r.url} (${r.state})`); results.push({ id: x.id, title: x.title, ok: true, url: r.url, state: r.state });
+        const fc = (x.first_comment ?? '').trim();
+        if (fc && !x.first_comment_at && r.external_id && ((x.platform === 'x') || (x.platform === 'youtube' && r.state === 'public'))) {
+          try {
+            if (x.platform === 'x') await xReply(token, r.external_id, fc); else await youtubeComment(token, r.external_id, fc);
+            await markComment(x.id, null); say('  + first comment');
+          } catch (e) { await markComment(x.id, (e as Error).message); say(`  ✗ first comment: ${(e as Error).message}`); }
+        }
       } catch (e) {
         const msg = (e as Error).message;
         if (!dry) await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ publish_error: msg.slice(0, 1000), publish_attempts: (x.publish_attempts ?? 0) + 1, publish_lock: null }) }).catch(() => null);

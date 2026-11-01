@@ -21,7 +21,7 @@ const GRAPH = 'https://graph.facebook.com/' + GRAPH_VERSION;
 const MAX_ATTEMPTS = 3;
 const LOCK_MIN = 15;
 
-type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; clients: { id: string; name: string; instagram: string | null; active: boolean; mirror_facebook: string; mirror_threads: boolean } };
+type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; first_comment: string | null; first_comment_at: string | null; clients: { id: string; name: string; instagram: string | null; active: boolean; mirror_facebook: string; mirror_threads: boolean } };
 type Account = { igId: string | null; username: string | null; pageId: string; pageName: string; pageToken: string };
 
 async function sb(path: string, init: RequestInit = {}) {
@@ -49,6 +49,11 @@ function captionOf(x: Item) {
   const both = en && ar && en !== ar ? en + '\n\n' + ar : (en || ar);
   return both.slice(0, 2200);
 }
+// Guard (KJ, 31 Oct 2026): internal production notes must never reach a platform. An item whose caption, Arabic caption or first comment
+// holds "[To produce" or "Script:" is not posted; the card shows the error and the owner fixes the caption.
+const INTERNAL_NOTE = /\[\s*to produce|\bscript\s*:/i;
+const hasInternalNote = (x: { caption: string | null; caption_ar: string | null; first_comment?: string | null }) => INTERNAL_NOTE.test(`${x.caption ?? ''}\n${x.caption_ar ?? ''}\n${x.first_comment ?? ''}`);
+const NOTE_ERROR = 'Blocked: the caption contains an internal production note ("[To produce" or "Script:"). Edit the caption in the Control Center, then approve it again.';
 // Meta accepts JPEG (and MP4 for video). Our site keeps .webp; a .jpg twin must exist next to it.
 async function mediaOf(x: Item) {
   const list = String(x.media_url ?? '').split(/[\s,]+/).filter((u) => /^https:\/\//i.test(u));
@@ -102,7 +107,7 @@ async function publishInstagram(x: Item, acc: Account, media: { url: string; vid
   await waitContainer(creation);
   const pub = await graph('POST', `${ig}/media_publish`, { creation_id: creation });
   const info = await graph('GET', pub.id, { fields: 'permalink' }).catch(() => ({}));
-  return info.permalink ?? `https://www.instagram.com/${acc.username ?? ''}/`;
+  return { url: (info.permalink ?? `https://www.instagram.com/${acc.username ?? ''}/`) as string, id: String(pub.id) };
 }
 // Facebook Reels API: start an upload, let Meta fetch the mp4 from its public link, then publish with the caption.
 async function facebookReel(x: Item, acc: Account, media: { url: string; video: boolean }[]) {
@@ -115,7 +120,8 @@ async function facebookReel(x: Item, acc: Account, media: { url: string; video: 
   await graph('POST', `${page}/video_reels`, { upload_phase: 'finish', video_id: start.video_id, video_state: 'PUBLISHED', description: captionOf(x) }, t);
   const info = await graph('GET', start.video_id, { fields: 'permalink_url' }, t).catch(() => ({}));
   const link = String(info.permalink_url ?? '');
-  return link ? (link.startsWith('http') ? link : 'https://www.facebook.com' + link) : `https://www.facebook.com/reel/${start.video_id}`;
+  const url = link ? (link.startsWith('http') ? link : 'https://www.facebook.com' + link) : `https://www.facebook.com/reel/${start.video_id}`;
+  return { url, id: String(start.video_id) as string | null };
 }
 // Facebook video story: same three-step upload as reels, on the video_stories edge.
 async function facebookVideoStory(acc: Account, url: string) {
@@ -127,21 +133,22 @@ async function facebookVideoStory(acc: Account, url: string) {
   await graph('POST', `${page}/video_stories`, { upload_phase: 'finish', video_id: start.video_id }, t);
   return `https://www.facebook.com/${page}`;
 }
-async function publishFacebook(x: Item, acc: Account, media: { url: string; video: boolean }[]) {
+// Returns the public link and the Facebook object id (used for the first comment). Stories have no id.
+async function publishFacebook(x: Item, acc: Account, media: { url: string; video: boolean }[]): Promise<{ url: string; id: string | null }> {
   const t = acc.pageToken, page = acc.pageId, message = captionOf(x);
   if (x.kind === 'reel') return await facebookReel(x, acc, media);
-  if (x.kind === 'story' && media.length === 1 && media[0].video) return await facebookVideoStory(acc, media[0].url);
+  if (x.kind === 'story' && media.length === 1 && media[0].video) return { url: await facebookVideoStory(acc, media[0].url), id: null };
   if (!media.length || media.some((m) => m.video)) throw new Error('Facebook publishing here supports images only (one or several).');
   if (x.kind === 'story') {
     const ph = await graph('POST', `${page}/photos`, { url: media[0].url, published: false }, t);
     await graph('POST', `${page}/photo_stories`, { photo_id: ph.id }, t);
-    return `https://www.facebook.com/${page}`;
+    return { url: `https://www.facebook.com/${page}`, id: null };
   }
   if (media.length === 1) {
     const ph = await graph('POST', `${page}/photos`, { url: media[0].url, message }, t);
     const postId = ph.post_id ?? ph.id;
     const info = await graph('GET', postId, { fields: 'permalink_url' }, t).catch(() => ({}));
-    return info.permalink_url ?? `https://www.facebook.com/${postId}`;
+    return { url: (info.permalink_url ?? `https://www.facebook.com/${postId}`) as string, id: String(postId) };
   }
   const ids: string[] = [];
   for (const m of media.slice(0, 10)) ids.push((await graph('POST', `${page}/photos`, { url: m.url, published: false }, t)).id);
@@ -149,7 +156,7 @@ async function publishFacebook(x: Item, acc: Account, media: { url: string; vide
   ids.forEach((id, i) => { params[`attached_media[${i}]`] = JSON.stringify({ media_fbid: id }); });
   const post = await graph('POST', `${page}/feed`, params, t);
   const info = await graph('GET', post.id, { fields: 'permalink_url' }, t).catch(() => ({}));
-  return info.permalink_url ?? `https://www.facebook.com/${post.id}`;
+  return { url: (info.permalink_url ?? `https://www.facebook.com/${post.id}`) as string, id: String(post.id) };
 }
 
 // Threads: graph.threads.net with the profile's own token (connected once through threads-connect). Stories do not exist on
@@ -193,12 +200,32 @@ async function publishThreads(x: Item, acct: { threads_user_id: string; access_t
   const info = await threads('GET', pub.id, { fields: 'permalink' }, t).catch(() => ({}));
   return info.permalink ?? `https://www.threads.com/@${acct.username ?? ''}`;
 }
+// First comment (KJ, 29 Oct 2026): the approved first_comment goes up right after the post is live. Stories have no comments.
+// Instagram comments use the system-user token; Facebook comments use the Page token. One retry after 4 s.
+async function postFirstComment(net: 'instagram' | 'facebook', objectId: string | null, text: string, acc: Account) {
+  if (!objectId) throw new Error('No post id to comment on.');
+  const message = text.slice(0, 2200);
+  for (let i = 0; ; i++) {
+    try {
+      if (net === 'instagram') await graph('POST', `${objectId}/comments`, { message });
+      else await graph('POST', `${objectId}/comments`, { message }, acc.pageToken);
+      return;
+    } catch (e) { if (i >= 1) throw e; await sleep(4000); }
+  }
+}
 // After an Instagram post: the same item to the Facebook Page and to Threads, as the client is set up.
 async function crossPost(x: Item, acc: Account, media: { url: string; video: boolean }[], say: (s: string) => void) {
   const patch: Record<string, string | null> = {};
   const fbMode = x.clients.mirror_facebook ?? 'none';
   if (fbMode === 'all' || (fbMode === 'stories' && x.kind === 'story')) {
-    try { patch.fb_url = await publishFacebook(x, acc, media); patch.fb_error = null; say(`  + Facebook ${patch.fb_url}`); }
+    try {
+      const fb = await publishFacebook(x, acc, media); patch.fb_url = fb.url; patch.fb_error = null; say(`  + Facebook ${fb.url}`);
+      const fc = (x.first_comment ?? '').trim();
+      if (fc && x.kind !== 'story') {
+        try { await postFirstComment('facebook', fb.id, fc, acc); say('  + first comment on Facebook'); }
+        catch (e) { patch.first_comment_error = ('Facebook copy: ' + (e as Error).message).slice(0, 500); say(`  ✗ first comment on Facebook: ${(e as Error).message}`); }
+      }
+    }
     catch (e) { patch.fb_error = (e as Error).message.slice(0, 1000); say(`  ✗ Facebook copy: ${patch.fb_error}`); }
   }
   if (x.clients.mirror_threads && x.kind !== 'story') {
@@ -248,15 +275,29 @@ Deno.serve(async (req) => {
         const acc = accountFor(x, accs);
         if (!acc) throw new Error(`No Page / Instagram account for ${x.clients.name} (${x.clients.instagram ?? 'no handle'}) is assigned to the system user.`);
         if (!['instagram', 'facebook'].includes(x.platform ?? '')) throw new Error(`Platform "${x.platform}" is not published by the system; post it by hand.`);
+        if (hasInternalNote(x)) throw new Error(NOTE_ERROR);
         const media = await mediaOf(x);
         if (dry) { say(`DRY ${tag} → ${acc.pageName}${acc.username ? ' / @' + acc.username : ''} · ${media.length} media · caption ${captionOf(x).length} chars`); results.push({ id: x.id, title: x.title, ok: true }); continue; }
         // claim (prevents a second run from posting the same item)
         const claimed = await sb(`items?id=eq.${x.id}&status=eq.approved&or=(publish_lock.is.null,publish_lock.lt.${new Date(now.getTime() - LOCK_MIN * 60000).toISOString()})`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ publish_lock: now.toISOString() }) });
         if (!claimed?.length) { say(`skip ${tag}: being handled by another run`); continue; }
-        const url = x.platform === 'instagram' ? await publishInstagram(x, acc, media) : await publishFacebook(x, acc, media);
+        const res = x.platform === 'instagram' ? await publishInstagram(x, acc, media) : await publishFacebook(x, acc, media);
+        const url = res.url;
         await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'published', published_at: new Date().toISOString(), published_url: url, publish_error: null, publish_lock: null }) });
         await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: 'client', title: `Published: ${x.title}`, title_ar: `نُشر: ${x.title}`, body: url, body_ar: url }) }).catch(() => null);
         say(`✓ ${tag} → ${url}`); results.push({ id: x.id, title: x.title, ok: true, url });
+        const fc = (x.first_comment ?? '').trim();
+        if (fc && x.kind !== 'story' && !x.first_comment_at) {
+          try {
+            await postFirstComment(x.platform === 'instagram' ? 'instagram' : 'facebook', res.id, fc, acc);
+            await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ first_comment_at: new Date().toISOString(), first_comment_error: null }) });
+            say('  + first comment');
+          } catch (e) {
+            const m = (e as Error).message.slice(0, 500);
+            await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ first_comment_error: m }) }).catch(() => null);
+            say(`  ✗ first comment: ${m}`);
+          }
+        }
         if (x.platform === 'instagram') await crossPost(x, acc, media, say);
       } catch (e) {
         const msg = (e as Error).message;
