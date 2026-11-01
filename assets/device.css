@@ -43,7 +43,7 @@ body:has(.device) { background: #070709; }
   radial-gradient(900px 600px at 105% 110%, rgba(201, 168, 76, .10), transparent 60%),
   radial-gradient(700px 500px at 60% 40%, rgba(80, 70, 120, .08), transparent 70%),
   var(--stage); }
-.stage-fx::before { content: ""; position: absolute; inset: -20%; background: conic-gradient(from 210deg at 30% 30%, transparent 0 40%, rgba(230, 213, 163, .06) 48%, transparent 56% 100%); animation: stage-drift 28s linear infinite; }
+.stage-fx::before { content: ""; position: absolute; inset: -20%; background: conic-gradient(from 210deg at 30% 30%, transparent 0 40%, rgba(230, 213, 163, .06) 48%, transparent 56% 100%); } /* spotlight no longer rotates: the 28 s drift cost a full-screen repaint every frame (31 Oct 2026) */
 .stage-fx::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px); background-size: 64px 64px; mask-image: radial-gradient(ellipse at 50% 40%, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 20%, transparent 75%); }
 @keyframes stage-drift { to { transform: rotate(360deg); } }
 .device .grain { opacity: .045; z-index: 1; }
@@ -70,7 +70,8 @@ body:has(.device) { background: #070709; }
   margin: 14px auto 0;
   display: grid; grid-template-rows: auto 1fr;
   background: var(--win);
-  backdrop-filter: blur(40px) saturate(150%); -webkit-backdrop-filter: blur(40px) saturate(150%);
+  /* No backdrop blur on the whole window (31 Oct 2026): on a Retina Mac it made Chrome redraw a huge texture every frame; sections went black and
+     the page lagged (measured 132 ms a frame; 17 ms without). The stage behind is dark, so the blur was barely visible. */
   border-radius: 14px;
   box-shadow: 0 0 0 1px rgba(255,255,255,.09), 0 0 0 1.5px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08), 0 40px 120px rgba(0,0,0,.75), 0 10px 40px rgba(0,0,0,.5), 0 -20px 120px rgba(201, 168, 76,.05);
   overflow: hidden;
@@ -932,8 +933,9 @@ html[lang="ar"] .ib-label { letter-spacing: 0; }
 .ambient { position: absolute; inset: 54px 0 0; z-index: 0; overflow: hidden; pointer-events: none; border-radius: 0 0 14px 14px; contain: strict; }
 .mac-window > .win-body { position: relative; z-index: 1; }
 .amb-art { position: absolute; inset: 0; opacity: var(--amb-o, .13); }
-.amb-slide { position: absolute; inset: -5%; background-size: cover; background-position: center; opacity: 0; transition: opacity 2.6s ease; will-change: opacity, transform; filter: saturate(.85) contrast(1.05); }
-.amb-slide.is-on { opacity: 1; animation: amb-kb 13s ease-in-out infinite alternate; }
+/* Cover slides fade only (31 Oct 2026): the slow zoom with a filter on a full-window image was the heaviest layer on desktop (measured). */
+.amb-slide { position: absolute; inset: -5%; background-size: cover; background-position: center; opacity: 0; transition: opacity 2.6s ease; }
+.amb-slide.is-on { opacity: 1; }
 .amb-slide:nth-child(2n).is-on { animation-name: amb-kb2; }
 .amb-slide:nth-child(3n).is-on { animation-name: amb-kb3; }
 @keyframes amb-kb { from { transform: scale(1) translate3d(0, 0, 0); } to { transform: scale(1.08) translate3d(-1.2%, -.8%, 0); } }
