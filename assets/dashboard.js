@@ -550,7 +550,7 @@
         '<div class="pc-actions"><button class="tactile yes" type="button" data-action="approve" data-id="' + a.id + '">' + D.icon('check') + '<span>' + esc(t('d.appr.approve')) + '</span><span class="sr-only"> — ' + esc(title) + '</span></button>' +
         '<button class="tactile no" type="button" data-action="changes" data-id="' + a.id + '">' + D.icon('pencil') + '<span>' + esc(t('d.appr.changes')) + '</span><span class="sr-only"> — ' + esc(title) + '</span></button></div>' +
         '<button class="link-btn pc-more" type="button" data-action="preview" data-id="' + a.id + '">' + esc(t('d.appr.preview')) + '<span class="sr-only"> — ' + esc(title) + '</span></button></article></li>';
-    }).join('') : '<li class="appr-empty">' + D.icon('check') + '<span>' + esc(t('d.appr.empty')) + '</span></li>';
+    }).join('') : '<li class="appr-empty">' + D.icon('check', true) + '<span>' + esc(t('d.appr.empty')) + '</span></li>';
     $('appr-done').innerHTML = done.map(function (a) {
       var ok = a.state === 'approved';
       return '<li><article class="appr row-card is-done" id="appr-' + a.id + '"><div class="rc-thumb">' + D.art({ a: a.art[0], b: a.art[1], kind: a.type, seed: a.id, sfx: '-t' }) + '</div>' +

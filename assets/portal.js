@@ -393,7 +393,7 @@
     var reviewed = S.items.filter(function (x) { return (x.status === 'changes_requested' || x.status === 'approved') && x.reviewed_at; })
       .sort(function (a, b) { return String(b.reviewed_at).localeCompare(String(a.reviewed_at)); }).slice(0, 6);
     $('appr-list').innerHTML = pend.length ? pend.map(phoneCard).join('')
-      : '<li class="appr-empty">' + D.icon('check') + '<span>' + esc(t('p.appr.empty')) + '</span></li>';
+      : '<li class="appr-empty">' + D.icon('check', true) + '<span>' + esc(t('p.appr.empty')) + '</span></li>';
     $('appr-done').innerHTML = reviewed.map(function (x) { return rowCard(x); }).join('');
     show($('done-wrap'), reviewed.length > 0);
     $('stack-ghosts').setAttribute('data-n', Math.min(pend.length, 3));
