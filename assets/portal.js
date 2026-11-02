@@ -1142,7 +1142,7 @@
     var plates = [
       ['approvals', t('fr.p.appr'), 'appr', 'v:approvals'],
       ['inbox', t('fr.p.inbox'), 'inbox', gate('inbox', 'inbox')],
-      ['adsman', t('fr.p.ads'), 'ads', gate('ads', 'ads')],
+      ['adsman', t('fr.p.ads'), 'ads', null],
       ['live', t('fr.p.live'), 'live', null],
       ['plan', t('fr.p.plan'), 'plan', null],
       ['calendar', t('fr.p.cal'), 'cal', 'v:calendar']];
@@ -1205,6 +1205,17 @@
       Object.keys(used).forEach(function (id) { chan.push(row(plat(id)[L()], t('fr.chan.used'))); });
     }
     sec.channels = { t: t('fr.r.chan'), s: c ? cName(c) : '', rows: chan.length ? chan : [row(t('fr.chan.none'), '')] };
+    // Ads: every platform's own ads manager (official addresses, checked 2 Nov 2026), plus our ad approvals
+    var pn = function (id) { return plat(id)[L()]; };
+    sec.adsman = { t: t('fr.p.ads'), s: t('fr.ads.s'), rows: [
+      gate('ads', 'ads') ? row(t('fr.ads.appr'), t('fr.ads.appr.s'), null, 'ads', 'v:ads') : row(t('fr.ads.appr'), t('fr.notinc'), WA + '?text=' + encodeURIComponent(t('wa.general')), 'ads'),
+      row('Meta', pn('facebook') + ' · ' + pn('instagram'), 'https://adsmanager.facebook.com/', 'pm-meta'),
+      row(pn('tiktok'), 'Ads Manager', 'https://ads.tiktok.com/', 'pm-tiktok'),
+      row('Google', 'Google Ads · ' + pn('youtube'), 'https://ads.google.com/', 'pm-google'),
+      row(pn('snapchat'), 'Ads Manager', 'https://ads.snapchat.com/', 'pm-snapchat'),
+      row(pn('x'), 'X Ads', 'https://ads.x.com/', 'pm-x'),
+      row(pn('pinterest'), 'Pinterest Ads', 'https://ads.pinterest.com/', 'pm-pinterest'),
+      row('LinkedIn', 'Campaign Manager', 'https://www.linkedin.com/campaignmanager/', 'pm-linkedin')] };
     // not in the package: say so and offer WhatsApp, never a dead tap
     sec.addon = { t: t('fr.addon.t'), s: planName(c), rows: [row(t('fr.addon.b'), t('fr.pay.wa.s'), WA + '?text=' + encodeURIComponent(t('wa.general')), 'whatsapp')] };
     plates.forEach(function (p) { if (p[3] === null && !sec[p[0]]) p[3] = 'sec:addon'; });

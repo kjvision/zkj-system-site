@@ -59,6 +59,7 @@ h = g_parts['HEAD']
 cut = h.rindex('</style>')
 g_parts['HEAD'] = h[:cut] + ('[dir=rtl] .plate .pn,[dir=rtl] .dt span,[dir=rtl] .hqp .pn,[dir=rtl] .mark p,[dir=rtl] .it.hd .rt b,[dir=rtl] .it.hd .rt small{letter-spacing:0}\n'
     '[dir=rtl] .it .rn.ar{transform:scaleX(-1)}\n'
+    '.it.hd .rt b{text-transform:uppercase}\n'
     '[dir=rtl] body,[dir=rtl] .card{font-family:"IBM Plex Sans Arabic","Inter",system-ui,sans-serif}\n') + h[cut:]
 
 open(OUT, 'w', encoding='utf-8').write(g_parts['HEAD'] + g_parts['PRE'] + e + g_parts['POST'] + TAIL)

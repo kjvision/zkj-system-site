@@ -67,6 +67,7 @@ rep('if(!shown&&t>2.6){shown=true;mark.classList.add("on");hint.classList.add("o
 # ZKJ ICONS v1.0 (brand kit ch. 08), small variant: hairline + ◆ nodes, 24-unit box
 _ZI = __import__('json').load(open(os.path.join(HERE, 'zkj-icons.json')))['ICS']
 ICON = {k: _ZI[k] for k in ['pay','pkg','plan','acc','terms','priv','appr','inbox','chan','live','num','cal','core','reports','ads','bell','globe','signout','box','drawings','pencil','calendar','control','ring','site']}
+for _k in ['meta','tiktok','google','snapchat','x','pinterest','linkedin']: ICON['pm-' + _k] = __import__('json').load(open(os.path.join(HERE, 'zkj-icons.json')))['PMS'][_k]
 ICON['whatsapp'] = __import__('json').load(open(os.path.join(HERE, 'zkj-icons.json')))['PMS']['whatsapp']
 def svg(k):
     o = ICON[k]; h = '<svg viewBox="0 0 24 24" overflow="visible" aria-hidden="true">'
@@ -81,7 +82,7 @@ var level=0,backTo=0,rowT0=0;
 var HINTS=["Tap a plate for today's work · tap the cube for your account","Tap a row to open it · tap the cube to return","Tap the cube to go back"];
 var ARIA=["ZKJ SYSTEM. Choose a plate for today's work, or press the cube for your account.","Your account. Choose a row, or press the cube to return.","Section details. Press the cube to go back."];
 var ICONS=%s;
-var PLATES=[["approvals","Approvals","appr"],["inbox","Inbox","inbox"],["adsman","Ads Manager","ads"],["live","Live now","live"],["plan","Plan","plan"],["calendar","Calendar","cal"]];
+var PLATES=[["approvals","Approvals","appr"],["inbox","Inbox","inbox"],["adsman","Ads","ads"],["live","Live now","live"],["plan","Plan","plan"],["calendar","Calendar","cal"]];
 var TODAY=[
   ["payments","Payments","Invoices and payment method","","#D4AF37","pay"],
   ["package","Package","What your plan includes","","#D4AF37","pkg"],
@@ -106,7 +107,7 @@ var SEC={
   account:{t:"ACCOUNT",s:"settings",rows:[["Brand","logo · colours"],["Back to site","system.zkjverse.com","https://system.zkjverse.com/"]]},
   core:{t:"CORE",s:"live sky · opens the full view",rows:[["Open Core","your clients and channels, live"]]},
   reports:{t:"REPORTS",s:"sample",rows:[["October report","PDF · sample"],["September report","PDF · sample"]]},
-  adsman:{t:"ADS MANAGER",s:"sample",rows:[["Active campaigns","none yet"],["Spend this month","shown when ads start"]]},
+  adsman:{t:"ADS",s:"official ads managers",rows:[["Meta","Facebook · Instagram","https://adsmanager.facebook.com/","pm-meta"],["TikTok","Ads Manager","https://ads.tiktok.com/","pm-tiktok"],["Google","Google Ads · YouTube","https://ads.google.com/","pm-google"],["Snapchat","Ads Manager","https://ads.snapchat.com/","pm-snapchat"],["X","X Ads","https://ads.x.com/","pm-x"],["Pinterest","Pinterest Ads","https://ads.pinterest.com/","pm-pinterest"],["LinkedIn","Campaign Manager","https://www.linkedin.com/campaignmanager/","pm-linkedin"]]},
   notifications:{t:"NOTIFICATIONS",s:"sample",rows:[["Post approved","sample · today"],["New comment","sample · today"],["Mark all read","clears the bell"]]},
   language:{t:"LANGUAGE",s:"choose",rows:[["English","current"],["العربية","Arabic"]]},
   signout:{t:"SIGN OUT",s:"end this session",rows:[["Sign out","back to the login page"]]},
