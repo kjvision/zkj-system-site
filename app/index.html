@@ -43,6 +43,7 @@
       <div class="tb-actions dash-actions">
         <a class="mb-link tb-back desk-only" href="../index.html" data-i18n="p.back">Back to site</a>
         <span class="mb-clock tb-clock" id="mb-clock"></span>
+        <button class="icon-btn front-btn" type="button" data-action="front" data-i18n-attr="aria-label:fr.home" aria-label="ZKJ SYSTEM home"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="17" height="20"></button>
         <button class="lang-toggle" type="button" data-lang-toggle><span class="lt-ar" lang="ar">العربية</span></button>
         <div class="notif" id="notif-wrap" hidden>
           <button class="icon-btn" type="button" data-action="notif-toggle" id="bell" aria-expanded="false" aria-controls="notif-panel" aria-label="Notifications">
@@ -294,6 +295,11 @@
               <p data-i18n="p.inbox.sub"></p>
             </div></header>
             <ul class="glass-list" id="inbox-list"></ul>
+            <div id="cm-wrap" hidden>
+              <h3 class="sub-head"><span data-i18n="p.cm.title">Comments</span> <span class="cm-count" id="cm-count"></span></h3>
+              <p class="portal-muted" data-i18n="p.cm.sub"></p>
+              <ul class="glass-list cm-list" id="cm-list"></ul>
+            </div>
           </section>
 
           <!-- ADS (package feature) -->

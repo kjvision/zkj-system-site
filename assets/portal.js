@@ -492,16 +492,68 @@
     var list = S.items.filter(function (x) { return x.kind === kind; });
     $(listId).innerHTML = list.length ? list.map(function (x) { return rowCard(x, 'k-'); }).join('') : '<li class="gcard portal-empty">' + esc(t(emptyKey)) + '</li>';
   }
+  /* ---------- Inbox: comments on the brand's posts, answered by hand (owner only; inbox-reply Edge Function) ---------- */
+  var CM_REPLY = { instagram: 1, facebook: 1, youtube: 1 };
+  function loadComments() {
+    if (!S.isAdmin || !S.client) { S.comments = []; return Promise.resolve(); }
+    return q(sb.from('comment_replies').select('*').eq('client_id', S.client.id).order('comment_at', { ascending: false, nullsFirst: false }).limit(60))
+      .then(function (d) { S.comments = d || []; }).catch(function () { S.comments = []; });
+  }
+  function renderComments() {
+    var wrap = $('cm-wrap'); if (!wrap) return;
+    show(wrap, !!S.isAdmin);
+    if (!S.isAdmin) return;
+    var list = S.comments || [];
+    $('cm-count').textContent = list.length ? String(list.length) : '';
+    $('cm-list').innerHTML = list.length ? list.map(function (c) {
+      var p = plat(c.platform), can = !!CM_REPLY[c.platform], link = safeUrl(c.permalink);
+      var auto = c.reply_text && c.status === 'replied' && !(c.manual_reply_text && c.manual_reply_text === c.reply_text);
+      return '<li class="gcard cm-row" data-cm="' + esc(c.comment_id) + '">' +
+        '<div class="cm-top"><span class="cm-pf" style="color:#fff">' + D.pglyph(c.platform) + '</span><b class="cm-from">' + esc(c.from_name ? (c.platform === 'instagram' ? '@' : '') + c.from_name : t('p.cm.someone')) + '</b>' +
+        '<span class="cm-when">' + esc(p[L()] || c.platform) + (c.comment_at ? ' · ' + esc(ago(c.comment_at)) : '') + '</span>' +
+        (link ? '<a class="cm-open" href="' + esc(link) + '" target="_blank" rel="noopener">' + esc(t('p.cm.open')) + '</a>' : '') + '</div>' +
+        '<p class="cm-text">' + esc(c.comment || '') + '</p>' +
+        (auto ? '<p class="cm-auto"><span>' + esc(t('p.cm.auto')) + '</span> ' + esc(c.reply_text) + '</p>' : '') +
+        (c.manual_reply_text ? '<p class="cm-mine"><span>' + esc(t('p.cm.mine')) + '</span> ' + esc(c.manual_reply_text) + '</p>' : '') +
+        (c.status === 'waiting' || c.status === 'failed' ? '<p class="cm-wait">' + esc(t('p.cm.waiting')) + '</p>' : '') +
+        (can ? '<form class="cm-form" data-cm-form="' + esc(c.comment_id) + '"><label class="sr-only" for="cm-in-' + esc(c.comment_id) + '">' + esc(t('p.cm.label')) + '</label>' +
+          '<textarea id="cm-in-' + esc(c.comment_id) + '" rows="1" maxlength="2000" placeholder="' + esc(t('p.cm.ph')) + '"></textarea>' +
+          '<button class="btn btn-primary btn-sm" type="submit">' + esc(t('p.cm.send')) + '</button></form>'
+          : '<p class="cm-wait">' + esc(t('p.cm.onplatform')) + '</p>') +
+        '</li>';
+    }).join('') : '<li class="gcard portal-empty">' + esc(t('p.cm.empty')) + '</li>';
+  }
+  document.addEventListener('submit', function (e) {
+    var f = e.target.closest && e.target.closest('[data-cm-form]'); if (!f) return;
+    e.preventDefault();
+    var id = f.getAttribute('data-cm-form'), ta = f.querySelector('textarea'), btn = f.querySelector('button'), text = (ta.value || '').trim();
+    if (!text) { ta.focus(); Z.toast(t('p.cm.write'), 'warn'); return; }
+    btn.disabled = true; ta.disabled = true; btn.textContent = t('p.cm.sending');
+    sb.auth.getSession().then(function (r) {
+      var tok = r && r.data && r.data.session && r.data.session.access_token;
+      return fetch(((window.ZKJ_SB && window.ZKJ_SB.url) || '') + '/functions/v1/inbox-reply', { method: 'POST', headers: { Authorization: 'Bearer ' + (tok || ''), 'Content-Type': 'application/json' }, body: JSON.stringify({ comment_id: id, text: text }) })
+        .then(function (res) { return res.json().catch(function () { return { ok: false, error: String(res.status) }; }); });
+    }).then(function (j) {
+      if (!j || !j.ok) throw new Error((j && j.error) || '?');
+      (S.comments || []).forEach(function (c) { if (c.comment_id === id) { c.manual_reply_text = text; c.manual_reply_at = j.at; if (c.status !== 'replied') { c.status = 'replied'; c.reply_text = text; } } });
+      Z.toast(t('p.cm.sent'), 'ok'); renderComments();
+    }).catch(function (err) {
+      Z.toast(t('p.cm.fail', { err: (err && err.message) || '?' }), 'bad');
+      btn.disabled = false; ta.disabled = false; btn.textContent = t('p.cm.send');
+    });
+  });
   function renderPackage() {
     var key = planKey(S.client), feats = PKG[key].features;
-    ['inbox', 'ads', 'whatsapp'].forEach(function (f) { D.setAvailable(f, feats.indexOf(f) > -1); });
+    var adm = S.isAdmin; // the owner always has every screen
+    ['inbox', 'ads', 'whatsapp'].forEach(function (f) { D.setAvailable(f, adm || feats.indexOf(f) > -1); });
     var missing = Object.keys(ADDONS).filter(function (f) { return feats.indexOf(f) < 0; });
     show($('addons'), missing.length > 0);
     $('addon-sub').textContent = t('p.addon.sub', { pkg: planName(S.client) });
     $('addon-list').innerHTML = missing.map(function (f) { return '<li><span class="pf-ic" aria-hidden="true">' + D.icon('plus') + '</span><span>' + esc(t(ADDONS[f])) + '</span></li>'; }).join('');
     $('addon-wa').href = 'https://wa.me/971541668700?text=' + encodeURIComponent(t('wa.general'));
-    if (feats.indexOf('inbox') > -1) kindList('reply', 'inbox-list', 'p.inbox.empty');
-    if (feats.indexOf('ads') > -1) kindList('ad', 'ads-list', 'p.ads.empty');
+    if (adm || feats.indexOf('inbox') > -1) kindList('reply', 'inbox-list', 'p.inbox.empty');
+    if (adm || feats.indexOf('ads') > -1) kindList('ad', 'ads-list', 'p.ads.empty');
+    renderComments();
     renderPkgCard();
   }
 
@@ -901,7 +953,8 @@
       q(sb.from('kpis').select('*').eq('client_id', id).order('period_start', { ascending: false }).order('created_at', { ascending: false })),
       q(sb.from('items').select('*').eq('client_id', id).order('scheduled_at', { ascending: true, nullsFirst: false })),
       q(sb.from('reports').select('*').eq('client_id', id).order('created_at', { ascending: false })),
-      loadNotifs()
+      loadNotifs(),
+      loadComments()
     ]).then(function (r) {
       S.kpis = r[0] || []; S.items = r[1] || []; S.reports = r[2] || [];
     });
@@ -1055,16 +1108,163 @@
           var stored = Z.store(CLIENT_KEY);
           S.ccClient = clientById(stored) ? stored : clientById(DEFAULT_CLIENT) ? DEFAULT_CLIENT : S.clients[0].id;
           showHQ('hq');
+          openFront();
         });
       }
       if (!p.client_id) { setState('p.st.unlinked.t', 'p.st.unlinked.b', [WA_ACTION]); return; }
       return q(sb.from('clients').select('*').eq('id', p.client_id).maybeSingle()).then(function (c) {
         if (!c || c.active === false) { setState('p.st.noclient.t', 'p.st.noclient.b', [WA_ACTION]); return; }
         S.clients = [c]; S.client = c; S.mode = 'client';
-        return loadClientData().then(function () { pickInitialWeek(); navFor('client'); showBoard('today'); });
+        return loadClientData().then(function () { pickInitialWeek(); navFor('client'); showBoard('today'); openFront(); });
       });
     }).catch(loadError);
   }
+
+
+  /* ---------- Front: the cube (app/front.html), the first screen after login (KJ, 2 Nov 2026) ----------
+     The cube runs in its own full-screen frame so its canvas and styles never touch the portal. It asks this file for a model
+     (labels, real numbers, links) through window.ZFRONT_HOST and sends every tap back as an action token:
+       v:<view>  open a portal screen · hq:<view>  KJ's HQ screen · ws:<client id>  KJ switches brand · bell · lang · signout · close */
+  var FR = { wrap: null, frame: null, on: false };
+  var WA = 'https://wa.me/971541668700';
+  function frontClient() { return S.isAdmin ? (clientById(S.ccClient) || S.clients[0] || null) : S.client; }
+  function frontItems(c) { if (!c) return []; return S.isAdmin ? (S.all || []).filter(function (x) { return x.client_id === c.id; }) : (S.items || []); }
+  function featsOf(c) { return S.isAdmin ? ['inbox', 'ads', 'whatsapp'] : PKG[planKey(c)].features; }
+  function frontModel() {
+    var c = frontClient(), items = frontItems(c), feats = featsOf(c);
+    var need = items.filter(function (x) { return x.status === 'needs_approval'; }).length;
+    var h = Number(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hour12: false, timeZone: 'Asia/Dubai' }).format(new Date()));
+    var who = S.isAdmin ? 'KJ' : ((S.profile && S.profile.full_name) || cName(c) || '');
+    var greet = t(h < 12 ? 'fr.morning' : h < 18 ? 'fr.afternoon' : 'fr.evening') + (who ? (L() === 'ar' ? '، ' : ', ') + who : '') +
+      (S.isAdmin && c ? ' · ' + cName(c) : '') + ' · ' + (need ? t('fr.need', { n: need }) : t('fr.clear'));
+    var gate = function (f, view) { return feats.indexOf(f) > -1 ? 'v:' + view : null; };
+    // page 1: six plates around the cube
+    var plates = [
+      ['approvals', t('fr.p.appr'), 'appr', 'v:approvals'],
+      ['inbox', t('fr.p.inbox'), 'inbox', gate('inbox', 'inbox')],
+      ['adsman', t('fr.p.ads'), 'ads', gate('ads', 'ads')],
+      ['live', t('fr.p.live'), 'live', null],
+      ['plan', t('fr.p.plan'), 'plan', null],
+      ['calendar', t('fr.p.cal'), 'cal', 'v:calendar']];
+    // page 2: account rows (the last four fold into tiles on short screens)
+    var rows = [
+      ['payments', t('fr.r.pay'), t('fr.r.pay.s'), '', '', 'pay', null, null],
+      ['package', t('fr.r.pkg'), planName(c), '', '', 'pkg', null, null],
+      ['account', t('fr.r.acc'), t('fr.r.acc.s'), '', '', 'acc', null, null],
+      ['terms', t('fr.r.terms'), t('fr.r.terms.s'), '', '', 'terms', '../terms.html', null],
+      ['privacy', t('fr.r.priv'), t('fr.r.priv.s'), '', '', 'priv', '../privacy.html', null],
+      ['channels', t('fr.r.chan'), t('fr.r.chan.s'), '', '', 'chan', null, null],
+      ['numbers', t('fr.r.num'), t('fr.r.num.s'), '', '', 'num', null, 'v:today'],
+      ['core', t('fr.r.core'), t('fr.r.core.s'), '', '', 'core', null, 'v:core'],
+      ['reports', t('fr.r.rep'), t('fr.r.rep.s'), '', '', 'reports', null, 'v:reports'],
+      ['whatsapp', 'WhatsApp', t('fr.r.wa.s'), '', '', 'whatsapp', WA, null]];
+    var sec = {};
+    var row = function (k, v, href, icon, act) { return [k, v || '', href || null, icon || null, act || null]; };
+    // Live now: the newest published posts, every link real
+    var live = [];
+    items.filter(function (x) { return x.published_url || x.fb_url || x.threads_url; })
+      .sort(function (a, b) { return String(b.published_at || b.scheduled_at || '').localeCompare(String(a.published_at || a.scheduled_at || '')); })
+      .forEach(function (x) {
+        var title = pick(x, 'title', 'title_ar'), when = x.published_at ? ' · ' + fmtDate(x.published_at) : '';
+        if (safeUrl(x.published_url)) live.push(row(title, plat(x.platform)[L()] + when, safeUrl(x.published_url)));
+        if (safeUrl(x.fb_url)) live.push(row(title, plat('facebook')[L()] + when, safeUrl(x.fb_url)));
+        if (safeUrl(x.threads_url)) live.push(row(title, plat('threads')[L()] + when, safeUrl(x.threads_url)));
+      });
+    sec.live = { t: t('fr.p.live'), s: live.length ? t('fr.live.s') : t('fr.live.none'), rows: live.slice(0, 7) };
+    // Plan: this month's planned posts by type (Dubai month), then the calendar
+    var ym = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', timeZone: 'Asia/Dubai' }).format(new Date());
+    var counts = {};
+    items.forEach(function (x) {
+      if (x.kind === 'reply' || !x.scheduled_at) return;
+      if (new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', timeZone: 'Asia/Dubai' }).format(new Date(x.scheduled_at)) !== ym) return;
+      counts[x.kind] = (counts[x.kind] || 0) + 1;
+    });
+    var planRows = ['reel', 'post', 'carousel', 'story', 'ad'].filter(function (k) { return counts[k]; }).map(function (k) { return row(t('fr.kind.' + k), String(counts[k])); });
+    planRows.push(row(t('fr.plan.open'), t('fr.plan.open.s'), null, 'calendar', 'v:calendar'));
+    sec.plan = { t: t('fr.p.plan'), s: new Intl.DateTimeFormat(loc(), { month: 'long', year: 'numeric', timeZone: 'Asia/Dubai' }).format(new Date()), rows: planRows };
+    sec.payments = { t: t('fr.r.pay'), s: t('fr.pay.s'), rows: [row(t('fr.pay.wa'), t('fr.pay.wa.s'), WA + '?text=' + encodeURIComponent(t('wa.general')), 'whatsapp')] };
+    var pk = PKG[planKey(c)].features;
+    sec.package = { t: t('fr.r.pkg'), s: planName(c), rows: [row(t('p.pkg.core'), t('fr.inc'))].concat(Object.keys(ADDONS).map(function (f) { return row(t(ADDONS[f]), pk.indexOf(f) > -1 ? t('fr.inc') : t('fr.notinc')); }))
+      .concat([row(t('fr.pkg.add'), t('fr.pay.wa.s'), WA + '?text=' + encodeURIComponent(t('wa.general')), 'whatsapp')]) };
+    sec.account = { t: t('fr.r.acc'), s: S.user && S.user.email ? S.user.email : '', rows: [
+      S.isAdmin ? row(t('fr.acc.brand'), t('fr.acc.brand.s'), null, 'control', 'hq:admin') : row(t('fr.acc.brand'), t('fr.acc.brand.kj')),
+      row(t('fr.acc.lang'), L() === 'ar' ? 'English' : 'العربية', null, 'globe', 'lang'),
+      row(t('p.back'), 'system.zkjverse.com', '../index.html', 'site'),
+      row(t('p.signout'), t('fr.acc.out.s'), null, 'signout', 'signout')] };
+    // Channels: what is linked for this brand
+    var chan = [];
+    if (c && c.instagram) chan.push(row('Instagram', '@' + String(c.instagram).replace(/^@/, ''), 'https://www.instagram.com/' + encodeURIComponent(String(c.instagram).replace(/^@/, '')) + '/'));
+    if (S.isAdmin) {
+      SOC_NETS.forEach(function (n) {
+        var a = (S.social || []).filter(function (s2) { return s2.client_id === c.id && s2.network === n.id; })[0];
+        chan.push(row(n[L()], !a ? t('p.soc.none') : a.status !== 'ok' ? t('p.soc.expired') : (a.name || t('p.soc.ok'))));
+      });
+      chan.push(row(t('fr.chan.manage'), t('fr.chan.manage.s'), null, 'control', 'hq:admin'));
+    } else {
+      var used = {}; items.forEach(function (x) { if (x.platform && x.platform !== 'instagram') used[x.platform] = 1; });
+      Object.keys(used).forEach(function (id) { chan.push(row(plat(id)[L()], t('fr.chan.used'))); });
+    }
+    sec.channels = { t: t('fr.r.chan'), s: c ? cName(c) : '', rows: chan.length ? chan : [row(t('fr.chan.none'), '')] };
+    // not in the package: say so and offer WhatsApp, never a dead tap
+    sec.addon = { t: t('fr.addon.t'), s: planName(c), rows: [row(t('fr.addon.b'), t('fr.pay.wa.s'), WA + '?text=' + encodeURIComponent(t('wa.general')), 'whatsapp')] };
+    plates.forEach(function (p) { if (p[3] === null && !sec[p[0]]) p[3] = 'sec:addon'; });
+    if (S.isAdmin) sec.hq = { t: t('fr.hq.t'), s: t('fr.hq.s'), rows: [
+      row(t('fr.hq.all'), t('fr.hq.all.s'), null, 'box', 'hq:hq'),
+      row(t('dv.drawings'), t('fr.hq.dw.s'), null, 'drawings', 'hq:drawings'),
+      row(t('dv.todo'), t('fr.hq.todo.s'), null, 'pencil', 'hq:todo'),
+      row(t('dv.week'), t('fr.hq.week.s'), null, 'calendar', 'hq:week'),
+      row(t('dv.control'), t('fr.hq.cc.s'), null, 'control', 'hq:admin')].concat(S.clients.filter(function (x) { return x.active !== false; }).map(function (x) {
+        return row(cName(x), x.id === (c && c.id) ? t('fr.hq.current') : t('fr.hq.switch'), null, 'ring', 'ws:' + x.id); })) };
+    return {
+      lang: L(), dir: L() === 'ar' ? 'rtl' : 'ltr', admin: !!S.isAdmin, greet: greet, plates: plates, rows: rows, sec: sec,
+      hints: [t('fr.h0'), t('fr.h1'), t('fr.h2')], aria: [t('fr.a0'), t('fr.a1'), t('fr.a2')],
+      labels: { hq: 'HQ', bell: t('p.notif.title'), lang: t('fr.acc.lang'), out: t('p.signout'), unread: (S.notifs || []).filter(function (n) { return !n.read; }).length }
+    };
+  }
+  function closeFront() {
+    if (!FR.wrap || !FR.on) return;
+    FR.on = false; FR.wrap.classList.remove('on'); document.documentElement.classList.remove('front-on');
+    setTimeout(function () { if (!FR.on) FR.wrap.hidden = true; }, 420);
+  }
+  function openFront(reload) {
+    if (!FR.wrap) {
+      FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html';
+      FR.frame.setAttribute('allow', 'fullscreen');
+      FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
+    } else if (reload) {
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html'; }
+    } else {
+      try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
+    }
+    FR.wrap.hidden = false; FR.on = true;
+    document.documentElement.classList.add('front-on');
+    requestAnimationFrame(function () { FR.wrap.classList.add('on'); });
+  }
+  function frontAct(tok) {
+    tok = String(tok || '');
+    var c = frontClient();
+    if (tok === 'close') { closeFront(); return; }
+    if (tok === 'signout') { sb.auth.signOut().then(toLogin, toLogin); return; }
+    if (tok === 'lang') { var lt = document.querySelector('[data-lang-toggle]'); if (lt) lt.click(); return; }
+    if (tok === 'bell') { closeFront(); setTimeout(function () { var b = $('bell'); if (b && b.getAttribute('aria-expanded') !== 'true') b.click(); }, 120); return; }
+    if (tok.indexOf('hq:') === 0) {
+      var hv = tok.slice(3); closeFront();
+      if (S.mode === 'hq') { navFor('hq'); showBoard(hv); } else backToHQ(hv);
+      return;
+    }
+    if (tok.indexOf('ws:') === 0) { S.ccClient = tok.slice(3); Z.store(CLIENT_KEY, S.ccClient); openFront(true); return; }
+    if (tok.indexOf('v:') === 0) {
+      var view = tok.slice(2); closeFront();
+      if (S.isAdmin && (S.mode !== 'ws' || !S.client || S.client.id !== (c && c.id))) {
+        if (c) openWorkspace(c.id).then(function () { D.show(view, { force: true, focus: true }); });
+        return;
+      }
+      D.show(view, { force: true, focus: true });
+    }
+  }
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct };
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && FR.on) closeFront(); });
 
   /* ---------- Set password (invite / recovery links) ---------- */
   function showPassword() {
@@ -1252,6 +1452,7 @@
   var actions = {
     retry: function () { setState('p.loading', null); loadProfile(); },
     signout: function () { sb.auth.signOut().then(toLogin, toLogin); },
+    front: function () { openFront(); },
     go: function (el) { D.show(el.getAttribute('data-target'), { focus: true }); },
     'notif-toggle': function (el, e) {
       var panel = $('notif-panel'), open = panel.hidden;
@@ -1610,6 +1811,7 @@
   Z.onLang(function () {
     if (modalOpen) closeModal();
     if ($('dash').getAttribute('data-state') === 'ready') renderBoard();
+    if (FR.wrap && FR.on) openFront(true);
     if ($('dash').getAttribute('data-state') === 'password') $('pw-sub').textContent = t('p.pw.sub', { email: (S.user && S.user.email) || '' });
   });
 
