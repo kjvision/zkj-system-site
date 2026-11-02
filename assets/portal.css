@@ -141,7 +141,7 @@ html[lang="ar"] .cc-pkg { font-family: var(--f-body); letter-spacing: 0; font-si
 .td-ic svg { width: 19px; height: 19px; }
 .td-ic[data-kind="changes"] { background: rgba(224,164,58,.16); color: #F5CF86; }
 .td-ic[data-kind="draft"] { background: rgba(154,160,166,.14); }
-.td-ic[data-kind="activity"] { background: rgba(201, 168, 76,.14); color: var(--gold); }
+.td-ic[data-kind="activity"] { background: rgba(201, 168, 76,.14); color: #FFFFFF; }
 .td-ic[data-kind="drawing"] { background: rgba(120,160,200,.16); color: #A9C7E8; }
 /* HQ: Jobs · Drawings block above the brands, and the Drawings view (cards come from drawings/drawings.js) */
 .hq-jobs { display: grid; gap: 12px; margin: 0 0 22px; }
@@ -257,7 +257,7 @@ html.reduce-motion .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-
 .ed-badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; color: var(--gold); }
 .ed-badge svg { width: 14px; height: 14px; flex: none; }
 .ed-note { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
-.td-revised .td-ic { color: var(--gold); }
+.td-revised .td-ic { color: #FFFFFF; }
 #rv-note { width: 100%; min-height: 96px; margin-top: 10px; }
 
 /* draft that cannot go to approval yet (reel without its video, post without an image) */
@@ -273,3 +273,29 @@ html.reduce-motion .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-
 .soc-net[data-st="ok"] .soc-st { color: #7fd79a; }
 .soc-net[data-st="expired"] .soc-st { color: #e6a23c; }
 .soc-net .btn { justify-self: start; }
+
+/* Inbox · comments answered by hand (KJ, 2 Nov 2026) */
+.sub-head { margin: 26px 0 4px; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-light, #E6D5A3); font-weight: 600; }
+.cm-count { color: #9AA0A6; font-weight: 400; letter-spacing: 0; }
+.cm-list { margin-top: 12px; }
+.cm-row { display: grid; gap: 8px; padding: 14px 16px; }
+.cm-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.cm-pf .pg { width: 18px; height: 18px; }
+.cm-from { font-weight: 600; }
+.cm-when { color: #9AA0A6; }
+.cm-open { margin-inline-start: auto; color: var(--gold-light, #E6D5A3); font-size: 12.5px; }
+.cm-text { margin: 0; font-size: 15px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cm-auto, .cm-mine { margin: 0; font-size: 13px; color: #C9CDD2; padding-inline-start: 10px; border-inline-start: 2px solid rgba(201, 168, 76, .45); }
+.cm-auto span, .cm-mine span { color: #9AA0A6; }
+.cm-wait { margin: 0; font-size: 12.5px; color: #9AA0A6; }
+.cm-form { display: flex; gap: 8px; align-items: flex-end; }
+.cm-form textarea { flex: 1; min-height: 40px; max-height: 160px; resize: vertical; padding: 9px 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .14); background: rgba(255, 255, 255, .04); color: inherit; font: inherit; font-size: 14px; }
+.cm-form textarea:focus { outline: none; border-color: var(--gold-light, #E6D5A3); }
+.cm-form .btn { flex: none; }
+
+/* Front: the cube over the portal (app/front.html) */
+.front-wrap { position: fixed; inset: 0; z-index: 2000; background: #0B0B0F; opacity: 0; transition: opacity .38s ease; }
+.front-wrap.on { opacity: 1; }
+.front-wrap iframe { display: block; width: 100%; height: 100%; border: 0; background: #0B0B0F; }
+html.front-on, html.front-on body { overflow: hidden; }
+.front-btn img { display: block; width: 17px; height: 20px; }
