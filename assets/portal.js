@@ -1246,13 +1246,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261103d';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261103e';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261103d'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261103e'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1309,7 +1309,17 @@ var CLASSIC_OFF = true;
       var byAt = function (a, b) { return String(a.scheduled_at || '').localeCompare(String(b.scheduled_at || '')); };
       // KJ sees every brand's posts waiting for a yes in one queue, each tagged with its brand (KJ, 3 Nov 2026: new episodes were hidden behind the cube's brand)
       var pendSrc = S.isAdmin ? (S.all || []).filter(function (x) { var cl = clientById(x.client_id); return cl && cl.active !== false; }) : items;
-      var pending = pendSrc.filter(function (x) { return x.status === 'needs_approval' && x.kind !== 'reply'; }).sort(byAt).map(function (x) { var o = itemOut(x); if (S.isAdmin) { var cl = clientById(x.client_id); o.client = cl ? cName(cl) : ''; } return o; });
+      // one card per post: the copies of the same post for each platform (same brand, type and first media) are approved together (KJ, 3 Nov 2026)
+      var groups = {}, pending = [];
+      pendSrc.filter(function (x) { return x.status === 'needs_approval' && x.kind !== 'reply'; }).sort(byAt).forEach(function (x) {
+        var key = x.client_id + '|' + x.kind + '|' + (String(x.media_url || '').split(/[\s,]+/)[0] || x.id);
+        var g = groups[key];
+        if (!g) { g = itemOut(x); g.ids = []; g.plats = []; if (S.isAdmin) { var cl = clientById(x.client_id); g.client = cl ? cName(cl) : ''; } groups[key] = g; pending.push(g); }
+        g.ids.push(x.id); if (x.platform && g.plats.indexOf(x.platform) < 0) g.plats.push(x.platform);
+        if (x.platform === 'instagram' && g.platform !== 'instagram') { var keep = { ids: g.ids, plats: g.plats, client: g.client }; var o = itemOut(x); for (var k in keep) o[k] = keep[k]; groups[key] = o; pending[pending.indexOf(g)] = o; g = o; }
+        g.canReview = g.canReview && canReview(x);
+      });
+      pending.forEach(function (g) { g.pnames = g.plats.map(function (id) { return plat(id)[L()]; }); });
       var drafts = pendSrc.filter(function (x) { return x.status === 'needs_approval' && x.kind === 'reply'; }).map(function (x) { var o = itemOut(x); if (S.isAdmin) { var cl = clientById(x.client_id); o.client = cl ? cName(cl) : ''; } return o; });
       // this week in Dubai, Sunday first; opt.week moves it
       var now = dub(new Date().toISOString()), base = Date.UTC(now.y, now.m, now.d) - now.wd * 86400e3 + (opt.week || 0) * 7 * 86400e3;
@@ -1361,6 +1371,15 @@ var CLASSIC_OFF = true;
     });
   }
   function itemById(id) { var all = (S.all || []).concat(S.items || []); for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i]; return null; }
+  // every platform copy of one post, one after the other; ok when all were saved
+  function circuitReviewMany(ids, decision, note) {
+    ids = (ids || []).slice(); var done = 0, fail = null;
+    var next = function () {
+      if (!ids.length) return Promise.resolve({ ok: !fail && done > 0, done: done, error: fail });
+      return circuitReview(ids.shift(), decision, note).then(function (r) { if (r && r.ok) done++; else fail = (r && r.error) || 'failed'; return next(); });
+    };
+    return next();
+  }
   function circuitReview(id, decision, note) {
     var x = itemById(id); if (!x) return Promise.resolve({ ok: false, error: 'missing' });
     if (!canReview(x)) return Promise.resolve({ ok: false, error: 'not-allowed' });
@@ -1382,10 +1401,10 @@ var CLASSIC_OFF = true;
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261103d#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261103e#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261103d#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261103e#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
@@ -1571,7 +1590,7 @@ var CLASSIC_OFF = true;
   }
   function circuitCoreOff() { if (CORE2.ctl) { try { CORE2.ctl.destroy(); } catch (e) { /* ignore */ } CORE2.ctl = null; } }
   function circuitItem(id) { var x = itemById(id); return Promise.resolve(x ? itemFull(x) : null); }
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff };
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff };
   // Esc steps back inside the new world (circuit → cube); it never drops to the old screens
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CX.on) frontAct('home'); });
 
