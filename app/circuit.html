@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>ZKJ SYSTEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="../assets/core.css?v=20261103b">
+<link rel="stylesheet" href="../assets/core.css?v=20261103c">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
 /* ZKJ SYSTEM circuit screens (KJ, 3 Nov 2026). Every screen lives in the cube's world: gold circuit traces, platform terminals,
@@ -18,7 +18,7 @@
 --display:"Cinzel",Georgia,serif;--body:"Inter","IBM Plex Sans Arabic",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--ob);color:var(--wh);font-family:var(--body);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;background:var(--ob);color:var(--wh);font-family:var(--body);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 [dir=rtl] body{font-family:"IBM Plex Sans Arabic","Inter",system-ui,sans-serif}
 #cv{position:fixed;inset:0;width:100%;height:100%;display:block}
 .ui{position:fixed;inset:0;pointer-events:none}
@@ -134,6 +134,7 @@ button.plaque.brand{justify-content:flex-start;gap:12px;height:56px;padding:0 14
 .sw2{height:44px;border-radius:12px;border:1px solid var(--hair);display:flex;overflow:hidden}.sw2 i{flex:1}
 @media (max-width:520px){.g3{grid-template-columns:1fr 1fr}}
 #core-host{position:absolute;left:0;right:0;bottom:0;pointer-events:auto;overflow:hidden}
+input,textarea,select,.cap2,.copy input{-webkit-user-select:text;user-select:text}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:reduce){.slide i{transition:none}}
 </style>
@@ -181,7 +182,7 @@ button.plaque.brand{justify-content:flex-start;gap:12px;height:56px;padding:0 14
 <div class="sheet" id="sheet" hidden><div id="sheet-in"></div></div>
 <div id="toast" hidden role="status"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="circuit-marks.js?v=20261103b"></script>
+<script src="circuit-marks.js?v=20261103c"></script>
 <script>
 (function(){
 "use strict";
@@ -320,7 +321,7 @@ var HQ={};
 function layHQ(){var R=desk?Math.min(H*.36,320):Math.min(W*.44,(H-TOP)*.3);HQ={R:R,cx:desk?W*.38:W/2,cy:desk?TOP+(H-TOP)*.48:TOP+R+30};
   var L=$("hq-list"),its=[];var cm=(D.comments||[]).filter(function(c){return c.status==="waiting";}).length;
   its.push('<div class="gcard" style="padding:16px 18px;display:grid;gap:10px"><div class="mm" style="color:var(--gold)">'+T("needNow")+'</div>'+
-    '<div class="mm" style="color:var(--wh)"><span class="stt need"></span> '+(D.pending.length)+' '+T("postsWait")+' · '+esc(D.client.name)+'</div>'+
+    '<div class="mm" style="color:var(--wh)"><span class="stt need"></span> '+(D.pending.length)+' '+T("postsWait")+'</div>'+
     '<div class="mm" style="color:var(--wh)"><span class="stt need"></span> '+cm+' '+T("commentsWait")+'</div>'+
     '<div class="mm" style="color:var(--wh)"><span class="stt sch"></span> '+(D.changes_all||0)+' '+T("changesReq")+'</div></div>');
   var HXb=ZH.hq?ZH.hq():null;if(HXb)HXb.clients.filter(function(c){return c.active;}).forEach(function(c){its.push('<button class="gcard plaque brand'+(c.cube?' on':'')+'" data-ws="'+esc(c.id)+'">'+lgHTML(c)+'<b>'+esc(c.name)+'</b><span>'+(c.cube?esc(T("onCube")):c.waiting+' '+esc(T("sWait")))+'</span></button>');});
@@ -357,7 +358,7 @@ function layAP(){AP.list=apList();if(AP.i>=AP.list.length)AP.i=Math.max(0,AP.lis
     var pin=[[ex,y+(row-1)*6],[mid,y+(row-1)*6],[mid+dir*kk,y],[x-dir*(desk?28:22),y]];AP.g.terms.push({id:id,x:x,y:y,pin:pin,len:plen(pin)});});
   AP.g.stem=[[cx,AP.g.cubeY+20],[cx,sy]];AP.g.bw=Math.min(desk?420:W-56,420);AP.g.by=Math.min(H-70,sy+sh+(desk?122:118));
   if(none){var e=$("ap-empty");$("ap-et").textContent=T("clear");$("ap-es").textContent=T("clearS");pos(e,cx-170,cy+40,340);return;}
-  $("ap-t").textContent=P.title||"—";$("ap-m").textContent=[(AP.i+1)+" / "+AP.list.length,P.kind?(T("kinds")[P.kind]||P.kind.toUpperCase()):"",P.pname,P.when].filter(Boolean).join(" · ");
+  $("ap-t").textContent=P.title||"—";$("ap-m").textContent=[(AP.i+1)+" / "+AP.list.length,P.client||"",P.kind?(T("kinds")[P.kind]||P.kind.toUpperCase()):"",P.pname,P.when].filter(Boolean).join(" · ");
   var cw=Math.min(360,W-128);pos($("ap-cap"),cx-cw/2,sy+sh+12,cw);pos($("ap-hit"),sx,sy,sw,sh);
   var pv=$("ap-prev"),nx=$("ap-next"),ny=sy+sh+12;pos(pv,AR()?cx+cw/2+10:cx-cw/2-54,ny);pos(nx,AR()?cx-cw/2-54:cx+cw/2+10,ny);
   pv.disabled=AP.i<=0;nx.disabled=AP.i>=AP.list.length-1;pv.setAttribute("aria-label",T("prevP"));nx.setAttribute("aria-label",T("nextP"));$("ap-hit").setAttribute("aria-label",P.title||"");

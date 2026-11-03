@@ -1244,13 +1244,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261103b';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261103c';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261103b'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261103c'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1304,7 +1304,9 @@
     ]).then(function (r) {
       var kpis = r[0] || [], reports = r[1] || [], comments = r[2] || [];
       var byAt = function (a, b) { return String(a.scheduled_at || '').localeCompare(String(b.scheduled_at || '')); };
-      var pending = items.filter(function (x) { return x.status === 'needs_approval' && x.kind !== 'reply'; }).sort(byAt).map(itemOut);
+      // KJ sees every brand's posts waiting for a yes in one queue, each tagged with its brand (KJ, 3 Nov 2026: new episodes were hidden behind the cube's brand)
+      var pendSrc = S.isAdmin ? (S.all || []).filter(function (x) { var cl = clientById(x.client_id); return cl && cl.active !== false; }) : items;
+      var pending = pendSrc.filter(function (x) { return x.status === 'needs_approval' && x.kind !== 'reply'; }).sort(byAt).map(function (x) { var o = itemOut(x); if (S.isAdmin) { var cl = clientById(x.client_id); o.client = cl ? cName(cl) : ''; } return o; });
       var drafts = items.filter(function (x) { return x.status === 'needs_approval' && x.kind === 'reply'; }).map(itemOut);
       // this week in Dubai, Sunday first; opt.week moves it
       var now = dub(new Date().toISOString()), base = Date.UTC(now.y, now.m, now.d) - now.wd * 86400e3 + (opt.week || 0) * 7 * 86400e3;
@@ -1377,10 +1379,10 @@
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261103b#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261103c#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261103b#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261103c#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
