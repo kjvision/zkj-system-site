@@ -1393,7 +1393,8 @@
   }
   function circuitReadAll() { return sb.rpc('mark_notifications_read').then(function (r) { if (r.error) throw r.error; (S.notifs || []).forEach(function (n) { n.read = true; }); renderNotifs(); return { ok: true }; }).catch(function (e) { return { ok: false, error: e && e.message }; }); }
   window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll };
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && FR.on) closeFront(); });
+  // Esc steps back inside the new world (circuit → cube); it never drops to the old screens
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CX.on) frontAct('home'); });
 
   /* ---------- Set password (invite / recovery links) ---------- */
   function showPassword() {
