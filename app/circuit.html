@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>ZKJ SYSTEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="../assets/core.css?v=20261103c">
+<link rel="stylesheet" href="../assets/core.css?v=20261103d">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
 /* ZKJ SYSTEM circuit screens (KJ, 3 Nov 2026). Every screen lives in the cube's world: gold circuit traces, platform terminals,
@@ -182,7 +182,7 @@ input,textarea,select,.cap2,.copy input{-webkit-user-select:text;user-select:tex
 <div class="sheet" id="sheet" hidden><div id="sheet-in"></div></div>
 <div id="toast" hidden role="status"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="circuit-marks.js?v=20261103c"></script>
+<script src="circuit-marks.js?v=20261103d"></script>
 <script>
 (function(){
 "use strict";
@@ -367,7 +367,7 @@ function layAP(){AP.list=apList();if(AP.i>=AP.list.length)AP.i=Math.max(0,AP.lis
   var c=$("chg");c.textContent=T("changes");c.hidden=!P.canReview;pos(c,cx,AP.g.by+38);c.style.transform="translateX(-50%)";
   if(AP.g.by-27<sy+sh+76)$("ap-read").hidden=true;}
 function drawAP(t){var G=AP.g,P=AP.list[AP.i];if(!P){empty(G.cx,G.cy,T("clear"),"",t);return;}
-  var T0=null;G.terms.forEach(function(x){if(x.id===P.platform)T0=x;});var dur=AP.phase==="rise"?.7:1.1,k=AP.phase==="idle"?0:Math.min(1,(t-AP.ph0)/dur),q;
+  var T0=null;G.terms.forEach(function(x){if(x.id===P.platform)T0=x;});var dur=AP.phase==="rise"?.7:1.1,k=AP.phase==="idle"?0:Math.min(1,(now()-AP.ph0)/dur),q;
   G.terms.forEach(function(x){var on=x===T0;if(on&&AP.phase==="idle")trace(x.pin,true,t,.55);else{g.strokeStyle=on?"rgba(201,168,76,.85)":"rgba(201,168,76,.22)";g.lineWidth=on?1.4:1;poly(x.pin);g.stroke();}
     var fl=on&&AP.phase==="send"&&k>.6?Math.max(0,1-(k-.6)/.4):0;g.save();if(fl){g.shadowColor="rgba(255,236,190,.95)";g.shadowBlur=26*fl;}mark(x.id,x.x,x.y,desk?46:36,on?WH:"#8C9096",on?1:.7);g.restore();});
   g.strokeStyle="rgba(201,168,76,.55)";g.lineWidth=1.2;poly(G.stem);g.stroke();q=at(G.stem,((t*.35)%1)*plen(G.stem));glowDot(q[0],q[1],1.6,.75);
@@ -387,8 +387,8 @@ function drawAP(t){var G=AP.g,P=AP.list[AP.i];if(!P){empty(G.cx,G.cy,T("clear"),
   g.fillStyle="rgba(201,168,76,.7)";for(var i=0;i<9;i++){var yy=sy+sh*.14+i*(sh*.72/8);g.fillRect(sx-4,yy-1,4,2);g.fillRect(sx+sw,yy-1,4,2);}g.restore();
   cube(G.cx,G.cubeY,desk?36:28,18+6*Math.sin(t*1.4));
   if(!$("slide").hidden){var sr=rect($("slide")),py=sy+sh*.9,lx2=sr.left+30,rx2=sr.right-30;[[[sx-4,py],[lx2,py],[lx2,sr.top]],[[sx+sw+4,py],[rx2,py],[rx2,sr.top]]].forEach(function(p,i){g.strokeStyle="rgba(201,168,76,.42)";g.lineWidth=1;poly(p);g.stroke();g.fillStyle="#0B0B0F";g.beginPath();g.arc(p[2][0],p[2][1],3,0,6.2832);g.fill();g.strokeStyle="rgba(230,213,163,.85)";g.stroke();var q=at(p,((t*.4+i*.5)%1)*plen(p));glowDot(q[0],q[1],1.3,.7);});}
-  if(AP.phase!=="idle"&&t-AP.ph0>dur){if(AP.phase==="send"||AP.phase==="back"){AP.phase="rise";AP.ph0=t;layAP();}else AP.phase="idle";}}
-function decided(id){D.pending=D.pending.filter(function(x){return x.id!==id;});AP.list=apList();if(AP.i>=AP.list.length)AP.i=0;}
+  var rt=now();if(AP.phase!=="idle"&&(RM||rt-AP.ph0>dur)){if((AP.phase==="send"||AP.phase==="back")&&!RM){AP.phase="rise";AP.ph0=rt;layAP();}else{AP.phase="idle";layAP();}}}
+function decided(id){D.pending=D.pending.filter(function(x){return x.id!==id;});AP.list=apList();if(AP.i>=AP.list.length)AP.i=0;if(scene==="ap")layAP();}
 function approve(){var P=AP.list[AP.i];if(!P||!P.canReview||AP.phase!=="idle"||AP.busy)return;AP.busy=true;var s=$("slide");s.querySelector("i").style.left="calc(100% - 48px)";
   ZH.review(P.id,"approved").then(function(r){AP.busy=false;s.querySelector("i").style.left="";if(r&&r.ok){toast(T("approved")+(P.when?" · "+T("goesOut")+" "+P.when:"")+(P.pname?" · "+P.pname:""));AP.phase="send";AP.ph0=now();setTimeout(function(){decided(P.id);},1000);}else toast(T("fail"),true);});}
 function changes(){var P=AP.list[AP.i];if(!P||!P.canReview||AP.phase!=="idle")return;
@@ -421,12 +421,12 @@ $("ap-read").addEventListener("click",function(){var P=AP.list[AP.i];if(P)sheet(
 /* ===== Inbox: comments arrive as light from their platform terminals ===== */
 var IB={};
 function layIB(){var L=$("ib-list"),h=[];
-  if(D.admin){(D.comments||[]).forEach(function(c){h.push('<div class="gcard cmt" data-c="'+esc(c.id)+'"><div class="h">'+markSVG(c.platform)+'<b>'+esc((c.platform==="instagram"?"@":"")+(c.from||"—"))+'</b><span>'+esc(c.ago)+'</span><em class="stt '+esc(c.status)+'">'+esc(c.status==="replied"?T("replied"):T("waiting"))+'</em>'+(c.url?'<a class="lnk gold" style="position:static;margin-inline-start:8px" href="'+esc(c.url)+'" target="_blank" rel="noopener">↗</a>':'')+'</div>'+
+  if(D.admin){(D.comments||[]).forEach(function(c){h.push('<div class="gcard cmt" data-c="'+esc(c.id)+'"><div class="h">'+markSVG(c.platform)+'<b>'+esc((c.platform==="instagram"?"@":"")+(c.from||"—"))+'</b><span>'+esc([c.client,c.ago].filter(Boolean).join(" · "))+'</span><em class="stt '+esc(c.status)+'">'+esc(c.status==="replied"?T("replied"):T("waiting"))+'</em>'+(c.url?'<a class="lnk gold" style="position:static;margin-inline-start:8px" href="'+esc(c.url)+'" target="_blank" rel="noopener">↗</a>':'')+'</div>'+
       '<q>'+esc(c.text)+'</q>'+(c.auto?'<div class="ln">'+esc(T("auto"))+' '+esc(c.auto)+'</div>':'')+(c.mine?'<div class="ln">'+esc(T("mine"))+' '+esc(c.mine)+'</div>':'')+
       (c.can?'<div class="rep"><textarea rows="1" maxlength="2000" aria-label="'+esc(T("reply"))+'" placeholder="'+esc(T("reply"))+'"></textarea><button class="coin" aria-label="'+esc(T("send"))+'"></button></div>':'<div class="ln">'+esc(T("onPlatform"))+'</div>')+'</div>');});
     if(!D.comments||!D.comments.length)h.push('<div class="gcard cmt"><q>'+esc(T("noComments"))+'</q></div>');}
   if(D.drafts&&D.drafts.length){h.push('<div class="mm" style="color:var(--gold);margin-top:6px">'+esc(T("drafts"))+'</div>');
-    D.drafts.forEach(function(x){h.push('<div class="gcard cmt" data-d="'+esc(x.id)+'"><div class="h">'+markSVG(x.platform)+'<b>'+esc(x.title)+'</b></div><q>'+esc(x.caption)+'</q>'+(x.canReview?'<div class="rep" style="justify-content:flex-end"><button class="pill gold">'+esc(T("approve"))+'</button></div>':'')+'</div>');});}
+    D.drafts.forEach(function(x){h.push('<div class="gcard cmt" data-d="'+esc(x.id)+'"><div class="h">'+markSVG(x.platform)+'<b>'+esc(x.title)+'</b>'+(x.client?'<span>'+esc(x.client)+'</span>':'')+'</div><q>'+esc(x.caption)+'</q>'+(x.canReview?'<div class="rep" style="justify-content:flex-end"><button class="pill gold">'+esc(T("approve"))+'</button></div>':'')+'</div>');});}
   else if(!D.admin)h.push('<div class="gcard cmt"><q>'+esc(T("noDrafts"))+'</q></div>');
   L.innerHTML=h.join("");
   L.querySelectorAll("[data-c]").forEach(function(card){var b=card.querySelector(".coin"),ta=card.querySelector("textarea");if(!b)return;

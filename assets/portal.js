@@ -934,6 +934,8 @@
   });
 
   function renderBoard() {
+    // the cube and circuit screens are the dashboard now: the classic board is never shown, so it is not drawn (no hidden work, no hidden photos)
+    if (CLASSIC_OFF) return;
     if (S.mode === 'hq') { renderHeader(); renderNotifs(); renderHQ(); renderAmbient(); renderCore(); return; }
     if (!S.client) return;
     renderHeader(); renderAmbient(); renderHello(); renderKpis(); renderNext(); renderApprovals();
@@ -1244,13 +1246,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261103c';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261103d';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261103c'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261103d'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1279,6 +1281,7 @@
   /* ---------- Circuit screens (app/circuit.html): every screen in the cube's world (KJ, 3 Nov 2026) ----------
      The page asks for its data with ZFRONT_HOST.data({week}) and acts through review(), reply() and act(). Real data only:
      where there is none yet, the page says so instead of showing figures. */
+var CLASSIC_OFF = true;
   var CX = { wrap: null, frame: null, on: false };
   function isVideo(u) { return /\.(mp4|mov|m4v|webm)(\?.*)?$/i.test(u || ''); }
   function mediaOf(x) {
@@ -1300,14 +1303,14 @@
     return Promise.all([
       get(sb.from('kpis').select('*').eq('client_id', c.id).order('period_start', { ascending: false }).order('created_at', { ascending: false })),
       get(sb.from('reports').select('*').eq('client_id', c.id).order('created_at', { ascending: false })),
-      S.isAdmin ? get(sb.from('comment_replies').select('*').eq('client_id', c.id).order('comment_at', { ascending: false, nullsFirst: false }).limit(40)) : Promise.resolve([])
+      S.isAdmin ? get(sb.from('comment_replies').select('*').in('client_id', S.clients.filter(function (x) { return x.active !== false; }).map(function (x) { return x.id; })).order('comment_at', { ascending: false, nullsFirst: false }).limit(60)) : Promise.resolve([])
     ]).then(function (r) {
       var kpis = r[0] || [], reports = r[1] || [], comments = r[2] || [];
       var byAt = function (a, b) { return String(a.scheduled_at || '').localeCompare(String(b.scheduled_at || '')); };
       // KJ sees every brand's posts waiting for a yes in one queue, each tagged with its brand (KJ, 3 Nov 2026: new episodes were hidden behind the cube's brand)
       var pendSrc = S.isAdmin ? (S.all || []).filter(function (x) { var cl = clientById(x.client_id); return cl && cl.active !== false; }) : items;
       var pending = pendSrc.filter(function (x) { return x.status === 'needs_approval' && x.kind !== 'reply'; }).sort(byAt).map(function (x) { var o = itemOut(x); if (S.isAdmin) { var cl = clientById(x.client_id); o.client = cl ? cName(cl) : ''; } return o; });
-      var drafts = items.filter(function (x) { return x.status === 'needs_approval' && x.kind === 'reply'; }).map(itemOut);
+      var drafts = pendSrc.filter(function (x) { return x.status === 'needs_approval' && x.kind === 'reply'; }).map(function (x) { var o = itemOut(x); if (S.isAdmin) { var cl = clientById(x.client_id); o.client = cl ? cName(cl) : ''; } return o; });
       // this week in Dubai, Sunday first; opt.week moves it
       var now = dub(new Date().toISOString()), base = Date.UTC(now.y, now.m, now.d) - now.wd * 86400e3 + (opt.week || 0) * 7 * 86400e3;
       var keys = []; for (var i = 0; i < 7; i++) keys.push(new Date(base + i * 86400e3).toISOString().slice(0, 10));
@@ -1338,7 +1341,7 @@
         live: live.slice(0, 8), plan: { counts: counts, days: Object.keys(days).map(Number), month: new Intl.DateTimeFormat(loc(), { month: 'long', year: 'numeric', timeZone: 'Asia/Dubai' }).format(new Date()),
           dim: new Date(Date.UTC(now.y, now.m + 1, 0)).getUTCDate(), today: now.d },
         nums: nums, reports: reports.map(function (x) { return { title: pick(x, 'title', 'title_ar') || '', period: x.period || x.period_start || '', url: safeUrl(x.file_url) || null, date: x.created_at ? fmtDate(x.created_at) : '' }; }),
-        comments: comments.map(function (m) { return { id: m.comment_id, platform: m.platform, from: m.from_name || '', text: m.comment || '', ago: m.comment_at ? ago(m.comment_at) : '', status: m.status,
+        comments: comments.map(function (m) { var mc = clientById(m.client_id); return { id: m.comment_id, client: S.isAdmin && mc ? cName(mc) : '', platform: m.platform, from: m.from_name || '', text: m.comment || '', ago: m.comment_at ? ago(m.comment_at) : '', status: m.status,
           auto: m.status === 'replied' && m.reply_text && m.reply_text !== m.manual_reply_text ? m.reply_text : '', mine: m.manual_reply_text || '', url: safeUrl(m.permalink) || null, can: !!CM_REPLY[m.platform] }; }),
         unread: (S.notifs || []).filter(function (n) { return !n.read; }).length,
         notifs: (S.notifs || []).slice(0, 40).map(function (n) { var cl = n.client_id ? clientById(n.client_id) : null; return { title: pick(n, 'title', 'title_ar') || '', body: pick(n, 'body', 'body_ar') || '', ago: n.created_at ? ago(n.created_at) : '', read: !!n.read, client: cl ? cName(cl) : '' }; }),
@@ -1379,10 +1382,10 @@
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261103c#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261103d#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261103c#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261103d#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
