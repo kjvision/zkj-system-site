@@ -40,7 +40,7 @@ rep('POST', 'var DOCKABLE={numbers:1,core:1,reports:1,whatsapp:1};', 'var DOCKAB
 rep('POST', 'return {k:r[0],v:r[1],href:r[2]||null,icon:r[3]||null};', 'return {k:r[0],v:r[1],href:r[2]||null,icon:r[3]||null,go:r[4]?function(){go(r[4]);}:null};')
 # HQ plate only for KJ
 rep('POST', "hqEl.innerHTML='<span class=\"pi\">'+ICONS.box+'</span><span class=\"pn\">HQ</span>';act(hqEl,function(){openSec(\"hq\",0);});",
-    "if(M.admin&&SEC.hq){hqEl.innerHTML='<span class=\"pi\">'+ICONS.box+'</span><span class=\"pn\">'+(M.labels.hq||'HQ')+'</span>';act(hqEl,function(){openSec(\"hq\",0);});}else{hqEl.style.display=\"none\";}")
+    "if(M.admin&&SEC.hq){hqEl.innerHTML='<span class=\"pi\">'+ICONS.box+'</span><span class=\"pn\">'+(M.labels.hq||'HQ')+'</span>';act(hqEl,function(){go(\"c:hq\");});}else{hqEl.style.display=\"none\";}")
 # top buttons: the portal's bell, language and sign out
 rep('POST', "[].forEach.call(tbar.querySelectorAll(\".tb\"),function(b){var k=b.dataset.s;b.innerHTML=ICONS[k===\"notifications\"?\"bell\":k===\"language\"?\"globe\":\"signout\"]+(k===\"notifications\"?'<i class=\"dot\"></i>':'');act(b,function(){openSec(k,1);});});",
     "[].forEach.call(tbar.querySelectorAll(\".tb\"),function(b){var k=b.dataset.s,tok=k===\"notifications\"?\"bell\":k===\"language\"?\"lang\":\"signout\";b.setAttribute(\"aria-label\",(k===\"notifications\"?M.labels.bell:k===\"language\"?M.labels.lang:M.labels.out)||b.getAttribute(\"aria-label\"));"
