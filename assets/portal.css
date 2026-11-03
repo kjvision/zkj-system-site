@@ -299,3 +299,5 @@ html.reduce-motion .lock-mark path { fill-opacity: 1; stroke-opacity: 0; stroke-
 .front-wrap iframe { display: block; width: 100%; height: 100%; border: 0; background: #0B0B0F; }
 html.front-on, html.front-on body { overflow: hidden; }
 .front-btn img { display: block; width: 17px; height: 20px; }
+
+.circuit-wrap { z-index: 2100; }

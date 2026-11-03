@@ -1140,23 +1140,24 @@
     var gate = function (f, view) { return feats.indexOf(f) > -1 ? 'v:' + view : null; };
     // page 1: six plates around the cube
     var plates = [
-      ['approvals', t('fr.p.appr'), 'appr', 'v:approvals'],
-      ['inbox', t('fr.p.inbox'), 'inbox', gate('inbox', 'inbox')],
-      ['adsman', t('fr.p.ads'), 'ads', null],
-      ['live', t('fr.p.live'), 'live', null],
-      ['plan', t('fr.p.plan'), 'plan', null],
-      ['calendar', t('fr.p.cal'), 'cal', 'v:calendar']];
+      ['approvals', t('fr.p.appr'), 'appr', 'c:ap'],
+      ['inbox', t('fr.p.inbox'), 'inbox', 'c:inbox'],
+      ['adsman', t('fr.p.ads'), 'ads', 'c:ads'],
+      ['live', t('fr.p.live'), 'live', 'c:live'],
+      ['plan', t('fr.p.plan'), 'plan', 'c:plan'],
+      ['calendar', t('fr.p.cal'), 'cal', 'c:cal']];
     // page 2: account rows (the last four fold into tiles on short screens)
     var rows = [
       ['payments', t('fr.r.pay'), t('fr.r.pay.s'), '', '', 'pay', null, null],
-      ['package', t('fr.r.pkg'), planName(c), '', '', 'pkg', null, null],
-      ['account', t('fr.r.acc'), t('fr.r.acc.s'), '', '', 'acc', null, null],
+      ['package', t('fr.r.pkg'), planName(c), '', '', 'pkg', null, 'c:acc'],
+      ['ecard', t('fr.r.ec'), t('fr.r.ec.s'), '', '', 'site', null, 'c:ec'],
+      ['account', t('fr.r.acc'), t('fr.r.acc.s'), '', '', 'acc', null, 'c:acc'],
       ['terms', t('fr.r.terms'), t('fr.r.terms.s'), '', '', 'terms', '../terms.html', null],
       ['privacy', t('fr.r.priv'), t('fr.r.priv.s'), '', '', 'priv', '../privacy.html', null],
       ['channels', t('fr.r.chan'), t('fr.r.chan.s'), '', '', 'chan', null, null],
-      ['numbers', t('fr.r.num'), t('fr.r.num.s'), '', '', 'num', null, 'v:today'],
+      ['numbers', t('fr.r.num'), t('fr.r.num.s'), '', '', 'num', null, 'c:num'],
       ['core', t('fr.r.core'), t('fr.r.core.s'), '', '', 'core', null, 'v:core'],
-      ['reports', t('fr.r.rep'), t('fr.r.rep.s'), '', '', 'reports', null, 'v:reports'],
+      ['reports', t('fr.r.rep'), t('fr.r.rep.s'), '', '', 'reports', null, 'c:rep'],
       ['whatsapp', 'WhatsApp', t('fr.r.wa.s'), '', '', 'whatsapp', WA, null]];
     var sec = {};
     var row = function (k, v, href, icon, act) { return [k, v || '', href || null, icon || null, act || null]; };
@@ -1256,17 +1257,19 @@
     tok = String(tok || '');
     var c = frontClient();
     if (tok === 'close') { closeFront(); return; }
+    if (tok === 'home') { closeCircuit(); openFront(); return; }
+    if (tok.indexOf('c:') === 0) { if (!FR.on) openFront(); openCircuit(tok.slice(2)); return; }
     if (tok === 'signout') { sb.auth.signOut().then(toLogin, toLogin); return; }
     if (tok === 'lang') { var lt = document.querySelector('[data-lang-toggle]'); if (lt) lt.click(); return; }
-    if (tok === 'bell') { closeFront(); setTimeout(function () { var b = $('bell'); if (b && b.getAttribute('aria-expanded') !== 'true') b.click(); }, 120); return; }
+    if (tok === 'bell') { closeCircuit(); closeFront(); setTimeout(function () { var b = $('bell'); if (b && b.getAttribute('aria-expanded') !== 'true') b.click(); }, 120); return; }
     if (tok.indexOf('hq:') === 0) {
-      var hv = tok.slice(3); closeFront();
+      var hv = tok.slice(3); closeCircuit(); closeFront();
       if (S.mode === 'hq') { navFor('hq'); showBoard(hv); } else backToHQ(hv);
       return;
     }
-    if (tok.indexOf('ws:') === 0) { S.ccClient = tok.slice(3); Z.store(CLIENT_KEY, S.ccClient); openFront(true); return; }
+    if (tok.indexOf('ws:') === 0) { S.ccClient = tok.slice(3); Z.store(CLIENT_KEY, S.ccClient); openFront(true); if (CX.on) { try { CX.frame.contentWindow.ZCIRCUIT.reload(); } catch (e) { /* ignore */ } } return; }
     if (tok.indexOf('v:') === 0) {
-      var view = tok.slice(2); closeFront();
+      var view = tok.slice(2); closeCircuit(); closeFront();
       if (S.isAdmin && (S.mode !== 'ws' || !S.client || S.client.id !== (c && c.id))) {
         if (c) openWorkspace(c.id).then(function () { D.show(view, { force: true, focus: true }); });
         return;
@@ -1274,7 +1277,114 @@
       D.show(view, { force: true, focus: true });
     }
   }
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct };
+
+  /* ---------- Circuit screens (app/circuit.html): every screen in the cube's world (KJ, 3 Nov 2026) ----------
+     The page asks for its data with ZFRONT_HOST.data({week}) and acts through review(), reply() and act(). Real data only:
+     where there is none yet, the page says so instead of showing figures. */
+  var CX = { wrap: null, frame: null, on: false };
+  function isVideo(u) { return /\.(mp4|mov|m4v|webm)(\?.*)?$/i.test(u || ''); }
+  function mediaOf(x) {
+    var all = String(x.media_url || '').split(/[\s,]+/).map(safeUrl).filter(Boolean);
+    return { img: all.filter(isImage), video: all.filter(isVideo)[0] || null };
+  }
+  function dub(iso) { var d = new Date(Date.parse(iso) + 4 * 3600e3); return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate(), wd: d.getUTCDay(), h: d.getUTCHours() + d.getUTCMinutes() / 60, key: d.toISOString().slice(0, 10) }; }
+  function itemOut(x) {
+    var md = mediaOf(x), w = x.scheduled_at ? dub(x.scheduled_at) : null;
+    return { id: x.id, title: pick(x, 'title', 'title_ar') || '', kind: x.kind, platform: x.platform || '', pname: x.platform ? plat(x.platform)[L()] : '',
+      status: x.status, when: x.scheduled_at ? fmtWhen(x.scheduled_at) : '', at: x.scheduled_at || null, wd: w ? w.wd : null, h: w ? w.h : null, key: w ? w.key : null,
+      img: md.img, video: md.video, caption: pick(x, 'caption', 'caption_ar') || '', canReview: canReview(x), url: safeUrl(x.published_url) || null };
+  }
+  function circuitData(opt) {
+    opt = opt || {};
+    var c = frontClient(); if (!c) return Promise.resolve(null);
+    var items = frontItems(c), feats = featsOf(c);
+    var get = function (pr) { return q(pr).catch(function () { return []; }); };
+    return Promise.all([
+      get(sb.from('kpis').select('*').eq('client_id', c.id).order('period_start', { ascending: false }).order('created_at', { ascending: false })),
+      get(sb.from('reports').select('*').eq('client_id', c.id).order('created_at', { ascending: false })),
+      S.isAdmin ? get(sb.from('comment_replies').select('*').eq('client_id', c.id).order('comment_at', { ascending: false, nullsFirst: false }).limit(40)) : Promise.resolve([])
+    ]).then(function (r) {
+      var kpis = r[0] || [], reports = r[1] || [], comments = r[2] || [];
+      var byAt = function (a, b) { return String(a.scheduled_at || '').localeCompare(String(b.scheduled_at || '')); };
+      var pending = items.filter(function (x) { return x.status === 'needs_approval' && x.kind !== 'reply'; }).sort(byAt).map(itemOut);
+      var drafts = items.filter(function (x) { return x.status === 'needs_approval' && x.kind === 'reply'; }).map(itemOut);
+      // this week in Dubai, Sunday first; opt.week moves it
+      var now = dub(new Date().toISOString()), base = Date.UTC(now.y, now.m, now.d) - now.wd * 86400e3 + (opt.week || 0) * 7 * 86400e3;
+      var keys = []; for (var i = 0; i < 7; i++) keys.push(new Date(base + i * 86400e3).toISOString().slice(0, 10));
+      var week = items.filter(function (x) { return x.kind !== 'reply' && x.scheduled_at && keys.indexOf(dub(x.scheduled_at).key) > -1; }).sort(byAt).map(itemOut);
+      var live = [];
+      items.filter(function (x) { return x.published_url || x.fb_url || x.threads_url; })
+        .sort(function (a, b) { return String(b.published_at || b.scheduled_at || '').localeCompare(String(a.published_at || a.scheduled_at || '')); })
+        .forEach(function (x) { var o = itemOut(x), when = x.published_at ? fmtDate(x.published_at) : '';
+          if (safeUrl(x.published_url)) live.push({ title: o.title, platform: x.platform, pname: o.pname, url: safeUrl(x.published_url), when: when, img: o.img[0] || null });
+          if (safeUrl(x.fb_url)) live.push({ title: o.title, platform: 'facebook', pname: plat('facebook')[L()], url: safeUrl(x.fb_url), when: when, img: o.img[0] || null });
+          if (safeUrl(x.threads_url)) live.push({ title: o.title, platform: 'threads', pname: plat('threads')[L()], url: safeUrl(x.threads_url), when: when, img: o.img[0] || null }); });
+      var ym = now.y + '-' + now.m, counts = {}, days = {};
+      items.forEach(function (x) { if (x.kind === 'reply' || !x.scheduled_at) return; var d = dub(x.scheduled_at); if (d.y + '-' + d.m !== ym) return; counts[x.kind] = (counts[x.kind] || 0) + 1; days[d.d] = 1; });
+      var seen = {}, latest = [], series = {};
+      kpis.forEach(function (k) { if (!seen[k.metric]) { seen[k.metric] = k; latest.push(k); } (series[k.metric] = series[k.metric] || []).push(Number(k.value)); });
+      var nums = latest.filter(function (k) { return !/^target_/.test(k.metric); }).slice(0, 4).map(function (k) {
+        var sr = series[k.metric], prev = sr.length > 1 ? sr[1] : null, tg = seen['target_' + k.metric];
+        return { label: pick(k, 'label', 'label_ar') || k.metric, value: num(k.value), raw: Number(k.value), delta: prev ? (Number(k.value) - prev) / Math.abs(prev) * 100 : null,
+          pct: tg && Number(tg.value) > 0 ? Number(k.value) / Number(tg.value) : null, asof: k.period_start ? fmtDate(k.period_start) : '' };
+      });
+      var out = {
+        lang: L(), dir: L() === 'ar' ? 'rtl' : 'ltr', admin: !!S.isAdmin, week: opt.week || 0,
+        client: { id: c.id, name: cName(c), plan: planName(c), feats: feats, internal: c.internal === true, instagram: c.instagram || '' },
+        pending: pending, drafts: drafts, week_items: week, week_keys: keys, now: { wd: now.wd, h: dub(new Date().toISOString()).h, key: now.key },
+        week_label: fmtDate(keys[0]) + ' – ' + fmtDate(keys[6]),
+        live: live.slice(0, 8), plan: { counts: counts, days: Object.keys(days).map(Number), month: new Intl.DateTimeFormat(loc(), { month: 'long', year: 'numeric', timeZone: 'Asia/Dubai' }).format(new Date()),
+          dim: new Date(Date.UTC(now.y, now.m + 1, 0)).getUTCDate(), today: now.d },
+        nums: nums, reports: reports.map(function (x) { return { title: pick(x, 'title', 'title_ar') || '', period: x.period || x.period_start || '', url: safeUrl(x.file_url) || null, date: x.created_at ? fmtDate(x.created_at) : '' }; }),
+        comments: comments.map(function (m) { return { id: m.comment_id, platform: m.platform, from: m.from_name || '', text: m.comment || '', ago: m.comment_at ? ago(m.comment_at) : '', status: m.status,
+          auto: m.status === 'replied' && m.reply_text && m.reply_text !== m.manual_reply_text ? m.reply_text : '', mine: m.manual_reply_text || '', url: safeUrl(m.permalink) || null, can: !!CM_REPLY[m.platform] }; }),
+        unread: (S.notifs || []).filter(function (n) { return !n.read; }).length,
+        ecard: /zkj system/i.test(c.name || '') ? 'https://system.zkjverse.com/zkj-system/' : null,
+        wa: WA, publishing: S.settings && S.settings.publisher_paused !== undefined ? S.settings.publisher_paused !== 'true' : null
+      };
+      if (S.isAdmin) {
+        out.hq = S.clients.filter(function (x) { return x.active !== false; }).map(function (x) {
+          var its = (S.all || []).filter(function (y) { return y.client_id === x.id; });
+          return { id: x.id, name: cName(x), waiting: its.filter(function (y) { return y.status === 'needs_approval'; }).length,
+            changes: its.filter(function (y) { return y.status === 'changes_requested'; }).length, current: x.id === c.id };
+        });
+        out.waiting_all = out.hq.reduce(function (a, b) { return a + b.waiting; }, 0);
+        out.changes_all = out.hq.reduce(function (a, b) { return a + b.changes; }, 0);
+      }
+      return out;
+    });
+  }
+  function itemById(id) { var all = (S.all || []).concat(S.items || []); for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i]; return null; }
+  function circuitReview(id, decision, note) {
+    var x = itemById(id); if (!x) return Promise.resolve({ ok: false, error: 'missing' });
+    if (!canReview(x)) return Promise.resolve({ ok: false, error: 'not-allowed' });
+    var before = x.status;
+    return review(x, decision, note).then(function () { return { ok: x.status === decision || x.status !== before }; });
+  }
+  function circuitReply(commentId, text) {
+    return sb.auth.getSession().then(function (r) {
+      var tok = r && r.data && r.data.session && r.data.session.access_token;
+      return fetch(((window.ZKJ_SB && window.ZKJ_SB.url) || '') + '/functions/v1/inbox-reply', { method: 'POST', headers: { Authorization: 'Bearer ' + (tok || ''), 'Content-Type': 'application/json' }, body: JSON.stringify({ comment_id: commentId, text: text }) })
+        .then(function (res) { return res.json().catch(function () { return { ok: false, error: String(res.status) }; }); });
+    }).catch(function (e) { return { ok: false, error: e.message }; });
+  }
+  function closeCircuit() {
+    if (!CX.wrap || !CX.on) return;
+    CX.on = false; CX.wrap.classList.remove('on');
+    setTimeout(function () { if (!CX.on) CX.wrap.hidden = true; }, 420);
+  }
+  function openCircuit(scene) {
+    if (!CX.wrap) {
+      CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html#' + scene;
+      CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
+    } else {
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html#' + scene; }
+    }
+    CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
+    requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
+  }
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && FR.on) closeFront(); });
 
   /* ---------- Set password (invite / recovery links) ---------- */
@@ -1823,6 +1933,7 @@
     if (modalOpen) closeModal();
     if ($('dash').getAttribute('data-state') === 'ready') renderBoard();
     if (FR.wrap && FR.on) openFront(true);
+    if (CX.wrap && CX.on) { try { CX.frame.contentWindow.ZCIRCUIT.reload(); } catch (e) { /* ignore */ } }
     if ($('dash').getAttribute('data-state') === 'password') $('pw-sub').textContent = t('p.pw.sub', { email: (S.user && S.user.email) || '' });
   });
 
