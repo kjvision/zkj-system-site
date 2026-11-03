@@ -1244,13 +1244,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261103b';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261103b'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1261,30 +1261,19 @@
   function frontAct(tok) {
     tok = String(tok || '');
     var c = frontClient();
-    if (tok === 'close') { closeFront(); return; }
+    if (tok === 'close') { closeCircuit(); openFront(); return; } // never the classic screens (KJ, 3 Nov 2026)
     if (tok === 'home') { closeCircuit(); openFront(); return; }
     if (tok.indexOf('c:') === 0) { if (!FR.on) openFront(); openCircuit(tok.slice(2)); return; }
     if (tok === 'signout') { sb.auth.signOut().then(toLogin, toLogin); return; }
     if (tok === 'lang') { var lt = document.querySelector('[data-lang-toggle]'); if (lt) lt.click(); return; }
     if (tok === 'bell') { if (!FR.on) openFront(); openCircuit('notif'); return; }
-    if (tok === 'bell-classic') { closeCircuit(); closeFront(); setTimeout(function () { var b = $('bell'); if (b && b.getAttribute('aria-expanded') !== 'true') b.click(); }, 120); return; }
+    if (tok === 'bell-classic') { if (!FR.on) openFront(); openCircuit('notif'); return; }
     // every screen that used to be classic now has its circuit screen (KJ, 3 Nov 2026)
     var NEWS = { 'hq:hq': 'cl', 'hq:drawings': 'dw', 'hq:todo': 'todo', 'hq:week': 'wk', 'hq:admin': 'cc', 'v:core': 'core', 'v:calendar': 'cal', 'v:ads': 'ads-ap', 'v:approvals': 'ap', 'v:inbox': 'inbox', 'v:reports': 'rep', 'v:today': 'hq' };
     if (NEWS[tok]) { if (!FR.on) openFront(); openCircuit(NEWS[tok]); return; }
-    if (tok.indexOf('hq:') === 0) {
-      var hv = tok.slice(3); closeCircuit(); closeFront();
-      if (S.mode === 'hq') { navFor('hq'); showBoard(hv); } else backToHQ(hv);
-      return;
-    }
     if (tok.indexOf('ws:') === 0) { S.ccClient = tok.slice(3); Z.store(CLIENT_KEY, S.ccClient); openFront(true); if (CX.on) { try { CX.frame.contentWindow.ZCIRCUIT.reload(); } catch (e) { /* ignore */ } } return; }
-    if (tok.indexOf('v:') === 0) {
-      var view = tok.slice(2); closeCircuit(); closeFront();
-      if (S.isAdmin && (S.mode !== 'ws' || !S.client || S.client.id !== (c && c.id))) {
-        if (c) openWorkspace(c.id).then(function () { D.show(view, { force: true, focus: true }); });
-        return;
-      }
-      D.show(view, { force: true, focus: true });
-    }
+    // any other old token still lands in the new world: KJ's HQ dial, or the client's approvals
+    if (tok.indexOf('hq:') === 0 || tok.indexOf('v:') === 0) { if (!FR.on) openFront(); openCircuit(S.isAdmin ? 'hq' : 'ap'); return; }
   }
 
   /* ---------- Circuit screens (app/circuit.html): every screen in the cube's world (KJ, 3 Nov 2026) ----------
@@ -1388,10 +1377,10 @@
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261103b#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261103b#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
