@@ -192,6 +192,11 @@ function geometry(){
     var pl=mk([sl,[lane,sl[1]+(sl[0]-lane)*.5],[lane,y-12],[lane+12,y],[WIN_L-4,y]]);
     var pr=mk([sr,[laneR,sr[1]+(laneR-sr[0])*.5],[laneR,y-12],[laneR-12,y],[W-WIN_R+4,y]]);
     pl.col=pr.col="#C9A84C";pl.row=pr.row=i;pl.next=clock+i*.45;pr.next=clock+i*.45+.2;BEAMS.push(pl,pr);});
+  /* tiles folded under the rows on shorter phones: each gets its own line from the cube */
+  var dts=[].slice.call(document.querySelectorAll("#dock .dt")),nd=dts.length;
+  dts.forEach(function(el,k){var r=el.getBoundingClientRect(),tx=r.left+r.width/2,ty=r.top,left=k<nd/2,j=left?k:nd-1-k;
+    var lane=left?5+j*4:W-5-j*4,s0=left?LV:RV,st=[s0[0]+(left?-1:1),s0[1]],hy=ty-12-j*6;
+    var p=mk([st,[lane,st[1]+Math.abs(st[0]-lane)*.5],[lane,hy],[tx,hy],[tx,ty-2]]);p.col="#C9A84C";p.row=n+k;p.next=clock+(n+k)*.45;BEAMS.push(p);});
   placePlates();
 }
 function resize(){var r=cv.getBoundingClientRect();W=r.width||W;H=r.height||H;DPR=Math.min(window.devicePixelRatio||1,2);
