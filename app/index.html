@@ -19,8 +19,10 @@
   <link rel="stylesheet" href="../assets/portal.css">
   <link rel="stylesheet" href="../assets/core.css">
   <link rel="stylesheet" href="../drawings/drawings.css">
+<style>/* boot cover: the old screens are never seen while the cube front loads */#boot{position:fixed;inset:0;z-index:3000;background:#0B0B0F;display:grid;place-items:center;transition:opacity .5s ease}#boot img{width:54px;height:auto;filter:drop-shadow(0 0 18px rgba(201,168,76,.45));animation:bootp 1.6s ease-in-out infinite}@keyframes bootp{50%{opacity:.55;transform:scale(.96)}}html.booted #boot{opacity:0;pointer-events:none}@media (prefers-reduced-motion:reduce){#boot img{animation:none}}</style>
 </head>
 <body data-title-key="p.app.meta">
+<div id="boot" aria-hidden="true"><img src="../assets/brand/zkjsystem-icon-primary.svg" alt="" width="54" height="62"></div>
 <div class="dash portal device no-client" id="dash" data-theme="core" data-state="loading" data-view="today" data-mood="a">
   <a class="skip-link" href="#dash-main" data-i18n="skip">Skip to content</a>
   <div class="stage-fx" aria-hidden="true"></div>

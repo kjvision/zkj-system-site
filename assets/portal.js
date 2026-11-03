@@ -152,7 +152,9 @@
   function chrome(on) {
     show($('dock'), on); show($('tabbar'), on); show($('sidebar'), on && (!!S.client || S.mode === 'hq'));
   }
+  function booted() { document.documentElement.classList.add('booted'); setTimeout(function () { var b = $('boot'); if (b) b.remove(); }, 700); }
   function setState(titleKey, bodyKey, actions) {
+    if (titleKey !== 'p.loading') booted();
     $('dash').setAttribute('data-state', 'message');
     show($('board'), false); show($('pw-panel'), false); show($('state'), true);
     chrome(false);
@@ -1072,6 +1074,7 @@
   }
 
   function loadError(err) {
+    booted();
     if (window.console) console.warn('[portal] load failed', err && (err.message || err));
     setState('p.st.error.t', 'p.st.error.b', [{ action: 'retry', key: 'p.retry', cls: 'btn-primary' }, WA_ACTION]);
   }
@@ -1242,6 +1245,8 @@
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
       FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html';
+      FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
+      setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
@@ -1261,7 +1266,8 @@
     if (tok.indexOf('c:') === 0) { if (!FR.on) openFront(); openCircuit(tok.slice(2)); return; }
     if (tok === 'signout') { sb.auth.signOut().then(toLogin, toLogin); return; }
     if (tok === 'lang') { var lt = document.querySelector('[data-lang-toggle]'); if (lt) lt.click(); return; }
-    if (tok === 'bell') { closeCircuit(); closeFront(); setTimeout(function () { var b = $('bell'); if (b && b.getAttribute('aria-expanded') !== 'true') b.click(); }, 120); return; }
+    if (tok === 'bell') { if (!FR.on) openFront(); openCircuit('notif'); return; }
+    if (tok === 'bell-classic') { closeCircuit(); closeFront(); setTimeout(function () { var b = $('bell'); if (b && b.getAttribute('aria-expanded') !== 'true') b.click(); }, 120); return; }
     if (tok.indexOf('hq:') === 0) {
       var hv = tok.slice(3); closeCircuit(); closeFront();
       if (S.mode === 'hq') { navFor('hq'); showBoard(hv); } else backToHQ(hv);
@@ -1339,6 +1345,7 @@
         comments: comments.map(function (m) { return { id: m.comment_id, platform: m.platform, from: m.from_name || '', text: m.comment || '', ago: m.comment_at ? ago(m.comment_at) : '', status: m.status,
           auto: m.status === 'replied' && m.reply_text && m.reply_text !== m.manual_reply_text ? m.reply_text : '', mine: m.manual_reply_text || '', url: safeUrl(m.permalink) || null, can: !!CM_REPLY[m.platform] }; }),
         unread: (S.notifs || []).filter(function (n) { return !n.read; }).length,
+        notifs: (S.notifs || []).slice(0, 40).map(function (n) { var cl = n.client_id ? clientById(n.client_id) : null; return { title: pick(n, 'title', 'title_ar') || '', body: pick(n, 'body', 'body_ar') || '', ago: n.created_at ? ago(n.created_at) : '', read: !!n.read, client: cl ? cName(cl) : '' }; }),
         ecard: /zkj system/i.test(c.name || '') ? 'https://system.zkjverse.com/zkj-system/' : null,
         wa: WA, publishing: S.settings && S.settings.publisher_paused !== undefined ? S.settings.publisher_paused !== 'true' : null
       };
@@ -1384,11 +1391,13 @@
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
   }
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply };
+  function circuitReadAll() { return sb.rpc('mark_notifications_read').then(function (r) { if (r.error) throw r.error; (S.notifs || []).forEach(function (n) { n.read = true; }); renderNotifs(); return { ok: true }; }).catch(function (e) { return { ok: false, error: e && e.message }; }); }
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && FR.on) closeFront(); });
 
   /* ---------- Set password (invite / recovery links) ---------- */
   function showPassword() {
+    booted();
     $('dash').setAttribute('data-state', 'password');
     show($('state'), false); show($('board'), false); show($('pw-panel'), true);
     chrome(false);
