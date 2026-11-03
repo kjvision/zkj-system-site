@@ -102,6 +102,16 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 [dir=rtl] .it .rn.ar{transform:scaleX(-1)}
 .it.hd .rt b{text-transform:uppercase}
 [dir=rtl] body,[dir=rtl] .card{font-family:"IBM Plex Sans Arabic","Inter",system-ui,sans-serif}
+[dir=rtl] .tback svg{transform:scaleX(-1)}
+[dir=rtl] .plate .pn,[dir=rtl] .plates.slim .plate .pn{font-size:13px;letter-spacing:0}
+/* page 1 without boxes: each place is a gold medallion on its line, the name under it */
+.plate,.plates.slim .plate{height:auto;min-width:92px;padding:4px 6px;border:0;border-radius:0;background:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible;gap:9px;grid-auto-flow:row}
+.plate::before{display:none}.plates.on .plate{animation:none}
+.plate .pi{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(201,168,76,.6);background:radial-gradient(circle at 50% 32%,rgba(230,213,163,.18),rgba(14,14,18,.92) 68%);box-shadow:0 0 0 4px rgba(11,11,15,.85),0 0 0 5px rgba(201,168,76,.16);transition:border-color .2s,box-shadow .2s}
+.plates.slim .plate .pi{width:40px;height:40px}.plates.slim .plate .pi svg{width:18px;height:18px}
+.plate .pn,.plates.slim .plate .pn{font-size:10.5px;letter-spacing:.22em;color:var(--gl);font-weight:500}
+.plate:hover,.plate:focus-visible,.plate.lit{border:0;box-shadow:none}
+.plate:hover .pi,.plate:focus-visible .pi,.plate.lit .pi{border-color:var(--gl);box-shadow:0 0 0 4px rgba(11,11,15,.85),0 0 0 5px rgba(230,213,163,.35),0 0 26px rgba(201,168,76,.35)}
 </style>
 <div class="wrap">
   <div class="card" id="card" role="button" tabindex="0" aria-label="ZKJ SYSTEM portal.">
@@ -110,7 +120,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
       <div class="mark" id="mark"><p id="mkp"></p></div>
       <div class="plates" id="plates"></div>
       <div class="hqp" id="hqp" role="button" tabindex="0" aria-label="HQ, admin"></div>
-      <div class="tbar" id="tbar"><button class="tb" data-s="notifications" aria-label="Notifications"></button><span class="tsp"></span><button class="tb" data-s="language" aria-label="Language"></button><button class="tb" data-s="signout" aria-label="Sign out"></button></div>
+      <div class="tbar" id="tbar"><button class="tb tback" id="tback" aria-label="Back"></button><button class="tb" data-s="notifications" aria-label="Notifications"></button><span class="tsp"></span><button class="tb" data-s="language" aria-label="Language"></button><button class="tb" data-s="signout" aria-label="Sign out"></button></div>
       <div id="rows"></div>
       <div class="dock" id="dock"></div>
       <div class="hint" id="hint"></div>
@@ -226,12 +236,12 @@ var POOL=[];for(var pi=0;pi<48;pi++)POOL.push({p:null,s:0,on:false});
 function spawn(p){for(var i=0;i<POOL.length;i++){if(!POOL[i].on){POOL[i].on=true;POOL[i].p=p;POOL[i].s=0;return;}}}
 function clearPulses(){for(var i=0;i<POOL.length;i++)POOL[i].on=false;}
 
-var lastSweep=0,clock=0,last=0,speed=1,open=false,oT=-9,oTo=0,pending=false,shown=false,visible=true,rowsOn=0;
+var lastSweep=0,clock=(function(){try{return sessionStorage.getItem("zkj-cube-seen")?3.3:0;}catch(x){return 0;}})(),last=0,speed=2.4,open=false,oT=-9,oTo=0,pending=false,shown=false,visible=true,rowsOn=0;
 resize();
 if(window.ResizeObserver)new ResizeObserver(function(){resize();}).observe(card);else addEventListener("resize",resize);
 if(window.IntersectionObserver)new IntersectionObserver(function(es){visible=es[0].isIntersecting;}).observe(card);
 
-var INTRO=3.2,TRANS=1.6;
+var INTRO=3.2,TRANS=1.1;
 function setLabels(){hint.textContent=HINTS[level];card.setAttribute("aria-label",ARIA[level]);platesEl.classList.toggle("on",!open&&shown);tbar.classList.toggle("on",level>0);dockEl.classList.toggle("on",level===1&&dockEl.children.length>0);hqEl.classList.toggle("on",level===0&&shown);}
 setLabels();
 function doToggle(){open=!open;oTo=open?1:0;oT=clock;mark.classList.toggle("on",!open);clearPulses();
@@ -346,15 +356,17 @@ function todayRows(){return TODAY.map(function(r){var o=r[6]?{k:r[1],v:r[2],icon
 function secRows(id){var d=SEC[id];var head={k:d.t,v:d.s,head:true};return [head].concat(d.rows.map(function(r){return {k:r[0],v:r[1],href:r[2]||null,icon:r[3]||null,go:r[4]?function(){go(r[4]);}:null};}));}
 function openSec(id,from){backTo=from;level=2;fillRows(secRows(id),.295,.092);if(!open)requestToggle();setLabels();}
 if(M.admin&&SEC.hq){hqEl.innerHTML='<span class="pi">'+ICONS.box+'</span><span class="pn">'+(M.labels.hq||'HQ')+'</span>';act(hqEl,function(){go("c:hq");});}else{hqEl.style.display="none";}
-[].forEach.call(tbar.querySelectorAll(".tb"),function(b){var k=b.dataset.s,tok=k==="notifications"?"bell":k==="language"?"lang":"signout";b.setAttribute("aria-label",(k==="notifications"?M.labels.bell:k==="language"?M.labels.lang:M.labels.out)||b.getAttribute("aria-label"));b.innerHTML=ICONS[k==="notifications"?"bell":k==="language"?"globe":"signout"]+(k==="notifications"&&M.labels.unread?'<i class="dot"></i>':'');act(b,function(){go(tok);});});
+[].forEach.call(tbar.querySelectorAll(".tb[data-s]"),function(b){var k=b.dataset.s,tok=k==="notifications"?"bell":k==="language"?"lang":"signout";b.setAttribute("aria-label",(k==="notifications"?M.labels.bell:k==="language"?M.labels.lang:M.labels.out)||b.getAttribute("aria-label"));b.innerHTML=ICONS[k==="notifications"?"bell":k==="language"?"globe":"signout"]+(k==="notifications"&&M.labels.unread?'<i class="dot"></i>':'');act(b,function(){go(tok);});});
 function cardTap(){
   if(level===0){level=1;fillRows(todayRows(),.315,.107);requestToggle();}
   else if(level===2){if(backTo===0){level=0;requestToggle();}else{level=1;fillRows(todayRows(),.315,.107);}}
   else{level=0;requestToggle();}
   setLabels();}
 document.getElementById("mkp").textContent=M.greet;
+try{sessionStorage.setItem("zkj-cube-seen","1");}catch(x){}
 window.ZFRONT_FRAME={home:function(){if(level!==0){level=0;if(open)requestToggle();setLabels();}}};
-document.addEventListener("keydown",function(ev){if(ev.key==="Escape")go("close");});
+var tback=document.getElementById("tback");tback.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 L7 12 L15 20" fill="none" stroke="#E6D5A3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';tback.setAttribute("aria-label",M.lang==="ar"?"رجوع":"Back");act(tback,function(){if(level!==0)cardTap();});
+document.addEventListener("keydown",function(ev){if(ev.key==="Escape"&&level!==0)cardTap();});
 
 })();
 </script>
