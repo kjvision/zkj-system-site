@@ -57,6 +57,7 @@ body{background:var(--ob);color:var(--wh);font-family:var(--body);overflow:hidde
 .cmt{padding:12px 14px;display:grid;gap:8px}
 .cmt .h{display:flex;align-items:center;gap:8px;font-size:12px}.cmt .h b{font-weight:600}.cmt .h span{color:var(--mute);font-family:var(--mono);font-size:10px}.cmt .h em{margin-inline-start:auto;font-style:normal}
 .cmt .h svg{width:16px;height:16px}
+.cmt .h span.stt.need{color:var(--bad)}
 .cmt q{font-size:14px;line-height:1.45;quotes:none;overflow-wrap:anywhere}
 .cmt .ln{font-size:12px;color:var(--sil);padding-inline-start:10px;border-inline-start:1px solid var(--line)}
 .rep{display:flex;gap:8px;align-items:flex-end}
@@ -123,6 +124,7 @@ button.plaque[disabled]{cursor:default}
   <div class="sc" data-s="num" hidden></div>
   <div class="sc" data-s="rep" hidden><div class="list" id="rp-list"></div></div>
   <div class="sc" data-s="acc" hidden><div class="list" id="ac-list"></div></div>
+  <div class="sc" data-s="notif" hidden><div class="list" id="nt-list"></div></div>
   <div class="sc" data-s="ec" hidden>
     <div id="ec-hit" role="button" tabindex="0" style="position:absolute;pointer-events:auto;cursor:pointer;border-radius:18px"></div>
     <div id="ec-bar" style="position:absolute;display:flex;gap:8px;pointer-events:auto"></div>
@@ -145,7 +147,7 @@ function $(id){return document.getElementById(id);}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 
 /* ---------- words (English · Arabic) ---------- */
-var TX={en:{hq:"HQ",ap:"APPROVALS",inbox:"INBOX",live:"LIVE NOW",plan:"PLAN",cal:"CALENDAR",ads:"ADS",num:"NUMBERS",rep:"REPORTS",acc:"ACCOUNT",ec:"E-CARD",
+var TX={en:{hq:"HQ",ap:"APPROVALS",inbox:"INBOX",live:"LIVE NOW",plan:"PLAN",cal:"CALENDAR",ads:"ADS",num:"NUMBERS",rep:"REPORTS",acc:"ACCOUNT",ec:"E-CARD",notif:"NOTIFICATIONS",readAll:"MARK ALL AS READ",allRead:"ALL READ",noNotif:"NOTHING NEW",
   slide:"SLIDE TO APPROVE",changes:"↺ REQUEST CHANGES",read:"READ THE CAPTION",clientOnly:"WAITING FOR THE CLIENT'S YES",clear:"ALL CLEAR",clearS:"NOTHING IS WAITING FOR YOUR YES",
   approved:"APPROVED",sent:"SENT BACK WITH YOUR NOTE",fail:"NOT SAVED. TRY AGAIN.",chT:"WHAT SHOULD CHANGE?",chPh:"Write your note…",send:"SEND",cancel:"CANCEL",close:"CLOSE",needNote:"WRITE A NOTE FIRST",
   chips:["Change the caption","Change the image","Change the time","Shorter, please"],
@@ -162,7 +164,7 @@ var TX={en:{hq:"HQ",ap:"APPROVALS",inbox:"INBOX",live:"LIVE NOW",plan:"PLAN",cal
   flip:"FLIP",showQR:"SHOW QR",copy:"COPY LINK",copied:"LINK COPIED",scan:"SCAN TO SAVE THE CARD",noCard:"YOUR E-CARD IS NOT READY YET",request:"REQUEST MY E-CARD →",
   waitingYes:"WAITING FOR A YES",needNow:"NEEDS YOU NOW",postsWait:"POSTS WAITING",commentsWait:"COMMENTS WAITING",changesReq:"CHANGES REQUESTED",pubOn:"PUBLISHING ON",pubOff:"PUBLISHING PAUSED",
   hqAll:"ALL CLIENTS",hqDw:"DRAWINGS",hqTodo:"TO-DO",hqWeek:"THIS WEEK",hqCC:"CONTROL CENTER",onCube:"ON THE CUBE",switchTo:"SHOW",loading:"LOADING"},
- ar:{hq:"المقر",ap:"الموافقات",inbox:"الوارد",live:"المنشور الآن",plan:"الخطة",cal:"التقويم",ads:"الإعلانات",num:"الأرقام",rep:"التقارير",acc:"الحساب",ec:"البطاقة الرقمية",
+ ar:{hq:"المقر",ap:"الموافقات",inbox:"الوارد",live:"المنشور الآن",plan:"الخطة",cal:"التقويم",ads:"الإعلانات",num:"الأرقام",rep:"التقارير",acc:"الحساب",ec:"البطاقة الرقمية",notif:"التنبيهات",readAll:"تعليم الكل كمقروء",allRead:"تمت قراءة الكل",noNotif:"لا جديد",
   slide:"اسحب للموافقة",changes:"↺ اطلب تعديلًا",read:"اقرأ النص",clientOnly:"بانتظار موافقة العميل",clear:"لا شيء معلّق",clearS:"لا منشورات بانتظار موافقتك",
   approved:"تمت الموافقة",sent:"أُعيد مع ملاحظتك",fail:"لم يُحفظ. حاول مجددًا.",chT:"ما الذي يجب تعديله؟",chPh:"اكتب ملاحظتك…",send:"إرسال",cancel:"إلغاء",close:"إغلاق",needNote:"اكتب الملاحظة أولًا",
   chips:["عدّل النص","غيّر الصورة","غيّر الموعد","اختصر رجاءً"],
@@ -500,6 +502,15 @@ function drawEC(t){var p=EC.flip+(EC.to-EC.flip)*.12;EC.flip=Math.abs(EC.to-p)<.
   g.save();rr(x,y,w,h,18);g.clip();if(back)cardBack(x,y,w,h);else cardFront(x,y,w,h,t);
   var s2=((t*.1)%1.8)-.4,sg=g.createLinearGradient(x+w*s2-80,y,x+w*s2+80,y+h);sg.addColorStop(0,"rgba(255,244,214,0)");sg.addColorStop(.5,"rgba(255,244,214,.07)");sg.addColorStop(1,"rgba(255,244,214,0)");g.fillStyle=sg;g.fillRect(x,y,w,h);g.restore();g.restore();}
 
+
+/* ===== Notifications: engraved plaques, newest first ===== */
+function layNT(){var L=$("nt-list"),ns=D.notifs||[],h=[];
+  if(ns.some(function(n){return !n.read;}))h.push('<button class="pill gold" id="nt-all" style="justify-self:center">'+esc(T("readAll"))+'</button>');
+  ns.forEach(function(n){h.push('<div class="gcard cmt"><div class="h">'+(n.read?'':'<span class="stt need"></span>')+'<b>'+esc(n.client||"ZKJ SYSTEM")+'</b><em style="color:var(--mute);font-family:var(--mono);font-size:10px">'+esc(n.ago)+'</em></div><q style="font-weight:600">'+esc(n.title)+'</q>'+(n.body?'<div class="ln">'+esc(n.body)+'</div>':'')+'</div>');});
+  if(!ns.length)h.push('<div class="gcard cmt"><q>'+esc(T("noNotif"))+'</q></div>');
+  L.innerHTML=h.join("");var all=$("nt-all");if(all)all.addEventListener("click",function(){all.disabled=true;ZH.readAll().then(function(r){if(r&&r.ok){toast(T("allRead"));D.notifs.forEach(function(n){n.read=true;});D.unread=0;layout();}else{toast(T("fail"),true);all.disabled=false;}});});
+  var w=desk?Math.min(620,W-80):W-32;pos(L,(W-w)/2,TOP+10,w,H-TOP-20);}
+function drawNT(t){var r=rect($("nt-list"));var x=desk?r.left-40:14,top=TOP+6;if(desk){g.strokeStyle="rgba(201,168,76,.4)";g.lineWidth=1;poly([[x,top],[x,H-30]]);g.stroke();var q=((t*.2)%1);glowDot(x,top+(H-30-top)*q,1.6,.7);}}
 /* ===== sheet (bottom drawer) ===== */
 function sheet(html){var s=$("sheet");$("sheet-in").innerHTML=html;s.hidden=false;s.querySelectorAll("[data-x]").forEach(function(b){b.addEventListener("click",closeSheet);});}
 function closeSheet(){$("sheet").hidden=true;}
@@ -507,7 +518,7 @@ $("sheet").addEventListener("click",function(e){if(e.target===this)closeSheet();
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(!$("sheet").hidden)closeSheet();else ZH.act("home");}});
 
 /* ===== frame & navigation ===== */
-var SCN={hq:[layHQ,drawHQ],ap:[layAP,drawAP],inbox:[layIB,drawIB],live:[layLV,drawLV],plan:[layPL,drawPL],cal:[layCAL,drawCAL],ads:[layAD,drawAD],num:[layNM,drawNM],rep:[layRP,drawRP],acc:[layAC,drawAC],ec:[layEC,drawEC]};
+var SCN={hq:[layHQ,drawHQ],ap:[layAP,drawAP],inbox:[layIB,drawIB],live:[layLV,drawLV],plan:[layPL,drawPL],cal:[layCAL,drawCAL],ads:[layAD,drawAD],num:[layNM,drawNM],rep:[layRP,drawRP],acc:[layAC,drawAC],ec:[layEC,drawEC],notif:[layNT,drawNT]};
 function now(){return (performance.now()-t0)/1000;}
 function layout(){if(!D)return;desk=W>=820;TOP=rect(document.querySelector(".top")).bottom+8;$("ttl").innerHTML=esc(T(scene))+'<small>'+esc(D.client.name)+'</small>';$("bell-dot").hidden=!D.unread;
   $("home").setAttribute("aria-label",AR()?"الرئيسية":"Home");$("bell").setAttribute("aria-label",AR()?"التنبيهات":"Notifications");(SCN[scene]||SCN.ap)[0]();}
@@ -515,7 +526,7 @@ function size(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerH
 function go(s){if(!SCN[s])s="ap";if(s==="hq"&&D&&!D.admin)s="ap";scene=s;closeSheet();document.querySelectorAll(".sc").forEach(function(e){e.hidden=e.getAttribute("data-s")!==s;});if(s!=="ap")AP.filter=null;layout();try{history.replaceState(null,"","#"+s);}catch(e){}}
 function load(s){$("ttl").textContent=T("loading");return ZH.data({week:0}).then(function(d){if(!d)return;D=d;LANG=d.lang==="ar"?"ar":"en";document.documentElement.lang=LANG;document.documentElement.dir=d.dir;go(s||scene);});}
 window.ZCIRCUIT={go:function(s){var target=s;if(s==="ads-ap"){AP.filter="ad";target="ap";}load(target);},reload:function(){load(scene);}};
-$("home").addEventListener("click",function(){ZH.act("home");});$("bell").addEventListener("click",function(){ZH.act("bell");});
+$("home").addEventListener("click",function(){ZH.act("home");});$("bell").addEventListener("click",function(){go("notif");});
 $("pl-open").addEventListener("click",function(){go("cal");});
 function frame(){var t=RM?0:now();g.setTransform(DPR,0,0,DPR,0,0);bg();if(D){try{(SCN[scene]||SCN.ap)[1](t);}catch(e){if(window.console)console.warn(e);}}requestAnimationFrame(frame);}
 window.addEventListener("resize",size);
