@@ -1268,6 +1268,9 @@
     if (tok === 'lang') { var lt = document.querySelector('[data-lang-toggle]'); if (lt) lt.click(); return; }
     if (tok === 'bell') { if (!FR.on) openFront(); openCircuit('notif'); return; }
     if (tok === 'bell-classic') { closeCircuit(); closeFront(); setTimeout(function () { var b = $('bell'); if (b && b.getAttribute('aria-expanded') !== 'true') b.click(); }, 120); return; }
+    // every screen that used to be classic now has its circuit screen (KJ, 3 Nov 2026)
+    var NEWS = { 'hq:hq': 'cl', 'hq:drawings': 'dw', 'hq:todo': 'todo', 'hq:week': 'wk', 'hq:admin': 'cc', 'v:core': 'core', 'v:calendar': 'cal', 'v:ads': 'ads-ap', 'v:approvals': 'ap', 'v:inbox': 'inbox', 'v:reports': 'rep', 'v:today': 'hq' };
+    if (NEWS[tok]) { if (!FR.on) openFront(); openCircuit(NEWS[tok]); return; }
     if (tok.indexOf('hq:') === 0) {
       var hv = tok.slice(3); closeCircuit(); closeFront();
       if (S.mode === 'hq') { navFor('hq'); showBoard(hv); } else backToHQ(hv);
@@ -1317,7 +1320,9 @@
       // this week in Dubai, Sunday first; opt.week moves it
       var now = dub(new Date().toISOString()), base = Date.UTC(now.y, now.m, now.d) - now.wd * 86400e3 + (opt.week || 0) * 7 * 86400e3;
       var keys = []; for (var i = 0; i < 7; i++) keys.push(new Date(base + i * 86400e3).toISOString().slice(0, 10));
-      var week = items.filter(function (x) { return x.kind !== 'reply' && x.scheduled_at && keys.indexOf(dub(x.scheduled_at).key) > -1; }).sort(byAt).map(itemOut);
+      // opt.all (KJ's This week): every active brand's posts in the week, each tagged with its brand
+      var weekSrc = opt.all && S.isAdmin ? (S.all || []).filter(function (x) { var cl = clientById(x.client_id); return cl && cl.active !== false && x.status !== 'draft'; }) : items;
+      var week = weekSrc.filter(function (x) { return x.kind !== 'reply' && x.scheduled_at && keys.indexOf(dub(x.scheduled_at).key) > -1; }).sort(byAt).map(function (x) { var o = itemOut(x); if (opt.all) { var cl = clientById(x.client_id); o.client = cl ? cName(cl) : ''; } return o; });
       var live = [];
       items.filter(function (x) { return x.published_url || x.fb_url || x.threads_url; })
         .sort(function (a, b) { return String(b.published_at || b.scheduled_at || '').localeCompare(String(a.published_at || a.scheduled_at || '')); })
@@ -1335,7 +1340,7 @@
           pct: tg && Number(tg.value) > 0 ? Number(k.value) / Number(tg.value) : null, asof: k.period_start ? fmtDate(k.period_start) : '' };
       });
       var out = {
-        lang: L(), dir: L() === 'ar' ? 'rtl' : 'ltr', admin: !!S.isAdmin, week: opt.week || 0,
+        lang: L(), dir: L() === 'ar' ? 'rtl' : 'ltr', admin: !!S.isAdmin, week: opt.week || 0, all: !!(opt.all && S.isAdmin),
         client: { id: c.id, name: cName(c), plan: planName(c), feats: feats, internal: c.internal === true, instagram: c.instagram || '' },
         pending: pending, drafts: drafts, week_items: week, week_keys: keys, now: { wd: now.wd, h: dub(new Date().toISOString()).h, key: now.key },
         week_label: fmtDate(keys[0]) + ' – ' + fmtDate(keys[6]),
@@ -1392,7 +1397,187 @@
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
   }
   function circuitReadAll() { return sb.rpc('mark_notifications_read').then(function (r) { if (r.error) throw r.error; (S.notifs || []).forEach(function (n) { n.read = true; }); renderNotifs(); return { ok: true }; }).catch(function (e) { return { ok: false, error: e && e.message }; }); }
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll };
+  /* ---------- Circuit HQ (KJ, 3 Nov 2026: "nothing old anywhere"): All clients, To-do, This week, Drawings, Control Center and Core
+     now live in circuit.html too. The page reads hqData() and acts through admin(op, payload). Same rules and tables as the classic
+     screens: the classic code stays in place (never delete), the circuit simply calls the same steps. */
+  function afterAdmin() { return loadHQ().then(function () { try { if (S.mode === 'hq') renderBoard(); } catch (e) { /* the classic board is hidden */ } }); }
+  function sendBackItem(x, note) {
+    var patch = { status: 'needs_approval', revised_at: new Date().toISOString(), revision_note: note, reviewed_at: null, reviewed_by: null, publish_error: null, publish_attempts: 0 };
+    return q(sb.from('items').update(patch).eq('id', x.id).eq('status', 'changes_requested').select()).then(function (rows) {
+      if (!rows || !rows.length) throw new Error('no longer waiting');
+      var row = rows[0]; for (var k in row) if (Object.prototype.hasOwnProperty.call(row, k)) x[k] = row[k];
+      var n = { client_id: x.client_id, audience: 'client', title: 'Edited after your note: ' + x.title, title_ar: 'عُدّل بعد ملاحظتك: ' + (x.title_ar || x.title), body: note, body_ar: note };
+      return q(sb.from('notifications').insert(n).select()).catch(function () { return null; });
+    });
+  }
+  function itemFull(x) {
+    var o = itemOut(x), c = clientById(x.client_id);
+    o.client = c ? cName(c) : ''; o.client_id = x.client_id; o.note = x.client_note || ''; o.revision = x.revision_note || '';
+    o.first = x.first_comment || ''; o.ready = x.status === 'draft' ? draftReady(x) : null; o.block = x.status === 'draft' && !draftReady(x) ? t(draftBlock(x)) : '';
+    o.ytPublish = !!(S.isAdmin && (x.platform === 'youtube' || x.platform === 'tiktok') && x.publish_state === 'private' && x.external_id);
+    o.media = (videoOf(x) || mediaList(x)[0] || '') || null; o.error = x.publish_error || '';
+    return o;
+  }
+  function dwLabel(s) { var k = 'p.dw.s.' + s, v = t(k); return v === k ? s : v; }
+  function hqData() {
+    if (!S.isAdmin) return null;
+    var cc = clientById(S.ccClient) || S.clients[0];
+    var clients = S.clients.map(function (c) {
+      var st = statsOf(c), nx = st.next, r = brandOf(c), v = D.resolveBrand(r.b, r.fb).vars;
+      return { id: c.id, name: cName(c), logo: safeUrl(c.logo_url), plan: planName(c), tag: tagOf(c), internal: !!c.internal, active: c.active !== false,
+        handle: c.instagram ? '@' + handle(c) : '', colors: [v['--b-bg'], v['--b-primary'], v['--b-accent']],
+        waiting: st.waiting, changes: st.changes, week: st.week, month: st.month,
+        next: nx ? { id: nx.id, title: pick(nx, 'title', 'title_ar'), when: fmtWhen(nx.scheduled_at) } : null, cube: cc && c.id === cc.id };
+    });
+    var todo = todoRows().map(function (r) {
+      if (r.type === 'dw-quote' || r.type === 'dw-check') return { type: r.type, job: r.j.id, title: r.j.name + (r.j.company ? ' · ' + r.j.company : ''), sub: (r.j.parent_id ? t('p.dw.addon') + ' · ' : '') + dwWork(r.j), ago: r.when ? ago(r.when) : '' };
+      if (r.type === 'activity') return { type: 'activity', title: pick(r.n, 'title', 'title_ar'), sub: pick(r.n, 'body', 'body_ar'), read: !!r.n.read, client: r.c ? cName(r.c) : '', ago: r.when ? ago(r.when) : '' };
+      var x = r.x;
+      return { type: r.type, id: x.id, title: pick(x, 'title', 'title_ar'), client: r.c ? cName(r.c) : '', ago: r.when ? ago(r.when) : '', note: r.type === 'changes' ? (x.client_note || '') : r.type === 'revised' ? (x.revision_note || '') : '',
+        own: r.type === 'revised' ? canReview(x) : false, ready: r.type === 'draft' ? draftReady(x) : null, block: r.type === 'draft' && !draftReady(x) ? t(draftBlock(x)) : '' };
+    });
+    var n = { quote: 0, check: 0, work: 0, cust: 0, done: 0 };
+    (S.dw || []).forEach(function (j) { if (DW_GROUP[j.status]) n[DW_GROUP[j.status]]++; });
+    var r0 = cc ? brandOf(cc) : null, bv = r0 ? D.resolveBrand(r0.b, r0.fb).vars : {};
+    var key = S.settings.social_connect_key || '', base = ((window.ZKJ_SB && window.ZKJ_SB.url) || '') + '/functions/v1/social-connect';
+    return {
+      clients: clients, todo: todo, todoOpen: todoCount(), dwCount: n,
+      cc: cc ? { id: cc.id, name: cName(cc), covers: coversOf(cc).join(',\n'),
+        brand: { bg: bv['--b-bg'], surface: bv['--b-surface'], text: (r0.b.text || bv['--b-text']), primary: bv['--b-primary'], accent: bv['--b-accent'],
+          font_display: r0.b.font_display || 'Cinzel', font_body: r0.b.font_body || 'Inter', radius: r0.b.radius != null ? r0.b.radius : 22 },
+        social: SOC_NETS.map(function (nt) {
+          var a = (S.social || []).filter(function (s2) { return s2.client_id === cc.id && s2.network === nt.id; })[0], st = !a ? 'none' : a.status !== 'ok' ? 'expired' : 'ok';
+          return { id: nt.id, name: nt[L()], st: st, label: st === 'ok' ? (a.name || t('p.soc.ok')) : t('p.soc.' + st), href: key ? base + '?client=' + encodeURIComponent(cc.name) + '&network=' + nt.id + '&key=' + encodeURIComponent(key) : '' };
+        }) } : null,
+      fonts: D.FONT_ALLOW.slice(), kinds: IMPORT_KINDS.map(function (k) { return [k, t('p.type.' + k)]; }),
+      platforms: allPlatforms().map(function (p) { return [p.id, p[L()]]; }), statuses: ['needs_approval', 'draft', 'scheduled', 'published'].map(function (s2) { return [s2, t('p.s.' + s2)]; }),
+      paused: S.settings.publisher_paused === undefined ? null : S.settings.publisher_paused === 'true', socialKey: !!key
+    };
+  }
+  function dwJobs() {
+    return Promise.all([q(sb.from('drawing_jobs').select('*').order('created_at', { ascending: false }).limit(100)), q(sb.from('app_settings').select('key,value').in('key', ['drawings_price_per_sheet'])).catch(function () { return []; })]).then(function (r) {
+      var order = ['received', 'check', 'changes', 'confirmed', 'quoted', 'in_work', 'review', 'approved', 'cancelled'];
+      var jobs = (r[0] || []).sort(function (a, b) { return order.indexOf(a.status) - order.indexOf(b.status) || (a.created_at < b.created_at ? 1 : -1); });
+      S.dw = jobs.filter(function (j) { return j.status !== 'cancelled'; });
+      return { price: ((r[1] || [])[0] || {}).value || '', jobs: jobs.map(function (j) {
+        var view = location.origin + '/drawings/view.html?job=' + j.id + '&k=' + j.customer_key + '&lang=' + j.lang;
+        return { id: j.id, name: j.name, company: j.company || '', status: j.status, label: dwLabel(j.status), rev: j.revision || 1, ago: ago(j.updated_at || j.created_at), created: fmtDate(j.created_at),
+          work: dwWork(j), addon: !!j.parent_id, spec: [j.labels, j.units, j.sheet].filter(Boolean).join(' · '), hq: j.hq_note || '', cust: j.customer_note || '', details: j.details || '',
+          sheets: j.sheets || '', ppsheet: j.price_per_sheet != null ? j.price_per_sheet : '', cur: j.currency || '',
+          view: view, agent: 'https://usucmdjupfjuchfxnxpz.supabase.co/functions/v1/drawings-desk?job=' + j.id + '&agent=' + j.agent_key,
+          wa: j.phone ? 'https://wa.me/' + String(j.phone).replace(/[^\d]/g, '') + '?text=' + encodeURIComponent((j.lang === 'ar' ? 'رابط طلب الرسومات: ' : 'Your drawing order: ') + view) : '',
+          inputs: (j.inputs || []).map(function (f) { return { name: f.name, path: 'inputs/' + j.id + '/' + f.name }; }),
+          outputs: (j.outputs || []).filter(function (o) { return o.rev === j.revision; }).map(function (o) { return { name: o.name, path: o.path }; }) };
+      }) };
+    });
+  }
+  function ok(msg) { return { ok: true, msg: msg || '' }; }
+  function bad(err) { return { ok: false, error: (err && err.message) || String(err || '?') }; }
+  function adminInsert(table, row, okKey) {
+    var target = clientById(S.ccClient); if (!S.isAdmin || !target) return Promise.resolve(bad('no brand'));
+    row.client_id = target.id; var name = cName(target);
+    return q(sb.from(table).insert(row).select()).then(function () { return afterAdmin().then(function () { return ok(t(okKey, { name: name })); }); }).catch(bad);
+  }
+  function str(v) { v = v == null ? '' : String(v).trim(); return v === '' ? null : v; }
+  function circuitAdmin(op, p) {
+    p = p || {};
+    if (!S.isAdmin) return Promise.resolve(bad('admin only'));
+    var x = p.id ? itemById(p.id) : null;
+    switch (op) {
+      case 'item': return Promise.resolve(x ? itemFull(x) : null);
+      case 'target': if (clientById(p.client)) { S.ccClient = p.client; Z.store(CLIENT_KEY, S.ccClient); } return Promise.resolve(ok());
+      case 'sendback':
+        if (!x || x.status !== 'changes_requested') return Promise.resolve(bad(t('p.appr.stale')));
+        if (!str(p.note)) return Promise.resolve(bad(t('p.sb.need')));
+        return sendBackItem(x, str(p.note)).then(afterAdmin).then(function () { return ok(t('p.sb.toast', { title: pick(x, 'title', 'title_ar') })); })
+          .catch(function (e) { return bad(/no longer waiting/i.test(e && e.message) ? t('p.appr.stale') : e); });
+      case 'to-approval':
+        if (!x || x.status !== 'draft' || !draftReady(x)) return Promise.resolve(bad(t('p.e.generic')));
+        return q(sb.from('items').update({ status: 'needs_approval' }).eq('id', x.id).eq('status', 'draft').select()).then(function (rows) {
+          if (!rows || !rows.length) throw new Error('no longer a draft'); x.status = 'needs_approval';
+          return afterAdmin().then(function () { return ok(t('p.dr.toast', { title: pick(x, 'title', 'title_ar') })); });
+        }).catch(bad);
+      case 'yt-publish':
+        if (!x) return Promise.resolve(bad('missing'));
+        return sb.auth.getSession().then(function (r) {
+          var tok = r && r.data && r.data.session && r.data.session.access_token;
+          return fetch(((window.ZKJ_SB && window.ZKJ_SB.url) || '') + '/functions/v1/social-publisher?publish=' + encodeURIComponent(x.id), { method: 'POST', headers: { Authorization: 'Bearer ' + (tok || '') } }).then(function (res) { return res.json(); });
+        }).then(function (j) {
+          if (j && j.ok) { x.publish_state = j.state || 'public'; return ok(t('p.soc.public')); }
+          if (j && j.studio) return { ok: false, open: j.studio, error: t(x.platform === 'tiktok' ? 'p.soc.tt.open' : 'p.soc.studio') };
+          return bad(t('p.soc.fail', { err: (j && j.error) || '?' }));
+        }).catch(bad);
+      case 'post':
+        if (!str(p.title)) return Promise.resolve(bad(t('p.f.need')));
+        return adminInsert('items', { kind: str(p.kind) || 'post', title: str(p.title), title_ar: str(p.title_ar), caption: str(p.caption), caption_ar: str(p.caption_ar), first_comment: str(p.first_comment),
+          media_url: str(p.media_url), platform: str(p.platform), scheduled_at: str(p.scheduled_at) ? new Date(p.scheduled_at).toISOString() : null, status: str(p.status) || 'needs_approval' }, 'p.f.ok.item');
+      case 'kpi':
+        if (!str(p.label) || !str(p.value) || !isFinite(Number(p.value))) return Promise.resolve(bad(t('p.f.need')));
+        var label = str(p.label), row = { metric: str(p.metric) || label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 60) || 'metric', value: Number(p.value), label: label, label_ar: str(p.label_ar) };
+        if (str(p.period_start)) row.period_start = str(p.period_start);
+        return adminInsert('kpis', row, 'p.f.ok.kpi');
+      case 'notif':
+        if (!str(p.title)) return Promise.resolve(bad(t('p.f.need')));
+        return adminInsert('notifications', { audience: 'client', title: str(p.title), title_ar: str(p.title_ar), body: str(p.body), body_ar: str(p.body_ar) }, 'p.f.ok.notif');
+      case 'import-check':
+        var res = parseImport(p.text), tg = clientById(S.ccClient);
+        return Promise.resolve({ fatal: res.fatal, n: res.rows.length, errors: res.errors.length, ready: !res.fatal && res.rows.length && !res.errors.length ? t('p.imp.ready', { n: res.rows.length, name: tg ? cName(tg) : '' }) : (res.rows.length ? t('p.imp.fix') : t('p.imp.none')),
+          rows: res.rows.map(function (r) { return { n: r.n, ok: r.ok, title: r.row.title || '—', meta: (IMPORT_KINDS.indexOf(r.row.kind) > -1 ? t('p.type.' + r.row.kind) : r.row.kind) + ' · ' + (r.row.platform ? plat(r.row.platform)[L()] : '—'), when: r.ok ? (r.when ? fmtWhen(r.when) : t('p.appr.nowhen')) : r.errs.join(' ') }; }) });
+      case 'import':
+        var rs = parseImport(p.text), target = clientById(S.ccClient);
+        if (rs.fatal || !rs.rows.length || rs.errors.length || !target) return Promise.resolve(bad(rs.fatal || t('p.imp.fix')));
+        var rows = rs.rows.map(function (r) { r.row.client_id = target.id; return r.row; });
+        return q(sb.from('items').insert(rows).select()).then(afterAdmin).then(function () { return ok(t('p.imp.done', { n: rows.length, name: cName(target) })); }).catch(bad);
+      case 'brand':
+        var tb = clientById(S.ccClient); if (!tb) return Promise.resolve(bad('no brand'));
+        var br = {}; brandFields().forEach(function (k) { br[k] = p[k]; }); br.radius = Math.max(0, Math.min(32, parseInt(br.radius, 10) || 0));
+        ['bg', 'surface', 'text', 'primary', 'accent'].forEach(function (k) { br[k] = String(br[k] || '').toUpperCase(); if (!/^#[0-9A-F]{6}$/.test(br[k])) delete br[k]; });
+        if (D.FONT_ALLOW.indexOf(br.font_display) < 0 || D.FONT_ALLOW.indexOf(br.font_body) < 0) return Promise.resolve(bad(t('p.f.need')));
+        return q(sb.from('clients').update({ brand: br }).eq('id', tb.id).select()).then(function () { brandFor = null; return afterAdmin(); }).then(function () { return ok(t('p.br.saved', { name: cName(tb) })); }).catch(bad);
+      case 'covers':
+        var tc = clientById(S.ccClient); if (!tc) return Promise.resolve(bad('no brand'));
+        var raw = String(p.text || '').split(/[\s,]+/).map(function (u) { return u.trim(); }).filter(Boolean), urls = raw.map(safeUrl).filter(Boolean);
+        if (urls.length !== raw.length) return Promise.resolve(bad(t('p.cov.bad')));
+        return q(sb.from('clients').update({ cover_urls: urls.length ? urls : null }).eq('id', tc.id).select()).then(afterAdmin).then(function () { return ok(t('p.cov.ok', { n: urls.length, name: cName(tc) })); }).catch(bad);
+      case 'pub':
+        if (S.settings.publisher_paused === undefined) return Promise.resolve(bad(t('p.pub.unknown')));
+        var next = S.settings.publisher_paused === 'true' ? 'false' : 'true';
+        return q(sb.from('app_settings').update({ value: next, updated_at: new Date().toISOString() }).eq('key', 'publisher_paused').select()).then(function (rows) {
+          if (!rows || !rows.length) throw new Error('not saved'); S.settings.publisher_paused = rows[0].value; try { renderPub(); } catch (e) { /* classic only */ }
+          return ok(t('p.pub.saved') + ' ' + t(rows[0].value === 'true' ? 'p.pub.off' : 'p.pub.on'));
+        }).catch(bad);
+      case 'dw-list': return dwJobs().catch(function (e) { return { error: e.message, jobs: [] }; });
+      case 'dw-sign': return sb.storage.from('drawings').createSignedUrl(p.path, 3600).then(function (r) { return r.data ? r.data.signedUrl : null; });
+      case 'dw':
+        var now = new Date().toISOString(), patch = null;
+        if (p.a === 'quote') {
+          var sh = parseInt(p.sheets, 10), pr = parseFloat(p.price);
+          if (!(sh > 0) || !(pr >= 0)) return Promise.resolve(bad(L() === 'ar' ? 'أدخل عدد اللوحات وسعر اللوحة.' : 'Enter the number of sheets and the price per sheet.'));
+          patch = { sheets: sh, price_per_sheet: pr, status: 'quoted', quoted_at: now };
+          sb.from('app_settings').update({ value: String(pr) }).eq('key', 'drawings_price_per_sheet').then(function () { /* default for the next quote */ });
+        } else if (p.a === 'release') patch = { status: 'review' };
+        else if (p.a === 'back') { if (!str(p.note)) return Promise.resolve(bad(L() === 'ar' ? 'اكتب ما يجب أن يصلحه الوكيل.' : 'Write what the agent should fix.')); patch = { status: 'changes', hq_note: str(p.note) }; }
+        else if (p.a === 'cancel') patch = { status: 'cancelled' };
+        if (!patch || !p.id) return Promise.resolve(bad('?'));
+        patch.updated_at = now;
+        return q(sb.from('drawing_jobs').update(patch).eq('id', p.id).select()).then(function () { return ok(); }).catch(bad);
+    }
+    return Promise.resolve(bad('unknown ' + op));
+  }
+  var CORE2 = { ctl: null };
+  // Core inside the circuit page: KJ sees the universe of every brand, a client sees their own
+  function circuitCore(host, o) {
+    if (!host || !window.ZCORE) return false; o = o || {};
+    if (CORE2.ctl) { try { CORE2.ctl.destroy(); } catch (e) { /* ignore */ } }
+    var uni = !!S.isAdmin, c = S.client;
+    if (!uni && !c) return false;
+    CORE2.ctl = window.ZCORE.create(host, { mode: uni ? 'universe' : 'client', platformName: function (id) { return plat(id)[L()]; }, onItem: o.onItem || function () {}, onOpenClient: o.onOpenClient || function () {} });
+    CORE2.ctl.update(uni ? coreUniverseData() : coreClientData(c, S.items, S.kpis)); CORE2.ctl.mount();
+    return true;
+  }
+  function circuitCoreOff() { if (CORE2.ctl) { try { CORE2.ctl.destroy(); } catch (e) { /* ignore */ } CORE2.ctl = null; } }
+  function circuitItem(id) { var x = itemById(id); return Promise.resolve(x ? itemFull(x) : null); }
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff };
   // Esc steps back inside the new world (circuit → cube); it never drops to the old screens
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CX.on) frontAct('home'); });
 
