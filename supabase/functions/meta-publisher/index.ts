@@ -21,7 +21,7 @@ const GRAPH = 'https://graph.facebook.com/' + GRAPH_VERSION;
 const MAX_ATTEMPTS = 3;
 const LOCK_MIN = 15;
 
-type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; first_comment: string | null; first_comment_at: string | null; clients: { id: string; name: string; instagram: string | null; active: boolean; mirror_facebook: string; mirror_threads: boolean } };
+type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; first_comment: string | null; first_comment_at: string | null; collaborators?: string[] | null; clients: { id: string; name: string; instagram: string | null; active: boolean; mirror_facebook: string; mirror_threads: boolean; default_collaborators?: string[] | null } };
 type Account = { igId: string | null; username: string | null; pageId: string; pageName: string; pageToken: string };
 
 async function sb(path: string, init: RequestInit = {}) {
@@ -85,7 +85,20 @@ async function waitContainer(id: string) {
   throw new Error('Meta container still processing after 60 s; will retry next run.');
 }
 
-async function publishInstagram(x: Item, acc: Account, media: { url: string; video: boolean }[]) {
+// Collaborators (KJ, 4 Nov 2026): up to 3 public Instagram usernames invited as co-authors on reels, feed photos and carousels
+// (Graph API `collaborators` on the container). The post's own list (items.collaborators) wins; otherwise the brand's standing partner
+// (clients.default_collaborators). If Meta refuses the invite, the post still goes out without it and the reason lands in items.collab_error.
+function collabOf(x: Item) {
+  const list = x.collaborators && x.collaborators.length ? x.collaborators : (x.clients.default_collaborators ?? []);
+  return list.map((u) => String(u).replace(/^@/, '').trim()).filter((u) => /^[A-Za-z0-9._]{1,30}$/.test(u) && u.toLowerCase() !== handle(x.clients.instagram)).slice(0, 3);
+}
+async function container(ig: string, params: Record<string, string | number | boolean>, collab: string[], note: (s: string) => void) {
+  if (!collab.length) return (await graph('POST', `${ig}/media`, params)).id as string;
+  try { return (await graph('POST', `${ig}/media`, { ...params, collaborators: JSON.stringify(collab) })).id as string; }
+  catch (e) { note(`Collaborator invite refused (${collab.join(', ')}): ${(e as Error).message}`.slice(0, 500)); return (await graph('POST', `${ig}/media`, params)).id as string; }
+}
+async function publishInstagram(x: Item, acc: Account, media: { url: string; video: boolean }[], note: (s: string) => void = () => {}) {
+  const collab = collabOf(x);
   if (!acc.igId) throw new Error(`No Instagram professional account is linked to the Page "${acc.pageName}".`);
   const ig = acc.igId, caption = captionOf(x);
   let creation: string;
@@ -94,15 +107,15 @@ async function publishInstagram(x: Item, acc: Account, media: { url: string; vid
     creation = (await graph('POST', `${ig}/media`, media[0].video ? { media_type: 'STORIES', video_url: media[0].url } : { media_type: 'STORIES', image_url: media[0].url })).id;
   } else if (x.kind === 'reel') {
     if (media.length !== 1 || !media[0].video) throw new Error('A reel needs one MP4 video link in the media field.');
-    creation = (await graph('POST', `${ig}/media`, { media_type: 'REELS', video_url: media[0].url, caption, share_to_feed: true })).id;
+    creation = await container(ig, { media_type: 'REELS', video_url: media[0].url, caption, share_to_feed: true }, collab, note);
   } else if (media.length > 1) {
     const children: string[] = [];
     for (const m of media.slice(0, 10)) children.push((await graph('POST', `${ig}/media`, { image_url: m.url, is_carousel_item: true })).id);
     for (const c of children) await waitContainer(c);
-    creation = (await graph('POST', `${ig}/media`, { media_type: 'CAROUSEL', children: children.join(','), caption })).id;
+    creation = await container(ig, { media_type: 'CAROUSEL', children: children.join(','), caption }, collab, note);
   } else {
     if (!media.length) throw new Error('No image link on this item.');
-    creation = (await graph('POST', `${ig}/media`, { image_url: media[0].url, caption })).id;
+    creation = await container(ig, { image_url: media[0].url, caption }, collab, note);
   }
   await waitContainer(creation);
   const pub = await graph('POST', `${ig}/media_publish`, { creation_id: creation });
@@ -252,8 +265,8 @@ Deno.serve(async (req) => {
     if (get('publisher_paused', 'false') === 'true' && !one) return json(200, { ok: true, paused: true, note: 'Publisher is paused (app_settings.publisher_paused = true).' });
     const hours = Number(get('publisher_window_hours', '36')) || 36;
     const now = new Date();
-    // YouTube / Pinterest / LinkedIn items belong to the social-publisher function; this one touches Instagram and Facebook only.
-    let q = `items?select=*,clients!inner(id,name,instagram,active,mirror_facebook,mirror_threads)&status=eq.approved&clients.active=eq.true&order=scheduled_at.asc&limit=10`;
+    // YouTube / Pinterest / TikTok / X / LinkedIn items belong to the social-publisher function; this one touches Instagram and Facebook only.
+    let q = `items?select=*,clients!inner(id,name,instagram,active,mirror_facebook,mirror_threads,default_collaborators)&status=eq.approved&clients.active=eq.true&order=scheduled_at.asc&limit=10`;
     if (one) q += `&id=eq.${one}`;
     else q += `&scheduled_at=lte.${now.toISOString()}&publish_attempts=lt.${MAX_ATTEMPTS}&platform=not.in.(youtube,pinterest,tiktok,x,linkedin)`;
     if (!one && !force) q += `&scheduled_at=gte.${new Date(now.getTime() - hours * 3600e3).toISOString()}`;
@@ -277,13 +290,14 @@ Deno.serve(async (req) => {
         if (!['instagram', 'facebook'].includes(x.platform ?? '')) throw new Error(`Platform "${x.platform}" is not published by the system; post it by hand.`);
         if (hasInternalNote(x)) throw new Error(NOTE_ERROR);
         const media = await mediaOf(x);
-        if (dry) { say(`DRY ${tag} → ${acc.pageName}${acc.username ? ' / @' + acc.username : ''} · ${media.length} media · caption ${captionOf(x).length} chars`); results.push({ id: x.id, title: x.title, ok: true }); continue; }
+        if (dry) { say(`DRY ${tag} → ${acc.pageName}${acc.username ? ' / @' + acc.username : ''} · ${media.length} media · caption ${captionOf(x).length} chars` + (collabOf(x).length ? ` · with @${collabOf(x).join(', @')}` : '')); results.push({ id: x.id, title: x.title, ok: true }); continue; }
         // claim (prevents a second run from posting the same item)
         const claimed = await sb(`items?id=eq.${x.id}&status=eq.approved&or=(publish_lock.is.null,publish_lock.lt.${new Date(now.getTime() - LOCK_MIN * 60000).toISOString()})`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ publish_lock: now.toISOString() }) });
         if (!claimed?.length) { say(`skip ${tag}: being handled by another run`); continue; }
-        const res = x.platform === 'instagram' ? await publishInstagram(x, acc, media) : await publishFacebook(x, acc, media);
+        let collabErr: string | null = null;
+        const res = x.platform === 'instagram' ? await publishInstagram(x, acc, media, (m) => { collabErr = m; say(`  ! ${m}`); }) : await publishFacebook(x, acc, media);
         const url = res.url;
-        await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'published', published_at: new Date().toISOString(), published_url: url, publish_error: null, publish_lock: null }) });
+        await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'published', published_at: new Date().toISOString(), published_url: url, publish_error: null, publish_lock: null, ...(x.platform === 'instagram' && collabOf(x).length ? { collab_error: collabErr } : {}) }) });
         await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: 'client', title: `Published: ${x.title}`, title_ar: `نُشر: ${x.title}`, body: url, body_ar: url }) }).catch(() => null);
         say(`✓ ${tag} → ${url}`); results.push({ id: x.id, title: x.title, ok: true, url });
         const fc = (x.first_comment ?? '').trim();

@@ -1293,7 +1293,8 @@ var CLASSIC_OFF = true;
     var md = mediaOf(x), w = x.scheduled_at ? dub(x.scheduled_at) : null;
     return { id: x.id, title: pick(x, 'title', 'title_ar') || '', kind: x.kind, platform: x.platform || '', pname: x.platform ? plat(x.platform)[L()] : '',
       status: x.status, when: x.scheduled_at ? fmtWhen(x.scheduled_at) : '', at: x.scheduled_at || null, wd: w ? w.wd : null, h: w ? w.h : null, key: w ? w.key : null,
-      img: md.img, video: md.video, caption: pick(x, 'caption', 'caption_ar') || '', canReview: canReview(x), url: safeUrl(x.published_url) || null };
+      img: md.img, video: md.video, caption: pick(x, 'caption', 'caption_ar') || '', canReview: canReview(x), url: safeUrl(x.published_url) || null,
+      collab: (x.collaborators || []).map(function (u) { return '@' + String(u).replace(/^@/, ''); }) };
   }
   function circuitData(opt) {
     opt = opt || {};

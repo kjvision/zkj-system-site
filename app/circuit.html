@@ -363,7 +363,7 @@ function layAP(){AP.list=apList();if(AP.i>=AP.list.length)AP.i=Math.max(0,AP.lis
     var pin=[[ex,y+(row-1)*6],[mid,y+(row-1)*6],[mid+dir*kk,y],[x-dir*(desk?28:22),y]];AP.g.terms.push({id:id,x:x,y:y,pin:pin,len:plen(pin)});});
   AP.g.stem=[[cx,AP.g.cubeY+20],[cx,sy]];AP.g.bw=Math.min(desk?420:W-56,420);AP.g.by=Math.min(H-70,sy+sh+(desk?122:118));
   if(none){var e=$("ap-empty");$("ap-et").textContent=T("clear");$("ap-es").textContent=T("clearS");pos(e,cx-170,cy+40,340);return;}
-  $("ap-t").textContent=P.title||"—";$("ap-m").textContent=[(AP.i+1)+" / "+AP.list.length,P.client||"",P.kind?(T("kinds")[P.kind]||P.kind.toUpperCase()):"",(P.pnames&&P.pnames.length?P.pnames.join(" + "):P.pname),P.when].filter(Boolean).join(" · ");
+  $("ap-t").textContent=P.title||"—";$("ap-m").textContent=[(AP.i+1)+" / "+AP.list.length,P.client||"",P.kind?(T("kinds")[P.kind]||P.kind.toUpperCase()):"",(P.pnames&&P.pnames.length?P.pnames.join(" + "):P.pname),P.when,(P.collab&&P.collab.length?(AR()?"مع ":"WITH ")+P.collab.join(" "):"")].filter(Boolean).join(" · ");
   var cw=Math.min(360,W-128);pos($("ap-cap"),cx-cw/2,sy+sh+12,cw);pos($("ap-hit"),sx,sy,sw,sh);
   var pv=$("ap-prev"),nx=$("ap-next"),ny=sy+sh+12;pos(pv,AR()?cx+cw/2+10:cx-cw/2-54,ny);pos(nx,AR()?cx-cw/2-54:cx+cw/2+10,ny);
   pv.disabled=AP.i<=0;nx.disabled=AP.i>=AP.list.length-1;pv.setAttribute("aria-label",T("prevP"));nx.setAttribute("aria-label",T("nextP"));$("ap-hit").setAttribute("aria-label",P.title||"");
@@ -653,7 +653,7 @@ function preview(id){var get=ZH.item?ZH.item(id):A("item",{id:id});Promise.resol
   if(x.note)b.push('<div class="mm" style="color:var(--gold)">'+esc(T("clientNote"))+'</div><div class="cmt" style="padding:0"><div class="ln">“'+esc(x.note)+'”</div></div>');
   if(x.revision)b.push('<div class="mm" style="color:var(--gold)">'+esc(T("whatChanged"))+'</div><div class="cmt" style="padding:0"><div class="ln">'+esc(x.revision)+'</div></div>');
   if(x.error)b.push('<div class="msg bad">'+esc(T("pubErr"))+' · '+esc(x.error)+'</div>');
-  if(x.caption)b.push('<div class="cap2">'+esc(x.caption)+'</div>');
+  if(x.collab&&x.collab.length)b.push('<div class="mm" style="color:var(--gl)">'+esc((AR()?"مع ":"WITH ")+x.collab.join(" "))+'</div>');if(x.caption)b.push('<div class="cap2">'+esc(x.caption)+'</div>');
   var a=[];if(x.status==="needs_approval"&&x.canReview&&inQ)a.push('<button class="pill gold sm" data-pa="review">'+esc(T("reviewIt"))+'</button>');
   if(D.admin&&x.status==="changes_requested")a.push('<button class="pill gold sm" data-pa="sendback">'+esc(T("sendBack"))+'</button>');
   if(D.admin&&x.status==="draft"&&x.ready)a.push('<button class="pill gold sm" data-pa="appr">'+esc(T("toAppr"))+'</button>');
