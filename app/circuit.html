@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>ZKJ SYSTEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="../assets/core.css?v=20261103e">
+<link rel="stylesheet" href="../assets/core.css?v=20261104a">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
 /* ZKJ SYSTEM circuit screens (KJ, 3 Nov 2026). Every screen lives in the cube's world: gold circuit traces, platform terminals,
@@ -108,7 +108,9 @@ button.plaque.brand{justify-content:flex-start;gap:12px;height:56px;padding:0 14
 [dir=rtl] .fld select{background-position:17px 52%,12px 52%}
 .fld select option{background:#0E0E12;color:var(--wh)}.fld input[type=color]{padding:3px;height:42px;cursor:pointer}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--gl)}.fld [aria-invalid=true]{border-color:var(--bad)}
-.chipsel{flex:none;min-height:36px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.chipsel{flex:none;min-height:36px}.step{font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--gold);margin-top:6px}[dir=rtl] .step{font-family:var(--body);letter-spacing:0;font-size:13px}
+.acc{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:12px 14px}.acc svg{width:22px;height:22px}.acc b{font-size:14px;font-weight:600}.acc .stt{display:flex;font-size:12px;margin-top:3px}
+@media (max-width:420px){.ttl{font-size:13px;letter-spacing:.14em}}.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.pill.sm{padding:8px 12px;font-size:9.5px}[dir=rtl] .pill.sm{font-size:12px}
 .msg{font-size:12.5px;line-height:1.5;color:var(--sil)}.msg.bad{color:var(--bad)}.msg.ok{color:var(--ok)}
 .cli{padding:14px 16px;display:grid;gap:11px}.cli .h{display:flex;align-items:center;gap:12px;min-width:0}.cli .h>div{min-width:0;flex:1}
@@ -185,7 +187,7 @@ input,textarea,select,.cap2,.copy input{-webkit-user-select:text;user-select:tex
 <div class="sheet" id="sheet" hidden><div id="sheet-in"></div></div>
 <div id="toast" hidden role="status"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="circuit-marks.js?v=20261103e"></script>
+<script src="circuit-marks.js?v=20261104a"></script>
 <script>
 (function(){
 "use strict";
@@ -264,7 +266,7 @@ var TX={en:{hq:"HQ",ap:"APPROVALS",inbox:"INBOX",live:"LIVE NOW",plan:"PLAN",cal
   covHelp:"رابط صورة واحد في كل سطر (https).",connect:"اربط ↗",reconnect:"أعِد الربط ↗",noKey:"روابط الربط تحتاج إلى مفتاح الربط",pubQon:"هل توقف كل النشر التلقائي؟",pubQoff:"هل تستأنف النشر التلقائي؟",pause:"أوقِف",resume:"استأنِف",
   pubHelp:"لا يُنشر شيء تلقائيًّا ما دام النشر متوقفًا.",forB:"لـ",openPost:"افتح المنشور ↗",media:"الوسائط ↗",publicNow:"اجعله عامًّا",clientNote:"ملاحظة العميل",whatChanged:"ما الذي تغيّر",pubErr:"خطأ في النشر",
   brandNow:"العلامة على لوحة التحكم",posts:"منشورات",need:"املأ الحقول المحدّدة"}};
- for(var l in X)for(var k in X[l])TX[l][k]=X[l][k];TX.ar.hqDw="الرسومات";TX.en.back="Back";TX.ar.back="رجوع";TX.en.prevP="Previous post";TX.ar.prevP="المنشور السابق";TX.en.nextP="Next post";TX.ar.nextP="المنشور التالي";TX.en.photo="PHOTO";TX.ar.photo="صورة";TX.en.tapSound="TAP FOR SOUND";TX.ar.tapSound="اضغط لتشغيل الصوت";TX.en.goesOut="GOES OUT";TX.ar.goesOut="يُنشر";TX.en.yes="✓  APPROVE";TX.ar.yes="✓  موافقة";TX.en.chg2="REQUEST CHANGES";TX.ar.chg2="اطلب تعديلًا";TX.en.onPl="ON";TX.ar.onPl="على";})();
+ for(var l in X)for(var k in X[l])TX[l][k]=X[l][k];TX.ar.hqDw="الرسومات";TX.en.back="Back";TX.ar.back="رجوع";TX.en.prevP="Previous post";TX.ar.prevP="المنشور السابق";TX.en.nextP="Next post";TX.ar.nextP="المنشور التالي";TX.en.photo="PHOTO";TX.ar.photo="صورة";TX.en.tapSound="TAP FOR SOUND";TX.ar.tapSound="اضغط لتشغيل الصوت";TX.en.stepBrand="1 · CHOOSE THE BRAND";TX.ar.stepBrand="١ · اختر العلامة";TX.en.stepAcc="2 · ACCOUNTS";TX.ar.stepAcc="٢ · الحسابات";TX.en.stepAdd="3 · ADD & EDIT";TX.ar.stepAdd="٣ · أضف وعدّل";TX.en.viaMeta="Connected · Meta";TX.ar.viaMeta="متصل · ميتا";TX.en.followsIG="Follows Instagram · Meta";TX.ar.followsIG="يتبع إنستغرام · ميتا";TX.en.goesOut="GOES OUT";TX.ar.goesOut="يُنشر";TX.en.yes="✓  APPROVE";TX.ar.yes="✓  موافقة";TX.en.chg2="REQUEST CHANGES";TX.ar.chg2="اطلب تعديلًا";TX.en.onPl="ON";TX.ar.onPl="على";})();
 function T(k){return (TX[LANG]||TX.en)[k];}
 var AR=function(){return LANG==="ar";};
 
@@ -803,9 +805,12 @@ function importSheet(){sheet('<h3>'+esc(T("imp"))+'</h3><div class="mm">'+esc(T(
     var okk=!r.fatal&&r.n&&!r.errors;go2.disabled=!okk;go2.textContent=okk?T("addN").replace("{n}",r.n):T("add");});}
   ta.addEventListener("input",function(){clearTimeout(tm);tm=setTimeout(chk,250);});
   go2.addEventListener("click",function(){go2.disabled=true;A("import",{text:ta.value}).then(function(r){if(r&&r.ok){closeSheet();toast(r.msg);refresh();}else{$("im-s").textContent=(r&&r.error)||T("fail");$("im-s").className="msg bad";go2.disabled=false;}});});ta.focus();}
-function layCC(){var R=desk?Math.min((H-TOP)*.34,280):Math.min(W*.38,(H-TOP)*.2);CCX={R:R,cx:desk?W*.34:W/2,cy:desk?TOP+(H-TOP)*.48:TOP+R+24};var X=HX,L=$("cc-list");if(!X||!X.cc){L.innerHTML="";return;}
-  var ps=[["post",T("addPost"),arrow()],["import",T("imp"),arrow()],["kpi",T("addNum"),arrow()],["notif",T("sendNotif"),arrow()],["brand",T("brandCol"),arrow()],["covers",T("covers"),arrow()],["conns",T("conns"),X.cc.social.filter(function(s){return s.st==="ok";}).length+" / "+X.cc.social.length],["pub",T("publishing"),X.paused===null?"—":X.paused?T("paused"):T("on")]];
-  L.innerHTML='<div class="chipsel" role="group" aria-label="'+esc(T("brandNow"))+'">'+X.clients.filter(function(c){return c.active;}).map(function(c){return '<button data-cl="'+esc(c.id)+'" aria-pressed="'+(c.id===X.cc.id)+'">'+esc(c.name)+'</button>';}).join("")+'</div>'+
+function layCC(){var R=desk?Math.min((H-TOP)*.34,280):Math.min(W*.28,(H-TOP)*.14);CCX={R:R,cx:desk?W*.34:W/2,cy:desk?TOP+(H-TOP)*.48:TOP+R+24};var X=HX,L=$("cc-list");if(!X||!X.cc){L.innerHTML="";return;}
+  var ps=[["post",T("addPost"),arrow()],["import",T("imp"),arrow()],["kpi",T("addNum"),arrow()],["notif",T("sendNotif"),arrow()],["brand",T("brandCol"),arrow()],["covers",T("covers"),arrow()],["pub",T("publishing"),X.paused===null?"—":X.paused?T("paused"):T("on")]];
+  var accRow=function(id,name,st,label,href){return '<div class="gcard acc">'+markSVG(id,22)+'<div><b>'+esc(name)+'</b><div class="stt '+(st==="ok"?"ok":st==="expired"?"need":"draft")+'">'+esc(label)+'</div></div>'+(href?'<a class="pill sm'+(st==="ok"?'':' gold')+'" href="'+esc(href)+'" target="_blank" rel="noopener">'+esc(T(st==="ok"?"reconnect":"connect"))+'</a>':'<span></span>')+'</div>';};
+  var accs=accRow("instagram","Instagram","ok",T("viaMeta"),null)+accRow("facebook","Facebook","ok",T("followsIG"),null)+X.cc.social.map(function(a){return accRow(a.id,a.name,a.st,a.label,a.href);}).join("")+(X.socialKey?'':'<div class="msg">'+esc(T("noKey"))+'</div>');
+  L.innerHTML='<div class="step">'+esc(T("stepBrand"))+'</div><div class="chipsel" role="group" aria-label="'+esc(T("brandNow"))+'">'+X.clients.filter(function(c){return c.active;}).map(function(c){return '<button data-cl="'+esc(c.id)+'" aria-pressed="'+(c.id===X.cc.id)+'">'+esc(c.name)+'</button>';}).join("")+'</div>'+
+    '<div class="step">'+esc(T("stepAcc"))+'</div>'+accs+'<div class="step">'+esc(T("stepAdd"))+'</div>'+
     ps.map(function(p){return '<button class="gcard plaque" data-cc="'+p[0]+'">'+esc(p[1])+'<span'+(p[0]==="pub"&&X.paused?' style="color:var(--warn)"':'')+'>'+esc(p[2])+'</span></button>';}).join("");
   L.querySelectorAll("[data-cl]").forEach(function(b){b.addEventListener("click",function(){if(b.getAttribute("aria-pressed")==="true")return;ZH.act("ws:"+b.getAttribute("data-cl"));});});
   L.querySelectorAll("[data-cc]").forEach(function(b){b.addEventListener("click",function(){ccOpen(b.getAttribute("data-cc"));});});
