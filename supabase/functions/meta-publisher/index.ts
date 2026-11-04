@@ -21,7 +21,7 @@ const GRAPH = 'https://graph.facebook.com/' + GRAPH_VERSION;
 const MAX_ATTEMPTS = 3;
 const LOCK_MIN = 15;
 
-type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; first_comment: string | null; first_comment_at: string | null; collaborators?: string[] | null; clients: { id: string; name: string; instagram: string | null; active: boolean; mirror_facebook: string; mirror_threads: boolean } };
+type Item = { id: string; client_id: string; kind: string; platform: string | null; title: string; caption: string | null; caption_ar: string | null; media_url: string | null; scheduled_at: string | null; status: string; publish_attempts: number; first_comment: string | null; first_comment_at: string | null; collaborators?: string[] | null; clients: { id: string; name: string; instagram: string | null; active: boolean; mirror_facebook: string; mirror_threads: boolean; default_collaborators?: string[] | null } };
 type Account = { igId: string | null; username: string | null; pageId: string; pageName: string; pageToken: string };
 
 async function sb(path: string, init: RequestInit = {}) {
@@ -85,11 +85,12 @@ async function waitContainer(id: string) {
   throw new Error('Meta container still processing after 60 s; will retry next run.');
 }
 
-// Collaborators (KJ board order 2026-11-04 organic growth): up to 3 public Instagram usernames invited as co-authors on reels,
-// feed photos and carousels (Graph API `collaborators` on the container). If Meta refuses the invite, the post still goes out
-// without it and the card says so in publish_error's card note (items.collab_error).
+// Collaborators (KJ, 4 Nov 2026): up to 3 public Instagram usernames invited as co-authors on reels, feed photos and carousels
+// (Graph API `collaborators` on the container). The post's own list (items.collaborators) wins; otherwise the brand's standing partner
+// (clients.default_collaborators). If Meta refuses the invite, the post still goes out without it and the reason lands in items.collab_error.
 function collabOf(x: Item) {
-  return (x.collaborators ?? []).map((u) => String(u).replace(/^@/, '').trim()).filter((u) => /^[A-Za-z0-9._]{1,30}$/.test(u)).slice(0, 3);
+  const list = x.collaborators && x.collaborators.length ? x.collaborators : (x.clients.default_collaborators ?? []);
+  return list.map((u) => String(u).replace(/^@/, '').trim()).filter((u) => /^[A-Za-z0-9._]{1,30}$/.test(u) && u.toLowerCase() !== handle(x.clients.instagram)).slice(0, 3);
 }
 async function container(ig: string, params: Record<string, string | number | boolean>, collab: string[], note: (s: string) => void) {
   if (!collab.length) return (await graph('POST', `${ig}/media`, params)).id as string;
@@ -264,8 +265,8 @@ Deno.serve(async (req) => {
     if (get('publisher_paused', 'false') === 'true' && !one) return json(200, { ok: true, paused: true, note: 'Publisher is paused (app_settings.publisher_paused = true).' });
     const hours = Number(get('publisher_window_hours', '36')) || 36;
     const now = new Date();
-    // YouTube / Pinterest / LinkedIn items belong to the social-publisher function; this one touches Instagram and Facebook only.
-    let q = `items?select=*,clients!inner(id,name,instagram,active,mirror_facebook,mirror_threads)&status=eq.approved&clients.active=eq.true&order=scheduled_at.asc&limit=10`;
+    // YouTube / Pinterest / TikTok / X / LinkedIn items belong to the social-publisher function; this one touches Instagram and Facebook only.
+    let q = `items?select=*,clients!inner(id,name,instagram,active,mirror_facebook,mirror_threads,default_collaborators)&status=eq.approved&clients.active=eq.true&order=scheduled_at.asc&limit=10`;
     if (one) q += `&id=eq.${one}`;
     else q += `&scheduled_at=lte.${now.toISOString()}&publish_attempts=lt.${MAX_ATTEMPTS}&platform=not.in.(youtube,pinterest,tiktok,x,linkedin)`;
     if (!one && !force) q += `&scheduled_at=gte.${new Date(now.getTime() - hours * 3600e3).toISOString()}`;
@@ -289,14 +290,14 @@ Deno.serve(async (req) => {
         if (!['instagram', 'facebook'].includes(x.platform ?? '')) throw new Error(`Platform "${x.platform}" is not published by the system; post it by hand.`);
         if (hasInternalNote(x)) throw new Error(NOTE_ERROR);
         const media = await mediaOf(x);
-        if (dry) { say(`DRY ${tag} → ${acc.pageName}${acc.username ? ' / @' + acc.username : ''} · ${media.length} media · caption ${captionOf(x).length} chars`); results.push({ id: x.id, title: x.title, ok: true }); continue; }
+        if (dry) { say(`DRY ${tag} → ${acc.pageName}${acc.username ? ' / @' + acc.username : ''} · ${media.length} media · caption ${captionOf(x).length} chars` + (collabOf(x).length ? ` · with @${collabOf(x).join(', @')}` : '')); results.push({ id: x.id, title: x.title, ok: true }); continue; }
         // claim (prevents a second run from posting the same item)
         const claimed = await sb(`items?id=eq.${x.id}&status=eq.approved&or=(publish_lock.is.null,publish_lock.lt.${new Date(now.getTime() - LOCK_MIN * 60000).toISOString()})`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ publish_lock: now.toISOString() }) });
         if (!claimed?.length) { say(`skip ${tag}: being handled by another run`); continue; }
         let collabErr: string | null = null;
         const res = x.platform === 'instagram' ? await publishInstagram(x, acc, media, (m) => { collabErr = m; say(`  ! ${m}`); }) : await publishFacebook(x, acc, media);
         const url = res.url;
-        await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'published', published_at: new Date().toISOString(), published_url: url, publish_error: null, publish_lock: null, ...(collabOf(x).length ? { collab_error: collabErr } : {}) }) });
+        await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'published', published_at: new Date().toISOString(), published_url: url, publish_error: null, publish_lock: null, ...(x.platform === 'instagram' && collabOf(x).length ? { collab_error: collabErr } : {}) }) });
         await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: 'client', title: `Published: ${x.title}`, title_ar: `نُشر: ${x.title}`, body: url, body_ar: url }) }).catch(() => null);
         say(`✓ ${tag} → ${url}`); results.push({ id: x.id, title: x.title, ok: true, url });
         const fc = (x.first_comment ?? '').trim();
