@@ -1246,13 +1246,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261104a';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261105a';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261104a'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261105a'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1296,6 +1296,28 @@ var CLASSIC_OFF = true;
       img: md.img, video: md.video, caption: pick(x, 'caption', 'caption_ar') || '', canReview: canReview(x), url: safeUrl(x.published_url) || null,
       collab: (x.collaborators || []).map(function (u) { return '@' + String(u).replace(/^@/, ''); }) };
   }
+  // Inbox health per platform: ok (every linked brand read fine) / bad (a brand failed: names it) / off (no brand linked) /
+  // stale (no check for 2 hours: the checker itself stopped) / unknown (never checked). Count = comments shown for that platform.
+  function inboxHealth(rows, comments) {
+    var val = {}; (rows || []).forEach(function (x) { try { val[x.key] = JSON.parse(x.value); } catch (e) { /* skip */ } });
+    var out = {};
+    [['instagram', 'inbox_health_meta'], ['facebook', 'inbox_health_meta'], ['youtube', 'inbox_health_youtube']].forEach(function (p) {
+      var h = val[p[1]], o = { state: 'unknown', bad: [], off: [], count: 0, waiting: 0, at: h && h.at ? ago(h.at) : '' };
+      if (h) {
+        if (h.error) { o.state = 'bad'; o.bad.push(String(h.error)); }
+        else {
+          var any = false;
+          Object.keys(h.brands || {}).forEach(function (b) { var v = (h.brands[b] || {})[p[0]]; if (v == null) return;
+            if (v === 'ok') any = true; else if (v === 'not linked') o.off.push(b); else o.bad.push(b + ': ' + v); });
+          o.state = o.bad.length ? 'bad' : any ? 'ok' : 'off';
+        }
+        if (o.state === 'ok' && Date.now() - Date.parse(h.at) > 2 * 3600e3) o.state = 'stale';
+      }
+      (comments || []).forEach(function (c) { if (c.platform === p[0]) { o.count++; if (c.status === 'waiting') o.waiting++; } });
+      out[p[0]] = o;
+    });
+    return out;
+  }
   function circuitData(opt) {
     opt = opt || {};
     var c = frontClient(); if (!c) return Promise.resolve(null);
@@ -1304,9 +1326,11 @@ var CLASSIC_OFF = true;
     return Promise.all([
       get(sb.from('kpis').select('*').eq('client_id', c.id).order('period_start', { ascending: false }).order('created_at', { ascending: false })),
       get(sb.from('reports').select('*').eq('client_id', c.id).order('created_at', { ascending: false })),
-      S.isAdmin ? get(sb.from('comment_replies').select('*').in('client_id', S.clients.filter(function (x) { return x.active !== false; }).map(function (x) { return x.id; })).order('comment_at', { ascending: false, nullsFirst: false }).limit(60)) : Promise.resolve([])
+      S.isAdmin ? get(sb.from('comment_replies').select('*').in('client_id', S.clients.filter(function (x) { return x.active !== false; }).map(function (x) { return x.id; })).order('comment_at', { ascending: false, nullsFirst: false }).limit(60)) : Promise.resolve([]),
+      // what the comment checkers could read on their last run (meta-replies, social-replies write it), KJ 5 Nov 2026
+      S.isAdmin ? get(sb.from('app_settings').select('key,value').like('key', 'inbox_health%')) : Promise.resolve([])
     ]).then(function (r) {
-      var kpis = r[0] || [], reports = r[1] || [], comments = r[2] || [];
+      var kpis = r[0] || [], reports = r[1] || [], comments = r[2] || [], healthRows = r[3] || [];
       var byAt = function (a, b) { return String(a.scheduled_at || '').localeCompare(String(b.scheduled_at || '')); };
       // KJ sees every brand's posts waiting for a yes in one queue, each tagged with its brand (KJ, 3 Nov 2026: new episodes were hidden behind the cube's brand)
       var pendSrc = S.isAdmin ? (S.all || []).filter(function (x) { var cl = clientById(x.client_id); return cl && cl.active !== false; }) : items;
@@ -1352,6 +1376,7 @@ var CLASSIC_OFF = true;
         live: live.slice(0, 8), plan: { counts: counts, days: Object.keys(days).map(Number), month: new Intl.DateTimeFormat(loc(), { month: 'long', year: 'numeric', timeZone: 'Asia/Dubai' }).format(new Date()),
           dim: new Date(Date.UTC(now.y, now.m + 1, 0)).getUTCDate(), today: now.d },
         nums: nums, reports: reports.map(function (x) { return { title: pick(x, 'title', 'title_ar') || '', period: x.period || x.period_start || '', url: safeUrl(x.file_url) || null, date: x.created_at ? fmtDate(x.created_at) : '' }; }),
+        inbox: S.isAdmin ? inboxHealth(healthRows, comments) : null,
         comments: comments.map(function (m) { var mc = clientById(m.client_id); return { id: m.comment_id, client: S.isAdmin && mc ? cName(mc) : '', platform: m.platform, from: m.from_name || '', text: m.comment || '', ago: m.comment_at ? ago(m.comment_at) : '', status: m.status,
           auto: m.status === 'replied' && m.reply_text && m.reply_text !== m.manual_reply_text ? m.reply_text : '', mine: m.manual_reply_text || '', url: safeUrl(m.permalink) || null, can: !!CM_REPLY[m.platform] }; }),
         unread: (S.notifs || []).filter(function (n) { return !n.read; }).length,
@@ -1402,10 +1427,10 @@ var CLASSIC_OFF = true;
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261104a#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261105a#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261104a#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261105a#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
