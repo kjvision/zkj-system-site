@@ -5,6 +5,8 @@
   var WA_NUMBER = '971541668700';
   var IG_URL = 'https://instagram.com/zkjsystem';
   var FORM_ENDPOINT = 'https://formspree.io/f/mvkzrbog';
+  // copy of every enquiry for KJ's dashboard (Inbox → Enquiries) and bell; the Formspree email stays as it is (KJ, 5 Nov 2026)
+  var SAVE_ENDPOINT = 'https://usucmdjupfjuchfxnxpz.supabase.co/functions/v1/site-enquiry';
   var LANG_KEY = 'zkj-lang';
 
   /* ---------- Icons ---------- */
@@ -809,9 +811,15 @@
       submit.disabled = true;
       var label = submit.querySelector('span');
       if (label) label.textContent = t('f.sending');
+      var copy = {}; fd.forEach(function (v, k) { if (k.charAt(0) !== '_') copy[k] = v; }); copy.page = location.href.split('#')[0];
+      var saved = fetch(SAVE_ENDPOINT, { method: 'POST', body: JSON.stringify(copy), headers: { 'Content-Type': 'application/json' }, keepalive: true })
+        .then(function (r) { return r.ok; }).catch(function () { return false; });
       fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { Accept: 'application/json' } })
+        .catch(function (e) { return saved.then(function (ok) { if (ok) return { ok: true }; throw e; }); })
         .then(function (r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
+          if (!r.ok) return saved.then(function (ok) { if (!ok) throw new Error('HTTP ' + r.status); });
+        })
+        .then(function () {
           showStatus('ok', 'f.ok');
           form.reset();
           setContext(null);
