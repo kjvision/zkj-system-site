@@ -30,6 +30,12 @@ async function sb(path: string, init: RequestInit = {}) {
   if (!r.ok) throw new Error(`Supabase ${path}: ${r.status} ${txt}`);
   return txt ? JSON.parse(txt) : null;
 }
+// Inbox health: what the last run could read, per brand; the dashboard inbox shows it under the YouTube mark (KJ, 5 Nov 2026)
+type Health = Record<string, Record<string, string>>;
+async function saveHealth(key: string, brands: Health, error: string | null = null) {
+  await sb('app_settings?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({ key, value: JSON.stringify({ at: new Date().toISOString(), error, brands }), updated_at: new Date().toISOString() }) }).catch(() => null);
+}
 async function yt(method: 'GET' | 'POST', path: string, token: string, params: Record<string, string> = {}, body?: unknown) {
   const u = new URL(`${YT}/${path}`);
   for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
@@ -79,6 +85,7 @@ Deno.serve(async (req) => {
   const log: string[] = [];
   const say = (s: string) => log.push(s);
   let replied = 0, failed = 0;
+  const health: Health = {};
   try {
     const settings: { key: string; value: string }[] = await sb('app_settings?select=key,value');
     const get = (k: string, d: string) => settings.find((s) => s.key === k)?.value ?? d;
@@ -87,15 +94,15 @@ Deno.serve(async (req) => {
     const clients: Client[] = await sb('clients?select=id,name&active=eq.true');
     const bank: { client_id: string; body: string }[] = await sb('reply_bank?select=client_id,body&active=eq.true&approved_at=not.is.null&order=created_at.asc');
     const accs: Account[] = await sb('social_accounts?select=id,client_id,external_id,name,access_token,refresh_token,expires_at,status&network=eq.youtube&status=neq.revoked');
-    if (!accs.length) return json(200, { ok: true, dry, replied: 0, failed: 0, note: 'No YouTube channel connected yet.' });
+    if (!accs.length) { if (!dry) await saveHealth('inbox_health_youtube', Object.fromEntries(clients.map((c) => [c.name, { youtube: 'not linked' }]))); return json(200, { ok: true, dry, replied: 0, failed: 0, note: 'No YouTube channel connected yet.' }); }
 
     for (const c of clients) {
       const acc = accs.find((a) => a.client_id === c.id);
-      if (!acc) continue;
+      if (!acc) { health[c.name] = { youtube: 'not linked' }; continue; }
       const text = bank.find((b) => b.client_id === c.id)?.body ?? null;
       let found: Found[] = [], token = '';
-      try { token = await fresh(acc); found = await youtubeComments(acc, token, since); }
-      catch (e) { const m = (e as Error).message; say(`${c.name} YouTube: ${m}`); if (!NO_PERMISSION.test(m)) failed++; continue; }
+      try { token = await fresh(acc); found = await youtubeComments(acc, token, since); health[c.name] = { youtube: 'ok' }; }
+      catch (e) { const m = (e as Error).message; health[c.name] = { youtube: m.slice(0, 200) }; say(`${c.name} YouTube: ${m}`); if (!NO_PERMISSION.test(m)) failed++; continue; }
       if (!found.length) continue;
       const seen: Seen[] = await sb(`comment_replies?select=comment_id,media_id,from_name,status,note&comment_id=in.(${found.map((f) => `"${f.id}"`).join(',')})`);
       const done: Seen[] = await sb(`comment_replies?select=comment_id,media_id,from_name,status&status=eq.replied&media_id=in.(${[...new Set(found.map((f) => `"${f.mediaId}"`))].join(',')})`);
@@ -129,10 +136,12 @@ Deno.serve(async (req) => {
       if (waiting) await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: c.id, audience: 'admin', title: `${waiting} new YouTube comment(s) on ${c.name}, no approved reply yet`, title_ar: `${waiting} تعليق جديد على يوتيوب ${c.name}، لا يوجد رد معتمد بعد`, body: 'Approve the reply for this account and they will be answered.', body_ar: 'اعتمد الرد لهذا الحساب وسيتم الرد عليها.' }) }).catch(() => null);
     }
     const status = failed ? 'error' : 'ok';
+    if (!dry) await saveHealth('inbox_health_youtube', health);
     if (!dry && (replied || failed)) await sb('sync_runs', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ job: 'social-replies', status, finished_at: new Date().toISOString(), note: log.join('\n') }) }).catch(() => null);
     return json(200, { ok: !failed, dry, replied, failed, log });
   } catch (e) {
     const msg = (e as Error).message;
+    if (!dry) await saveHealth('inbox_health_youtube', health, msg.slice(0, 300));
     await sb('sync_runs', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ job: 'social-replies', status: 'error', finished_at: new Date().toISOString(), note: msg }) }).catch(() => null);
     return json(500, { ok: false, error: msg, log });
   }

@@ -39,6 +39,12 @@ async function graph(method: 'GET' | 'POST', path: string, params: Record<string
   if (!r.ok || j.error) throw new Error(`Meta ${path.split('?')[0]}: ${j.error?.message ?? r.status}` + (j.error?.code ? ` (code ${j.error.code})` : ''));
   return j;
 }
+// Inbox health: what the last run could read, per brand and platform; the dashboard inbox shows it under each platform mark (KJ, 5 Nov 2026)
+type Health = Record<string, Record<string, string>>;
+async function saveHealth(key: string, brands: Health, error: string | null = null) {
+  await sb('app_settings?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({ key, value: JSON.stringify({ at: new Date().toISOString(), error, brands }), updated_at: new Date().toISOString() }) }).catch(() => null);
+}
 const handle = (s: unknown) => String(s ?? '').replace(/^@/, '').trim().toLowerCase();
 
 async function accounts(): Promise<Account[]> {
@@ -92,6 +98,7 @@ Deno.serve(async (req) => {
   const log: string[] = [];
   const say = (s: string) => log.push(s);
   let replied = 0, failed = 0;
+  const health: Health = {};
   try {
     if (!TOKEN) throw new Error('META_ACCESS_TOKEN secret is missing.');
     const settings: { key: string; value: string }[] = await sb('app_settings?select=key,value');
@@ -104,11 +111,14 @@ Deno.serve(async (req) => {
 
     for (const c of clients) {
       const acc = accountFor(c, accs);
-      if (!acc) continue;
+      if (!acc) { health[c.name] = { instagram: 'not linked', facebook: 'not linked' }; continue; }
+      health[c.name] = {};
       const text = bank.find((b) => b.client_id === c.id)?.body ?? null;
       let found: Found[] = [];
       for (const [name, fn] of [['Instagram', instagramComments], ['Facebook', facebookComments]] as const) {
-        try { found = found.concat(await fn(acc, since)); } catch (e) { const m = (e as Error).message; say(`${c.name} ${name}: ${m}`); if (!NO_PERMISSION.test(m)) failed++; }
+        const hk = name.toLowerCase();
+        try { found = found.concat(await fn(acc, since)); health[c.name][hk] = name === 'Instagram' && !acc.igId ? 'not linked' : 'ok'; }
+        catch (e) { const m = (e as Error).message; health[c.name][hk] = m.slice(0, 200); say(`${c.name} ${name}: ${m}`); if (!NO_PERMISSION.test(m)) failed++; }
       }
       if (!found.length) continue;
       const seen: Seen[] = await sb(`comment_replies?select=comment_id,media_id,from_name,status,note&comment_id=in.(${found.map((f) => `"${f.id}"`).join(',')})`);
@@ -144,10 +154,12 @@ Deno.serve(async (req) => {
       if (waiting) await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: c.id, audience: 'admin', title: `${waiting} new comment(s) on ${c.name}, no approved reply yet`, title_ar: `${waiting} تعليق جديد على ${c.name}، لا يوجد رد معتمد بعد`, body: 'Approve the reply for this account and they will be answered.', body_ar: 'اعتمد الرد لهذا الحساب وسيتم الرد عليها.' }) }).catch(() => null);
     }
     const status = failed ? 'error' : 'ok';
+    if (!dry) await saveHealth('inbox_health_meta', health);
     if (!dry && (replied || failed)) await sb('sync_runs', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ job: 'meta-replies', status, finished_at: new Date().toISOString(), note: log.join('\n') }) }).catch(() => null);
     return json(200, { ok: !failed, dry, replied, failed, log });
   } catch (e) {
     const msg = (e as Error).message;
+    if (!dry) await saveHealth('inbox_health_meta', health, msg.slice(0, 300));
     await sb('sync_runs', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ job: 'meta-replies', status: 'error', finished_at: new Date().toISOString(), note: msg }) }).catch(() => null);
     return json(500, { ok: false, error: msg, log });
   }

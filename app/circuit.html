@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>ZKJ SYSTEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="../assets/core.css?v=20261104a">
+<link rel="stylesheet" href="../assets/core.css?v=20261105a">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
 /* ZKJ SYSTEM circuit screens (KJ, 3 Nov 2026). Every screen lives in the cube's world: gold circuit traces, platform terminals,
@@ -64,6 +64,14 @@ body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;backgr
 .cmt .h{display:flex;align-items:center;gap:8px;font-size:12px}.cmt .h b{font-weight:600}.cmt .h span{color:var(--mute);font-family:var(--mono);font-size:10px}.cmt .h em{margin-inline-start:auto;font-style:normal}
 .cmt .h svg{width:16px;height:16px}
 .cmt .h span.stt.need{color:var(--bad)}
+.ibt{all:unset;position:absolute;z-index:2;cursor:pointer;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:4px;transform:translateX(-50%);-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+.ibt .hit{display:block;width:52px;height:52px;border-radius:50%}
+.ibt i{font-style:normal;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;line-height:1.3;white-space:nowrap;color:var(--ok);text-align:center;padding-bottom:3px;border-bottom:1px solid transparent}
+.ibt i.bad{color:var(--bad)}.ibt i.mute{color:var(--sil)}.ibt i b{font-weight:400;color:var(--wh)}
+.ibt[aria-pressed=true] i{border-bottom-color:var(--gold)}
+.ibt:focus-visible .hit{outline:1px solid var(--gl);outline-offset:2px}
+[dir=rtl] .ibt i{font-family:var(--body);letter-spacing:0;font-size:10px}
+.cmt.hl q{color:var(--sil);font-size:13px}.cmt.hl .ln{color:var(--bad);border-color:rgba(240,128,110,.4)}
 .cmt q{font-size:14px;line-height:1.45;quotes:none;overflow-wrap:anywhere}
 .cmt .ln{font-size:12px;color:var(--sil);padding-inline-start:10px;border-inline-start:1px solid var(--line)}
 .rep{display:flex;gap:8px;align-items:flex-end}
@@ -162,7 +170,7 @@ input,textarea,select,.cap2,.copy input{-webkit-user-select:text;user-select:tex
     <button class="lnk" id="chg"></button><button class="yes" id="ap-yes"></button>
     <div class="cap" id="ap-empty" hidden><h2 id="ap-et"></h2><p id="ap-es"></p></div>
   </div>
-  <div class="sc" data-s="inbox" hidden><div class="list" id="ib-list"></div></div>
+  <div class="sc" data-s="inbox" hidden><div id="ib-terms"></div><div class="list" id="ib-list"></div></div>
   <div class="sc" data-s="live" hidden><div class="list" id="lv-list"></div></div>
   <div class="sc" data-s="plan" hidden><button class="lnk gold" id="pl-open"></button></div>
   <div class="sc" data-s="cal wk" hidden>
@@ -187,7 +195,7 @@ input,textarea,select,.cap2,.copy input{-webkit-user-select:text;user-select:tex
 <div class="sheet" id="sheet" hidden><div id="sheet-in"></div></div>
 <div id="toast" hidden role="status"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="circuit-marks.js?v=20261104a"></script>
+<script src="circuit-marks.js?v=20261105a"></script>
 <script>
 (function(){
 "use strict";
@@ -205,7 +213,7 @@ var TX={en:{hq:"HQ",ap:"APPROVALS",inbox:"INBOX",live:"LIVE NOW",plan:"PLAN",cal
   slide:"SLIDE TO APPROVE",changes:"↺ REQUEST CHANGES",read:"READ THE CAPTION",clientOnly:"WAITING FOR THE CLIENT'S YES",clear:"ALL CLEAR",clearS:"NOTHING IS WAITING FOR YOUR YES",
   approved:"APPROVED",sent:"SENT BACK WITH YOUR NOTE",fail:"NOT SAVED. TRY AGAIN.",chT:"WHAT SHOULD CHANGE?",chPh:"Write your note…",send:"SEND",cancel:"CANCEL",close:"CLOSE",needNote:"WRITE A NOTE FIRST",
   chips:["Change the caption","Change the image","Change the time","Shorter, please"],
-  waiting:"Waiting",replied:"Answered",reply:"Write a reply…",auto:"Auto reply:",mine:"Your reply:",posted:"REPLY POSTED",noComments:"NO COMMENTS YET",onPlatform:"Reply on the platform itself.",
+  waiting:"Waiting",replied:"Answered",reply:"Write a reply…",auto:"Auto reply:",mine:"Your reply:",posted:"REPLY POSTED",noComments:"NO COMMENTS YET",hOk:"CONNECTED",hBad:"CHECK FAILED",hOff:"NOT CONNECTED",hStale:"NOT CHECKED",hUnk:"WAITING FOR FIRST CHECK",hNone:"No {p} comments in the last 48 hours.",hLast:"Last check {t}.",hBrands:"Not connected for: {b}",hAll:"Showing every platform",pn:{instagram:"Instagram",facebook:"Facebook",youtube:"YouTube"},onPlatform:"Reply on the platform itself.",
   drafts:"SUGGESTED REPLIES",approve:"APPROVE",noDrafts:"NO REPLIES TO REVIEW",inboxNote:"X · TIKTOK · PINTEREST OPEN ON THE PLATFORM",
   open:"OPEN ↗",noLive:"NOTHING PUBLISHED YET",newest:"NEWEST FIRST",
   planned:"POSTS PLANNED",openCal:"OPEN THE CALENDAR →",kinds:{reel:"REELS",post:"POSTS",carousel:"CAROUSELS",story:"STORIES",ad:"ADS"},noPlan:"NOTHING PLANNED THIS MONTH YET",
@@ -222,7 +230,7 @@ var TX={en:{hq:"HQ",ap:"APPROVALS",inbox:"INBOX",live:"LIVE NOW",plan:"PLAN",cal
   slide:"اسحب للموافقة",changes:"↺ اطلب تعديلًا",read:"اقرأ النص",clientOnly:"بانتظار موافقة العميل",clear:"لا شيء معلّق",clearS:"لا منشورات بانتظار موافقتك",
   approved:"تمت الموافقة",sent:"أُعيد مع ملاحظتك",fail:"لم يُحفظ. حاول مجددًا.",chT:"ما الذي يجب تعديله؟",chPh:"اكتب ملاحظتك…",send:"إرسال",cancel:"إلغاء",close:"إغلاق",needNote:"اكتب الملاحظة أولًا",
   chips:["عدّل النص","غيّر الصورة","غيّر الموعد","اختصر رجاءً"],
-  waiting:"بانتظار الرد",replied:"تم الرد",reply:"اكتب ردًّا…",auto:"الرد التلقائي:",mine:"ردّك:",posted:"نُشر الرد",noComments:"لا تعليقات بعد",onPlatform:"الرد يكون من المنصة نفسها.",
+  waiting:"بانتظار الرد",replied:"تم الرد",reply:"اكتب ردًّا…",auto:"الرد التلقائي:",mine:"ردّك:",posted:"نُشر الرد",noComments:"لا تعليقات بعد",hOk:"متصل",hBad:"تعذّر الفحص",hOff:"غير متصل",hStale:"لم يُفحص",hUnk:"بانتظار أول فحص",hNone:"لا تعليقات على {p} خلال آخر 48 ساعة.",hLast:"آخر فحص {t}.",hBrands:"غير متصل لـ: {b}",hAll:"عرض كل المنصات",pn:{instagram:"إنستغرام",facebook:"فيسبوك",youtube:"يوتيوب"},onPlatform:"الرد يكون من المنصة نفسها.",
   drafts:"ردود مقترحة",approve:"موافقة",noDrafts:"لا ردود للمراجعة",inboxNote:"إكس · تيك توك · بنترست تُفتح من المنصة",
   open:"افتح ↗",noLive:"لم يُنشر شيء بعد",newest:"الأحدث أولًا",
   planned:"المنشورات المخططة",openCal:"افتح التقويم ←",kinds:{reel:"ريلز",post:"منشورات",carousel:"منشورات متعددة",story:"قصص",ad:"إعلانات"},noPlan:"لا شيء مخطط هذا الشهر بعد",
@@ -426,13 +434,24 @@ document.addEventListener("keydown",function(e){if(scene!=="ap"||!$("sheet").hid
 $("ap-read").addEventListener("click",function(){var P=AP.list[AP.i];if(P)sheet('<h3>'+esc(P.title)+'</h3><div class="cap2">'+esc(P.caption)+'</div><div class="row"><button class="pill" data-x>'+esc(T("close"))+'</button></div>');});
 
 /* ===== Inbox: comments arrive as light from their platform terminals ===== */
-var IB={};
-function layIB(){var L=$("ib-list"),h=[];
-  if(D.admin){(D.comments||[]).forEach(function(c){h.push('<div class="gcard cmt" data-c="'+esc(c.id)+'"><div class="h">'+markSVG(c.platform)+'<b>'+esc((c.platform==="instagram"?"@":"")+(c.from||"—"))+'</b><span>'+esc([c.client,c.ago].filter(Boolean).join(" · "))+'</span><em class="stt '+esc(c.status)+'">'+esc(c.status==="replied"?T("replied"):T("waiting"))+'</em>'+(c.url?'<a class="lnk gold" style="position:static;margin-inline-start:8px" href="'+esc(c.url)+'" target="_blank" rel="noopener">↗</a>':'')+'</div>'+
+var IB={f:null};
+/* platform terminals: each says if its comment checker can read every brand (KJ, 5 Nov 2026: "facebook and youtube are not connected" — they were, the dim marks said otherwise) */
+function ibState(p){var h=D.inbox&&D.inbox[p];if(!h)return{cls:"mute",lab:"",live:false};
+  var st=h.state,lab=st==="ok"?T("hOk"):st==="bad"?T("hBad"):st==="off"?T("hOff"):st==="stale"?T("hStale"):T("hUnk");
+  return{cls:st==="ok"?"":st==="bad"||st==="off"||st==="stale"?"bad":"mute",lab:lab+(st==="ok"?' · <b>'+h.count+'</b>':''),live:st==="ok",bad:st==="bad"||st==="off"||st==="stale",h:h};}
+function layIB(){var L=$("ib-list"),h=[],F=IB.f,all=D.comments||[],list=F?all.filter(function(c){return c.platform===F;}):all;
+  if(D.admin){
+    if(F){var hs=D.inbox&&D.inbox[F],note=[];
+      if(hs&&hs.bad.length)note=note.concat(hs.bad);
+      if(hs&&hs.off.length)note.push(T("hBrands").replace("{b}",hs.off.join(", ")));
+      if(note.length||!list.length)h.push('<div class="gcard cmt hl"><div class="h">'+markSVG(F)+'<b>'+esc(T("pn")[F])+'</b><em class="stt '+(ibState(F).bad?"failed":"replied")+'">'+esc(ibState(F).lab.replace(/<[^>]+>/g,""))+'</em></div>'+
+        (!list.length?'<q>'+esc(T("hNone").replace("{p}",T("pn")[F]))+'</q>':'')+note.map(function(n){return '<div class="ln">'+esc(n)+'</div>';}).join("")+
+        (hs&&hs.at?'<div class="mm">'+esc(T("hLast").replace("{t}",hs.at))+'</div>':'')+'</div>');}
+    list.forEach(function(c){h.push('<div class="gcard cmt" data-c="'+esc(c.id)+'"><div class="h">'+markSVG(c.platform)+'<b>'+esc((c.platform==="instagram"?"@":"")+(c.from||"—"))+'</b><span>'+esc([c.client,c.ago].filter(Boolean).join(" · "))+'</span><em class="stt '+esc(c.status)+'">'+esc(c.status==="replied"?T("replied"):T("waiting"))+'</em>'+(c.url?'<a class="lnk gold" style="position:static;margin-inline-start:8px" href="'+esc(c.url)+'" target="_blank" rel="noopener">↗</a>':'')+'</div>'+
       '<q>'+esc(c.text)+'</q>'+(c.auto?'<div class="ln">'+esc(T("auto"))+' '+esc(c.auto)+'</div>':'')+(c.mine?'<div class="ln">'+esc(T("mine"))+' '+esc(c.mine)+'</div>':'')+
       (c.can?'<div class="rep"><textarea rows="1" maxlength="2000" aria-label="'+esc(T("reply"))+'" placeholder="'+esc(T("reply"))+'"></textarea><button class="coin" aria-label="'+esc(T("send"))+'"></button></div>':'<div class="ln">'+esc(T("onPlatform"))+'</div>')+'</div>');});
-    if(!D.comments||!D.comments.length)h.push('<div class="gcard cmt"><q>'+esc(T("noComments"))+'</q></div>');}
-  if(D.drafts&&D.drafts.length){h.push('<div class="mm" style="color:var(--gold);margin-top:6px">'+esc(T("drafts"))+'</div>');
+    if(!F&&!all.length)h.push('<div class="gcard cmt"><q>'+esc(T("noComments"))+'</q></div>');}
+  if(!F&&D.drafts&&D.drafts.length){h.push('<div class="mm" style="color:var(--gold);margin-top:6px">'+esc(T("drafts"))+'</div>');
     D.drafts.forEach(function(x){h.push('<div class="gcard cmt" data-d="'+esc(x.id)+'"><div class="h">'+markSVG(x.platform)+'<b>'+esc(x.title)+'</b>'+(x.client?'<span>'+esc(x.client)+'</span>':'')+'</div><q>'+esc(x.caption)+'</q>'+(x.canReview?'<div class="rep" style="justify-content:flex-end"><button class="pill gold">'+esc(T("approve"))+'</button></div>':'')+'</div>');});}
   else if(!D.admin)h.push('<div class="gcard cmt"><q>'+esc(T("noDrafts"))+'</q></div>');
   L.innerHTML=h.join("");
@@ -440,19 +459,24 @@ function layIB(){var L=$("ib-list"),h=[];
     b.addEventListener("click",function(){var v=ta.value.trim();if(!v){ta.focus();return;}b.disabled=true;ta.disabled=true;
       ZH.reply(card.getAttribute("data-c"),v).then(function(r){if(r&&r.ok){toast(T("posted"));(D.comments||[]).forEach(function(c){if(c.id===card.getAttribute("data-c")){c.mine=v;c.status="replied";}});layout();}else{toast(T("fail")+" "+((r&&r.error)||""),true);b.disabled=false;ta.disabled=false;}});});});
   L.querySelectorAll("[data-d] .pill").forEach(function(b){var id=b.closest("[data-d]").getAttribute("data-d");b.addEventListener("click",function(){b.disabled=true;ZH.review(id,"approved").then(function(r){if(r&&r.ok){toast(T("approved"));D.drafts=D.drafts.filter(function(x){return x.id!==id;});layout();}else{toast(T("fail"),true);b.disabled=false;}});});});
-  var pf=["instagram","facebook","youtube"];
+  var pf=["instagram","facebook","youtube"],tm=D.admin&&D.inbox;
   if(desk){pos(L,W*.48,TOP+30,Math.min(560,W*.46),H-TOP-40);IB.term=pf.map(function(p,i){return{id:p,x:W*.2,y:TOP+(H-TOP)*(.25+i*.22)};});}
-  else{pos(L,16,TOP+96,W-32,H-TOP-110);IB.term=pf.map(function(p,i){return{id:p,x:W*(.25+i*.25),y:TOP+40};});}}
-function drawIB(t){var cards=[].slice.call($("ib-list").querySelectorAll("[data-c]"));
-  IB.term.forEach(function(T0,i){var card=cards.filter(function(c){var d=(D.comments||[]).filter(function(x){return x.id===c.getAttribute("data-c");})[0];return d&&d.platform===T0.id;})[0],live=!!card,r=card?rect(card):null,p;
+  else{var top=tm?TOP+122:TOP+96;pos(L,16,top,W-32,H-top-14);IB.term=pf.map(function(p,i){return{id:p,x:W*(.25+i*.25),y:TOP+40};});}
+  var TB=$("ib-terms");TB.innerHTML="";if(!tm)return;
+  IB.term.forEach(function(T0){var st=ibState(T0.id),b=document.createElement("button");b.className="ibt";b.type="button";
+    b.setAttribute("aria-pressed",IB.f===T0.id?"true":"false");b.setAttribute("aria-label",T("pn")[T0.id]+" · "+st.lab.replace(/<[^>]+>/g,""));
+    b.innerHTML='<span class="hit"></span><i class="'+st.cls+'">'+st.lab+'</i>';pos(b,T0.x,T0.y-26);
+    b.addEventListener("click",function(){IB.f=IB.f===T0.id?null:T0.id;layout();var l=$("ib-list");if(l)l.scrollTop=0;});TB.appendChild(b);});}
+function drawIB(t){var cards=[].slice.call($("ib-list").querySelectorAll("[data-c]")),tm=D.admin&&D.inbox;
+  IB.term.forEach(function(T0,i){var card=cards.filter(function(c){var d=(D.comments||[]).filter(function(x){return x.id===c.getAttribute("data-c");})[0];return d&&d.platform===T0.id;})[0],st=ibState(T0.id),live=tm?st.live:!!card,r=card?rect(card):null,p,dim=IB.f&&IB.f!==T0.id;
     if(r&&(r.top>H||r.bottom<TOP+60))r=null;
     if(desk){var ey=r?Math.max(TOP+20,Math.min(H-20,r.top+26)):T0.y,ex=r?r.left-2:W*.46,mx=(T0.x+ex)/2;p=[[T0.x+28,T0.y],[mx,T0.y],[mx,ey],[ex,ey]];}
-    else{p=[[T0.x,T0.y+22],[T0.x,T0.y+40]];}
-    var waiting=card&&/waiting|failed/.test(card.querySelector("em").className);trace(p,!!waiting,t,.45+i*.1);
-    mark(T0.id,T0.x,T0.y,desk?46:34,live?WH:"#8C9096",live?1:.6);});
-  bus($("ib-list"),desk?[IB.term[1].x+28,IB.term[1].y]:[IB.term[0].x,IB.term[0].y+22],t);
-  if(desk)txt(T("inboxNote"),W*.2,H-40,9,MUTE);
-  if(!D.admin&&!(D.drafts||[]).length&&!desk){}}
+    else{p=tm?[[T0.x,T0.y+50],[T0.x,T0.y+66]]:[[T0.x,T0.y+22],[T0.x,T0.y+40]];}
+    var waiting=card&&/waiting|failed/.test(card.querySelector("em").className);if(!dim)trace(p,!!waiting,t,.45+i*.1);
+    mark(T0.id,T0.x,T0.y,desk?46:34,tm&&st.bad?"#F0806E":live?WH:"#8C9096",dim?.3:live||(tm&&st.bad)?1:.6);});
+  var BT=IB.term.filter(function(x){return x.id===IB.f;})[0];
+  bus($("ib-list"),desk?(BT?[BT.x+28,BT.y]:[IB.term[1].x+28,IB.term[1].y]):[(BT||IB.term[0]).x,(BT||IB.term[0]).y+(tm?50:22)],t);
+  if(desk)txt(T("inboxNote"),W*.2,H-40,9,MUTE);}
 
 /* ===== Live now: a broadcast line, each live post sends rings ===== */
 var LV={};
