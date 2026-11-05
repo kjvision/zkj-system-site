@@ -6,7 +6,7 @@
 // (default 36 h); at most 3 attempts per item; app_settings.publisher_paused pauses everything. Nothing else is ever posted.
 // Waiting-time mode (KJ, 22 Oct 2026): YouTube uploads land PRIVATE until app_settings.youtube_public_allowed = 'true' (the day Google's audit
 // passes); items then carry publish_state = 'private' and KJ taps Publish in the portal. Pinterest: on Trial access pins are visible only to the
-// account itself; nothing here can change that. TikTok: before TikTok's audit every post is private (SELF_ONLY) until app_settings.tiktok_public_allowed = 'true';
+// account itself; app_settings.pinterest_sandbox = 'true' sends pins to the API sandbox for the Standard-access demo (see publishPinterest). TikTok: before TikTok's audit every post is private (SELF_ONLY) until app_settings.tiktok_public_allowed = 'true';
 // the Publish tap opens the post (TikTok has no API to change privacy). X: public at once, pay-per-use ($0.015 a post, $0.20 with a link). LinkedIn: Company Page posts only (parked 23 Oct; code kept).
 // Tokens come from public.social_accounts (filled by social-connect); SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected by Supabase.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
@@ -127,9 +127,32 @@ async function markComment(id: string, err: string | null) {
 }
 
 // ---- Pinterest: image pin, carousel pin or video pin on the brand's board ----
-async function publishPinterest(x: Item, token: string, media: Media[], acc: Account) {
-  const board = acc.extra?.board_id;
-  if (!board) throw new Error('No Pinterest board saved for this brand: reconnect Pinterest from the portal.');
+// Sandbox switch (KJ, 4 Nov 2026): app_settings.pinterest_sandbox = 'true' sends every pin to api-sandbox.pinterest.com, so KJ can record the
+// demo Pinterest asks for before it grants Standard access (Trial apps may not create production pins). Sandbox needs its own token, tied to
+// KJ's Pinterest user: the secret PINTEREST_SANDBOX_TOKEN (generated on the app page in the Pinterest developer portal and pasted straight into
+// Supabase secrets), or social_accounts.extra.sandbox_token when social-connect saves one. Sandbox boards are separate: one is made on first use
+// and kept in extra.sandbox_board_id. Sandbox pins are visible only to the account owner. Default 'false': production, unchanged.
+const PIN_PROD = 'https://api.pinterest.com', PIN_SANDBOX = 'https://api-sandbox.pinterest.com';
+async function pinterestTarget(acc: Account, token: string, sandbox: boolean, x: Item) {
+  if (!sandbox) {
+    const board = acc.extra?.board_id;
+    if (!board) throw new Error('No Pinterest board saved for this brand: reconnect Pinterest from the portal.');
+    return { base: PIN_PROD, token, board };
+  }
+  const sTok = (acc.extra?.sandbox_token as string | undefined) || env('PINTEREST_SANDBOX_TOKEN');
+  if (!sTok) throw new Error('Pinterest sandbox is on, but no sandbox token is saved: generate one on the app page of the Pinterest developer portal and save it as the Supabase secret PINTEREST_SANDBOX_TOKEN.');
+  let board = acc.extra?.sandbox_board_id as string | undefined;
+  if (!board) {
+    const H = { Authorization: `Bearer ${sTok}`, 'Content-Type': 'application/json' };
+    const list = (await api('Pinterest sandbox', `${PIN_SANDBOX}/v5/boards?page_size=25`, { headers: H })).j.items ?? [];
+    board = list[0]?.id ?? (await api('Pinterest sandbox', `${PIN_SANDBOX}/v5/boards`, { method: 'POST', headers: H, body: JSON.stringify({ name: x.clients.name, description: `${x.clients.name} · ZKJ SYSTEM`, privacy: 'PUBLIC' }) })).j.id;
+    if (!board) throw new Error('Pinterest sandbox: no board could be found or made.');
+    await sb(`social_accounts?id=eq.${acc.id}`, { method: 'PATCH', body: JSON.stringify({ extra: { ...(acc.extra ?? {}), sandbox_board_id: board } }) }).catch(() => null);
+  }
+  return { base: PIN_SANDBOX, token: sTok, board };
+}
+async function publishPinterest(x: Item, token0: string, media: Media[], acc: Account, sandbox = false) {
+  const { base: PIN, token, board } = await pinterestTarget(acc, token0, sandbox, x);
   if (!media.length) throw new Error('A pin needs an image or a video in the media link.');
   const H = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
   const base: Record<string, unknown> = { board_id: board, title: x.title.slice(0, 100), description: captionOf(x, 800), alt_text: x.title.slice(0, 500) };
@@ -139,7 +162,7 @@ async function publishPinterest(x: Item, token: string, media: Media[], acc: Acc
   if (first.video) {
     const cover = media.find((m) => !m.video)?.url;
     if (!cover) throw new Error('A video pin needs a cover image: add an image link after the video link in the media field.');
-    const reg = (await api('Pinterest', 'https://api.pinterest.com/v5/media', { method: 'POST', headers: H, body: JSON.stringify({ media_type: 'video' }) })).j;
+    const reg = (await api('Pinterest', `${PIN}/v5/media`, { method: 'POST', headers: H, body: JSON.stringify({ media_type: 'video' }) })).j;
     const file = await bytes(first.url);
     const fd = new FormData();
     for (const [k, v] of Object.entries(reg.upload_parameters ?? {})) fd.append(k, String(v));
@@ -149,7 +172,7 @@ async function publishPinterest(x: Item, token: string, media: Media[], acc: Acc
     let state = '';
     for (let i = 0; i < 40; i++) {
       await sleep(3000);
-      state = (await api('Pinterest', `https://api.pinterest.com/v5/media/${reg.media_id}`, { headers: H })).j.status;
+      state = (await api('Pinterest', `${PIN}/v5/media/${reg.media_id}`, { headers: H })).j.status;
       if (state === 'succeeded') break;
       if (state === 'failed') throw new Error('Pinterest could not process the video.');
     }
@@ -157,8 +180,8 @@ async function publishPinterest(x: Item, token: string, media: Media[], acc: Acc
     media_source = { source_type: 'video_id', media_id: reg.media_id, cover_image_url: cover };
   } else if (media.length > 1) media_source = { source_type: 'multiple_image_urls', items: media.filter((m) => !m.video).slice(0, 5).map((m) => ({ url: m.url, title: x.title.slice(0, 100) })) };
   else media_source = { source_type: 'image_url', url: first.url };
-  const j = (await api('Pinterest', 'https://api.pinterest.com/v5/pins', { method: 'POST', headers: H, body: JSON.stringify({ ...base, media_source }) })).j;
-  return { url: `https://www.pinterest.com/pin/${j.id}/`, external_id: String(j.id), state: 'public' };
+  const j = (await api('Pinterest', `${PIN}/v5/pins`, { method: 'POST', headers: H, body: JSON.stringify({ ...base, media_source }) })).j;
+  return { url: `https://www.pinterest.com/pin/${j.id}/`, external_id: String(j.id), state: sandbox ? 'sandbox' : 'public' };
 }
 
 
@@ -322,6 +345,7 @@ Deno.serve(async (req) => {
     const version = get('linkedin_version', '202509');
     const ytPublic = get('youtube_public_allowed', 'false') === 'true';
     const ttPublic = get('tiktok_public_allowed', 'false') === 'true';
+    const pinSandbox = get('pinterest_sandbox', 'false') === 'true';
 
     // the Publish tap from the portal (YouTube private → public)
     const pub = u.searchParams.get('publish');
@@ -373,11 +397,11 @@ Deno.serve(async (req) => {
         const claimed = await sb(`items?id=eq.${x.id}&status=eq.approved&or=(publish_lock.is.null,publish_lock.lt.${new Date(now.getTime() - LOCK_MIN * 60000).toISOString()})`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ publish_lock: now.toISOString() }) });
         if (!claimed?.length) { say(`skip ${tag}: being handled by another run`); continue; }
         const token = await fresh(acc);
-        const r = x.platform === 'youtube' ? await publishYouTube(x, token, media, ytPublic) : x.platform === 'pinterest' ? await publishPinterest(x, token, media, acc) : x.platform === 'tiktok' ? await publishTikTok(x, token, media, acc, ttPublic) : x.platform === 'x' ? await publishX(x, token, media, acc) : await publishLinkedIn(x, token, media, acc, version);
+        const r = x.platform === 'youtube' ? await publishYouTube(x, token, media, ytPublic) : x.platform === 'pinterest' ? await publishPinterest(x, token, media, acc, pinSandbox) : x.platform === 'tiktok' ? await publishTikTok(x, token, media, acc, ttPublic) : x.platform === 'x' ? await publishX(x, token, media, acc) : await publishLinkedIn(x, token, media, acc, version);
         await sb(`items?id=eq.${x.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'published', published_at: new Date().toISOString(), published_url: r.url, external_id: r.external_id, publish_state: r.state, publish_error: null, publish_lock: null }) });
         const priv = r.state === 'private';
         const netName = x.platform === 'tiktok' ? 'TikTok' : 'YouTube', netAr = x.platform === 'tiktok' ? 'تيك توك' : 'يوتيوب';
-        await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: priv ? 'admin' : 'client', title: priv ? `Uploaded to ${netName} (private) · tap Publish: ${x.title}` : `Published: ${x.title}`, title_ar: priv ? `رُفع إلى ${netAr} (خاص) · اضغط نشر: ${x.title}` : `نُشر: ${x.title}`, body: r.url, body_ar: r.url }) }).catch(() => null);
+        if (r.state !== 'sandbox') await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: x.client_id, audience: priv ? 'admin' : 'client', title: priv ? `Uploaded to ${netName} (private) · tap Publish: ${x.title}` : `Published: ${x.title}`, title_ar: priv ? `رُفع إلى ${netAr} (خاص) · اضغط نشر: ${x.title}` : `نُشر: ${x.title}`, body: r.url, body_ar: r.url }) }).catch(() => null);
         say(`✓ ${tag} → ${r.url} (${r.state})`); results.push({ id: x.id, title: x.title, ok: true, url: r.url, state: r.state });
         const fc = (x.first_comment ?? '').trim();
         if (fc && !x.first_comment_at && r.external_id && ((x.platform === 'x') || (x.platform === 'youtube' && r.state === 'public'))) {
