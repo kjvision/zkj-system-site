@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>ZKJ SYSTEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="../assets/core.css?v=20261105b">
+<link rel="stylesheet" href="../assets/core.css?v=20261105c">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
 /* ZKJ SYSTEM circuit screens (KJ, 3 Nov 2026). Every screen lives in the cube's world: gold circuit traces, platform terminals,
@@ -76,6 +76,8 @@ body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;backgr
 .enq .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.enq .acts a.pill{text-decoration:none}
 .enq .sts{display:flex;flex-wrap:wrap;gap:6px;margin-inline-start:auto}.enq .sts button{padding:8px 11px;font-size:9px}
 .enq .sts button[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}
+.ntgo{cursor:pointer;-webkit-tap-highlight-color:transparent}.ntgo:active{border-color:var(--gold)}.ntgo:focus-visible{outline:1px solid var(--gl);outline-offset:2px}
+.ntgo .open{justify-self:end;font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--gold)}[dir=rtl] .ntgo .open{font-family:var(--body);letter-spacing:0;font-size:12px}
 .cmt.hl q{color:var(--sil);font-size:13px}.cmt.hl .ln{color:var(--bad);border-color:rgba(240,128,110,.4)}
 .cmt q{font-size:14px;line-height:1.45;quotes:none;overflow-wrap:anywhere}
 .cmt .ln{font-size:12px;color:var(--sil);padding-inline-start:10px;border-inline-start:1px solid var(--line)}
@@ -200,7 +202,7 @@ input,textarea,select,.cap2,.copy input{-webkit-user-select:text;user-select:tex
 <div class="sheet" id="sheet" hidden><div id="sheet-in"></div></div>
 <div id="toast" hidden role="status"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="circuit-marks.js?v=20261105b"></script>
+<script src="circuit-marks.js?v=20261105c"></script>
 <script>
 (function(){
 "use strict";
@@ -671,9 +673,13 @@ function drawEC(t){var p=EC.flip+(EC.to-EC.flip)*.12;EC.flip=Math.abs(EC.to-p)<.
 /* ===== Notifications: engraved plaques, newest first ===== */
 function layNT(){var L=$("nt-list"),ns=D.notifs||[],h=[];
   if(ns.some(function(n){return !n.read;}))h.push('<button class="pill gold" id="nt-all" style="justify-self:center">'+esc(T("readAll"))+'</button>');
-  ns.forEach(function(n){h.push('<div class="gcard cmt"><div class="h">'+(n.read?'':'<span class="stt need"></span>')+'<b>'+esc(n.client||"ZKJ SYSTEM")+'</b><em style="color:var(--mute);font-family:var(--mono);font-size:10px">'+esc(n.ago)+'</em></div><q style="font-weight:600">'+esc(n.title)+'</q>'+(n.body?'<div class="ln">'+esc(n.body)+'</div>':'')+'</div>');});
+  ns.forEach(function(n){h.push('<div class="gcard cmt'+(n.go?' ntgo':'')+'"'+(n.go?' role="button" tabindex="0" data-go="'+esc(n.go)+'" data-n="'+esc(n.id||"")+'"':'')+'><div class="h">'+(n.read?'':'<span class="stt need"></span>')+'<b>'+esc(n.client||"ZKJ SYSTEM")+'</b><em style="color:var(--mute);font-family:var(--mono);font-size:10px">'+esc(n.ago)+'</em></div><q style="font-weight:600">'+esc(n.title)+'</q>'+(n.body?'<div class="ln">'+esc(n.body)+'</div>':'')+(n.go?'<span class="open">'+esc(T("open").replace(/\s*↗$/,""))+' ›</span>':'')+'</div>');});
   if(!ns.length)h.push('<div class="gcard cmt"><q>'+esc(T("noNotif"))+'</q></div>');
   L.innerHTML=h.join("");var all=$("nt-all");if(all)all.addEventListener("click",function(){all.disabled=true;ZH.readAll().then(function(r){if(r&&r.ok){toast(T("allRead"));D.notifs.forEach(function(n){n.read=true;});D.unread=0;layout();}else{toast(T("fail"),true);all.disabled=false;}});});
+  L.querySelectorAll(".ntgo").forEach(function(c){var open=function(){var id=c.getAttribute("data-n"),to=c.getAttribute("data-go");
+      (D.notifs||[]).forEach(function(n){if(n.id===id&&!n.read){n.read=true;D.unread=Math.max(0,(D.unread||1)-1);}});
+      if(id&&ZH.readOne)ZH.readOne(id);go(to);};
+    c.addEventListener("click",open);c.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});});
   var w=desk?Math.min(620,W-80):W-32;pos(L,(W-w)/2,TOP+10,w,H-TOP-20);}
 function drawNT(t){var hb=rect($("bell"));bus($("nt-list"),[hb.left+hb.width/2,hb.bottom+2],t);}
 /* ===== HQ screens (KJ, 3 Nov 2026): nothing old anywhere ===== */

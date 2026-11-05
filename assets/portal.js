@@ -1246,13 +1246,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261105b';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261105c';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261105b'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261105c'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1387,7 +1387,7 @@ var CLASSIC_OFF = true;
         comments: comments.map(function (m) { var mc = clientById(m.client_id); return { id: m.comment_id, client: S.isAdmin && mc ? cName(mc) : '', platform: m.platform, from: m.from_name || '', text: m.comment || '', ago: m.comment_at ? ago(m.comment_at) : '', status: m.status,
           auto: m.status === 'replied' && m.reply_text && m.reply_text !== m.manual_reply_text ? m.reply_text : '', mine: m.manual_reply_text || '', url: safeUrl(m.permalink) || null, can: !!CM_REPLY[m.platform] }; }),
         unread: (S.notifs || []).filter(function (n) { return !n.read; }).length,
-        notifs: (S.notifs || []).slice(0, 40).map(function (n) { var cl = n.client_id ? clientById(n.client_id) : null; return { title: pick(n, 'title', 'title_ar') || '', body: pick(n, 'body', 'body_ar') || '', ago: n.created_at ? ago(n.created_at) : '', read: !!n.read, client: cl ? cName(cl) : '' }; }),
+        notifs: (S.notifs || []).slice(0, 40).map(function (n) { var cl = n.client_id ? clientById(n.client_id) : null; return { id: n.id, title: pick(n, 'title', 'title_ar') || '', body: pick(n, 'body', 'body_ar') || '', ago: n.created_at ? ago(n.created_at) : '', read: !!n.read, client: cl ? cName(cl) : '', go: notifGo(n.title) }; }),
         ecard: /zkj system/i.test(c.name || '') ? 'https://system.zkjverse.com/zkj-system/' : null,
         wa: WA, publishing: S.settings && S.settings.publisher_paused !== undefined ? S.settings.publisher_paused !== 'true' : null
       };
@@ -1434,13 +1434,28 @@ var CLASSIC_OFF = true;
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261105b#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261105c#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261105b#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261105c#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
+  }
+  // where a bell note leads when tapped (KJ, 5 Nov 2026: "it is not open the notification"); matched on the English title
+  function notifGo(title) {
+    var x = String(title || '');
+    if (/website enquiry|comment/i.test(x)) return 'inbox';
+    if (/^Studio delivered|waiting for your|needs? (your )?approval|changes requested|sent back/i.test(x)) return S.isAdmin ? 'todo' : 'ap';
+    if (/^Published|Uploaded to YouTube|went live/i.test(x)) return 'live';
+    if (/connected|reconnect|token|disconnected/i.test(x)) return S.isAdmin ? 'cc' : 'acc';
+    if (/report/i.test(x)) return 'rep';
+    return null;
+  }
+  function circuitReadOne(id) {
+    var n = (S.notifs || []).filter(function (x) { return x.id === id; })[0];
+    if (!n || n.read || !S.isAdmin) return Promise.resolve({ ok: true });
+    return q(sb.from('notifications').update({ read: true }).eq('id', id).select('id')).then(function () { n.read = true; try { renderNotifs(); } catch (e) { /* classic only */ } return { ok: true }; }).catch(function () { return { ok: false }; });
   }
   function circuitReadAll() { return sb.rpc('mark_notifications_read').then(function (r) { if (r.error) throw r.error; (S.notifs || []).forEach(function (n) { n.read = true; }); renderNotifs(); return { ok: true }; }).catch(function (e) { return { ok: false, error: e && e.message }; }); }
   /* ---------- Circuit HQ (KJ, 3 Nov 2026: "nothing old anywhere"): All clients, To-do, This week, Drawings, Control Center and Core
@@ -1627,7 +1642,7 @@ var CLASSIC_OFF = true;
   }
   function circuitCoreOff() { if (CORE2.ctl) { try { CORE2.ctl.destroy(); } catch (e) { /* ignore */ } CORE2.ctl = null; } }
   function circuitItem(id) { var x = itemById(id); return Promise.resolve(x ? itemFull(x) : null); }
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff };
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff };
   // Esc steps back inside the new world (circuit → cube); it never drops to the old screens
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CX.on) frontAct('home'); });
 
