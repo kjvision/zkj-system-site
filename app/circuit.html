@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>ZKJ SYSTEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="../assets/core.css?v=20261105a">
+<link rel="stylesheet" href="../assets/core.css?v=20261105b">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
 /* ZKJ SYSTEM circuit screens (KJ, 3 Nov 2026). Every screen lives in the cube's world: gold circuit traces, platform terminals,
@@ -71,6 +71,11 @@ body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;backgr
 .ibt[aria-pressed=true] i{border-bottom-color:var(--gold)}
 .ibt:focus-visible .hit{outline:1px solid var(--gl);outline-offset:2px}
 [dir=rtl] .ibt i{font-family:var(--body);letter-spacing:0;font-size:10px}
+[dir=rtl] .enq .meta span[dir=ltr]{text-align:right!important}.mm.enqh{padding-inline-start:14px}
+.enq .meta{display:grid;gap:3px;font-size:12px;color:var(--sil)}.enq .meta b{font-weight:500;color:var(--wh)}
+.enq .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.enq .acts a.pill{text-decoration:none}
+.enq .sts{display:flex;flex-wrap:wrap;gap:6px;margin-inline-start:auto}.enq .sts button{padding:8px 11px;font-size:9px}
+.enq .sts button[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}
 .cmt.hl q{color:var(--sil);font-size:13px}.cmt.hl .ln{color:var(--bad);border-color:rgba(240,128,110,.4)}
 .cmt q{font-size:14px;line-height:1.45;quotes:none;overflow-wrap:anywhere}
 .cmt .ln{font-size:12px;color:var(--sil);padding-inline-start:10px;border-inline-start:1px solid var(--line)}
@@ -195,7 +200,7 @@ input,textarea,select,.cap2,.copy input{-webkit-user-select:text;user-select:tex
 <div class="sheet" id="sheet" hidden><div id="sheet-in"></div></div>
 <div id="toast" hidden role="status"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="circuit-marks.js?v=20261105a"></script>
+<script src="circuit-marks.js?v=20261105b"></script>
 <script>
 (function(){
 "use strict";
@@ -213,7 +218,7 @@ var TX={en:{hq:"HQ",ap:"APPROVALS",inbox:"INBOX",live:"LIVE NOW",plan:"PLAN",cal
   slide:"SLIDE TO APPROVE",changes:"↺ REQUEST CHANGES",read:"READ THE CAPTION",clientOnly:"WAITING FOR THE CLIENT'S YES",clear:"ALL CLEAR",clearS:"NOTHING IS WAITING FOR YOUR YES",
   approved:"APPROVED",sent:"SENT BACK WITH YOUR NOTE",fail:"NOT SAVED. TRY AGAIN.",chT:"WHAT SHOULD CHANGE?",chPh:"Write your note…",send:"SEND",cancel:"CANCEL",close:"CLOSE",needNote:"WRITE A NOTE FIRST",
   chips:["Change the caption","Change the image","Change the time","Shorter, please"],
-  waiting:"Waiting",replied:"Answered",reply:"Write a reply…",auto:"Auto reply:",mine:"Your reply:",posted:"REPLY POSTED",noComments:"NO COMMENTS YET",hOk:"CONNECTED",hBad:"CHECK FAILED",hOff:"NOT CONNECTED",hStale:"NOT CHECKED",hUnk:"WAITING FOR FIRST CHECK",hNone:"No {p} comments in the last 48 hours.",hLast:"Last check {t}.",hBrands:"Not connected for: {b}",hAll:"Showing every platform",pn:{instagram:"Instagram",facebook:"Facebook",youtube:"YouTube"},onPlatform:"Reply on the platform itself.",
+  waiting:"Waiting",replied:"Answered",reply:"Write a reply…",auto:"Auto reply:",mine:"Your reply:",posted:"REPLY POSTED",noComments:"NO COMMENTS YET",hOk:"CONNECTED",hBad:"CHECK FAILED",hOff:"NOT CONNECTED",hStale:"NOT CHECKED",hUnk:"CHECKING…",hNone:"No {p} comments in the last 48 hours.",enqH:"WEBSITE ENQUIRIES",enqNone:"No open website enquiries.",enqClosed:"{n} done or closed",st:{new:"New",contacted:"Contacted",won:"Won",lost:"Closed"},waB:"WHATSAPP",mailB:"EMAIL",pkgL:"Package",toolsL:"Tools",platL:"Platforms",waHi:"Hi {n}, this is KJ from ZKJ SYSTEM. Thank you for your enquiry about {b}. ",hLast:"Last check {t}.",hBrands:"Not connected for: {b}",hAll:"Showing every platform",pn:{instagram:"Instagram",facebook:"Facebook",youtube:"YouTube"},onPlatform:"Reply on the platform itself.",
   drafts:"SUGGESTED REPLIES",approve:"APPROVE",noDrafts:"NO REPLIES TO REVIEW",inboxNote:"X · TIKTOK · PINTEREST OPEN ON THE PLATFORM",
   open:"OPEN ↗",noLive:"NOTHING PUBLISHED YET",newest:"NEWEST FIRST",
   planned:"POSTS PLANNED",openCal:"OPEN THE CALENDAR →",kinds:{reel:"REELS",post:"POSTS",carousel:"CAROUSELS",story:"STORIES",ad:"ADS"},noPlan:"NOTHING PLANNED THIS MONTH YET",
@@ -230,7 +235,7 @@ var TX={en:{hq:"HQ",ap:"APPROVALS",inbox:"INBOX",live:"LIVE NOW",plan:"PLAN",cal
   slide:"اسحب للموافقة",changes:"↺ اطلب تعديلًا",read:"اقرأ النص",clientOnly:"بانتظار موافقة العميل",clear:"لا شيء معلّق",clearS:"لا منشورات بانتظار موافقتك",
   approved:"تمت الموافقة",sent:"أُعيد مع ملاحظتك",fail:"لم يُحفظ. حاول مجددًا.",chT:"ما الذي يجب تعديله؟",chPh:"اكتب ملاحظتك…",send:"إرسال",cancel:"إلغاء",close:"إغلاق",needNote:"اكتب الملاحظة أولًا",
   chips:["عدّل النص","غيّر الصورة","غيّر الموعد","اختصر رجاءً"],
-  waiting:"بانتظار الرد",replied:"تم الرد",reply:"اكتب ردًّا…",auto:"الرد التلقائي:",mine:"ردّك:",posted:"نُشر الرد",noComments:"لا تعليقات بعد",hOk:"متصل",hBad:"تعذّر الفحص",hOff:"غير متصل",hStale:"لم يُفحص",hUnk:"بانتظار أول فحص",hNone:"لا تعليقات على {p} خلال آخر 48 ساعة.",hLast:"آخر فحص {t}.",hBrands:"غير متصل لـ: {b}",hAll:"عرض كل المنصات",pn:{instagram:"إنستغرام",facebook:"فيسبوك",youtube:"يوتيوب"},onPlatform:"الرد يكون من المنصة نفسها.",
+  waiting:"بانتظار الرد",replied:"تم الرد",reply:"اكتب ردًّا…",auto:"الرد التلقائي:",mine:"ردّك:",posted:"نُشر الرد",noComments:"لا تعليقات بعد",hOk:"متصل",hBad:"تعذّر الفحص",hOff:"غير متصل",hStale:"لم يُفحص",hUnk:"قيد الفحص…",hNone:"لا تعليقات على {p} خلال آخر 48 ساعة.",enqH:"استفسارات الموقع",enqNone:"لا استفسارات مفتوحة من الموقع.",enqClosed:"{n} منجز أو مغلق",st:{new:"جديد",contacted:"تم التواصل",won:"تم الاتفاق",lost:"مغلق"},waB:"واتساب",mailB:"بريد",pkgL:"الباقة",toolsL:"الأدوات",platL:"المنصات",waHi:"مرحبًا {n}، معك KJ من ZKJ SYSTEM. شكرًا على استفسارك عن {b}. ",hLast:"آخر فحص {t}.",hBrands:"غير متصل لـ: {b}",hAll:"عرض كل المنصات",pn:{instagram:"إنستغرام",facebook:"فيسبوك",youtube:"يوتيوب"},onPlatform:"الرد يكون من المنصة نفسها.",
   drafts:"ردود مقترحة",approve:"موافقة",noDrafts:"لا ردود للمراجعة",inboxNote:"إكس · تيك توك · بنترست تُفتح من المنصة",
   open:"افتح ↗",noLive:"لم يُنشر شيء بعد",newest:"الأحدث أولًا",
   planned:"المنشورات المخططة",openCal:"افتح التقويم ←",kinds:{reel:"ريلز",post:"منشورات",carousel:"منشورات متعددة",story:"قصص",ad:"إعلانات"},noPlan:"لا شيء مخطط هذا الشهر بعد",
@@ -440,6 +445,16 @@ function ibState(p){var h=D.inbox&&D.inbox[p];if(!h)return{cls:"mute",lab:"",liv
   var st=h.state,lab=st==="ok"?T("hOk"):st==="bad"?T("hBad"):st==="off"?T("hOff"):st==="stale"?T("hStale"):T("hUnk");
   return{cls:st==="ok"?"":st==="bad"||st==="off"||st==="stale"?"bad":"mute",lab:lab+(st==="ok"?' · <b>'+h.count+'</b>':''),live:st==="ok",bad:st==="bad"||st==="off"||st==="stale",h:h};}
 function layIB(){var L=$("ib-list"),h=[],F=IB.f,all=D.comments||[],list=F?all.filter(function(c){return c.platform===F;}):all;
+  if(D.admin&&!F&&D.enquiries){var open=D.enquiries.filter(function(e){return e.status==="new"||e.status==="contacted";}),shut=D.enquiries.length-open.length;
+    h.push('<div class="mm enqh" style="color:var(--gold)">'+esc(T("enqH"))+(shut?' · <span style="color:var(--sil)">'+esc(T("enqClosed").replace("{n}",shut))+'</span>':'')+'</div>');
+    if(!open.length)h.push('<div class="gcard cmt"><q>'+esc(T("enqNone"))+'</q></div>');
+    open.forEach(function(e){var hi=encodeURIComponent((e.ar?TX.ar:TX.en).waHi.replace("{n}",e.name.split(" ")[0]).replace("{b}",e.business||e.name));
+      h.push('<div class="gcard cmt enq" data-e="'+esc(e.id)+'"><div class="h"><b>'+esc(e.name)+'</b><span>'+esc([e.business,e.country,e.ago].filter(Boolean).join(" · "))+'</span><em class="stt '+(e.status==="new"?"waiting":"sch")+'">'+esc(T("st")[e.status])+'</em></div>'+
+        (e.message?'<q>'+esc(e.message)+'</q>':'')+
+        '<div class="meta">'+(e.pkg?'<span>'+esc(T("pkgL"))+': <b>'+esc(e.pkg)+'</b></span>':'')+(e.tools?'<span>'+esc(T("toolsL"))+': '+esc(e.tools)+'</span>':'')+(e.platforms?'<span>'+esc(T("platL"))+': '+esc(e.platforms)+'</span>':'')+
+        '<span dir="ltr" style="text-align:start">'+esc([e.phone,e.email].filter(Boolean).join(" · "))+'</span></div>'+
+        '<div class="acts">'+(e.wa?'<a class="pill gold" href="'+esc(e.wa)+'?text='+hi+'" target="_blank" rel="noopener">'+esc(T("waB"))+'</a>':'')+(e.mail?'<a class="pill" href="'+esc(e.mail)+'">'+esc(T("mailB"))+'</a>':'')+
+        '<span class="sts">'+["contacted","won","lost"].map(function(k){return '<button class="pill" data-st="'+k+'" aria-pressed="'+(e.status===k)+'">'+esc(T("st")[k])+'</button>';}).join("")+'</span></div></div>');});}
   if(D.admin){
     if(F){var hs=D.inbox&&D.inbox[F],note=[];
       if(hs&&hs.bad.length)note=note.concat(hs.bad);
@@ -459,6 +474,9 @@ function layIB(){var L=$("ib-list"),h=[],F=IB.f,all=D.comments||[],list=F?all.fi
     b.addEventListener("click",function(){var v=ta.value.trim();if(!v){ta.focus();return;}b.disabled=true;ta.disabled=true;
       ZH.reply(card.getAttribute("data-c"),v).then(function(r){if(r&&r.ok){toast(T("posted"));(D.comments||[]).forEach(function(c){if(c.id===card.getAttribute("data-c")){c.mine=v;c.status="replied";}});layout();}else{toast(T("fail")+" "+((r&&r.error)||""),true);b.disabled=false;ta.disabled=false;}});});});
   L.querySelectorAll("[data-d] .pill").forEach(function(b){var id=b.closest("[data-d]").getAttribute("data-d");b.addEventListener("click",function(){b.disabled=true;ZH.review(id,"approved").then(function(r){if(r&&r.ok){toast(T("approved"));D.drafts=D.drafts.filter(function(x){return x.id!==id;});layout();}else{toast(T("fail"),true);b.disabled=false;}});});});
+  L.querySelectorAll("[data-e] [data-st]").forEach(function(b){var card=b.closest("[data-e]"),id=card.getAttribute("data-e");b.addEventListener("click",function(){var st=b.getAttribute("data-st");
+    card.querySelectorAll("[data-st]").forEach(function(x){x.disabled=true;});
+    A("enq",{enq:id,status:st}).then(function(r){if(r&&r.ok){(D.enquiries||[]).forEach(function(e){if(e.id===id)e.status=st;});toast(T("st")[st]);layout();}else{toast(T("fail"),true);card.querySelectorAll("[data-st]").forEach(function(x){x.disabled=false;});}});});});
   var pf=["instagram","facebook","youtube"],tm=D.admin&&D.inbox;
   if(desk){pos(L,W*.48,TOP+30,Math.min(560,W*.46),H-TOP-40);IB.term=pf.map(function(p,i){return{id:p,x:W*.2,y:TOP+(H-TOP)*(.25+i*.22)};});}
   else{var top=tm?TOP+122:TOP+96;pos(L,16,top,W-32,H-top-14);IB.term=pf.map(function(p,i){return{id:p,x:W*(.25+i*.25),y:TOP+40};});}
