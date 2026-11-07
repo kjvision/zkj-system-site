@@ -1,0 +1,7 @@
+-- Record of migrations applied 6 Nov 2026 (push_alerts, emergency_alerts) + cron jobs. KJ: normal alerts from 08:00 Dubai, emergencies 24/7.
+-- notifications.priority ('normal'|'emergency'), notifications.pushed_at; push_subscriptions (own rows only); push_keys (service role only).
+-- raise_emergency(title, body): writes one admin emergency note, de-duplicated for 6 hours per title.
+-- Triggers: notifications_push_now (emergency → push-send at once) · social_accounts_emergency (account not ok)
+--           items_emergency_publish (3+ publish errors in 1 h) · sync_runs_emergency (same job errors 3+ times in 1 h).
+-- Cron: push-send every 5 min · uptime-check at :03 :13 :23 :33 :43 :53 (store, site, dashboard sign-in; 2 fails in a row → emergency).
+-- Full SQL is in the Supabase migration history (supabase_migrations.schema_migrations).
