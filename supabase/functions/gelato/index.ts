@@ -109,6 +109,31 @@ Deno.serve(async (req) => {
       await log('ok', `quote ${size} → ${country}: ${out.product_price} ${out.currency} + shipping from ${out.fulfillment_country}`);
       return json(200, { ok: true, quote: out });
     }
+    // Control point path (KJ 7 Nov): the store order is paid, the address came from the store checkout, the print file is
+    // the master KJ dropped once. Service role only (store-control calls it); nothing a browser can reach.
+    if (action === 'order_direct') {
+      const bearer = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
+      if (bearer !== SB_KEY) return json(401, { ok: false, error: 'service only' });
+      const a = (b.address ?? {}) as Record<string, string>;
+      for (const k of ['firstName', 'lastName', 'addressLine1', 'city', 'postCode', 'country', 'email']) if (!a[k]) return json(400, { ok: false, error: `address.${k} missing` });
+      if (!b.file_url || !b.size) return json(400, { ok: false, error: 'file_url and size needed' });
+      const p = await findProduct(String(b.size));
+      const o = await gl(`${ORDER_API}/orders`, { method: 'POST', body: JSON.stringify({
+        orderType: 'order', orderReferenceId: String(b.ref ?? `zkj-${Date.now()}`), customerReferenceId: a.email, currency: String(b.currency ?? 'USD'),
+        items: [{ itemReferenceId: 'art-1', productUid: p.productUid, quantity: Number(b.qty ?? 1), files: [{ type: 'default', url: b.file_url }] }],
+        shipmentMethodUid: String(b.shipment_method_uid ?? 'normal'), shippingAddress: a,
+      }) });
+      await log('ok', `order_direct ${o.id} · ${b.ref ?? ''} · ${p.productUid} → ${a.country}`);
+      return json(200, { ok: true, order_id: o.id, status: o.fulfillmentStatus, productUid: p.productUid });
+    }
+    if (action === 'status') {
+      const bearer = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
+      if (bearer !== SB_KEY) return json(401, { ok: false, error: 'service only' });
+      const o = await gl(`${ORDER_API}/orders/${b.gelato_order_id}`);
+      const sh = (o.shipment as Record<string, unknown>) ?? {};
+      const pk = ((sh.packages as Record<string, unknown>[]) ?? [])[0] ?? {};
+      return json(200, { ok: true, status: o.fulfillmentStatus, financial: o.financialStatus, tracking_url: pk.trackingUrl ?? null, tracking_code: pk.trackingCode ?? null, carrier: sh.shipmentMethodName ?? null, min_date: sh.minDeliveryDate ?? null, max_date: sh.maxDeliveryDate ?? null });
+    }
     if (action === 'order') {
       // Guard: KJ's yes must be on the job first (tasks.answer = 'order'), and the enquiry must carry a full address.
       const t = (await sb(`tasks?select=id,answer,source_id&source_table=eq.site_enquiries&source_id=eq.${b.enquiry_id}&order=answered_at.desc&limit=1`))?.[0];

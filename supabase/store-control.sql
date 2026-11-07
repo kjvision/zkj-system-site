@@ -30,3 +30,7 @@ end $$;
 select cron.schedule('store-control', '5,15,25,35,45,55 * * * *',
   $$select net.http_post(url := 'https://usucmdjupfjuchfxnxpz.supabase.co/functions/v1/store-control', headers := '{"Content-Type":"application/json"}'::jsonb, body := '{"action":"sync"}'::jsonb, timeout_milliseconds := 60000)$$)
 where not exists (select 1 from cron.job where jobname = 'store-control');
+
+-- 7 Nov 2026, second migration (print_files_bucket): private bucket "prints" (admin only, 500 MB files), table print_files
+-- (one master per store handle), art_orders + gelato_order_id / gelato_status / ship_to / print_file_id / handle,
+-- trigger print_files_kick → store-control sync at once when a file is dropped.

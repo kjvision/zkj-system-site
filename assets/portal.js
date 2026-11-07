@@ -1246,13 +1246,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'home.html?v=20261107d';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'home.html?v=20261107e';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'home.html?v=20261107d'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'home.html?v=20261107e'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1435,10 +1435,10 @@ var CLASSIC_OFF = true;
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261107d#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261107e#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261107d#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261107e#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
@@ -1721,12 +1721,23 @@ var CLASSIC_OFF = true;
   function gelatoCall(body) { return fnCall('gelato', body); }
   function storeCall(body) { return fnCall('store-control', body); }
   // the enquiry behind an art job (for the dispatch note: everything the client already told us is pre-written)
+  // the print file, dropped once per piece (KJ 7 Nov 2026): private bucket "prints", one row in print_files per store handle
+  function printUpload(handle, artwork, file) {
+    if (!S.isAdmin || !handle || !file) return Promise.resolve({ ok: false, error: 'nothing to upload' });
+    if (!/\.(jpe?g|png|tiff?)$/i.test(file.name)) return Promise.resolve({ ok: false, error: 'jpg, png or tiff only' });
+    var safe = file.name.replace(/[^\w.\-]+/g, '_').slice(-80), path = handle + '/' + Date.now() + '-' + safe;
+    return sb.storage.from('prints').upload(path, file, { upsert: false, contentType: file.type || undefined }).then(function (r) {
+      if (r.error) throw r.error;
+      return q(sb.from('print_files').upsert({ handle: handle, artwork: artwork || null, path: path, bytes: file.size, uploaded_by: S.user && S.user.id }, { onConflict: 'handle' }).select('id'));
+    }).then(function (rows) { return { ok: true, id: rows && rows[0] && rows[0].id, path: path }; })
+      .catch(function (e) { return { ok: false, error: e && e.message }; });
+  }
   function homeEnquiry(id) {
     if (!S.isAdmin || !id) return Promise.resolve(null);
     return q(sb.from('site_enquiries').select('*').eq('id', id).limit(1)).then(function (rows) { return rows && rows[0] ? rows[0] : null; }).catch(function () { return null; });
   }
   pushState();
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff, home: homeData, task: homeTask, push: pushToggle, gelato: gelatoCall, store: storeCall, enquiry: homeEnquiry };
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff, home: homeData, task: homeTask, push: pushToggle, gelato: gelatoCall, store: storeCall, enquiry: homeEnquiry, print: printUpload };
   // Esc steps back inside the new world (circuit → cube); it never drops to the old screens
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CX.on) frontAct('home'); });
 

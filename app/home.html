@@ -96,6 +96,11 @@ nav button i{position:absolute;top:-2px;inset-inline-start:calc(50% + 22px);font
 .dn-or{color:#5A564F;padding:0 2px}
 .dn-noq{color:#8F8A80;font-style:italic}
 .dn-fine{margin-top:10px;font:300 12px/1.6 var(--body);color:#8F8A80}
+.drop{display:block;margin-top:22px;padding:26px 18px;border:1px dotted rgba(201,168,76,.7);text-align:center;cursor:pointer}
+.drop-t{display:block;font:400 15px/1.3 var(--body);color:var(--gl)}
+.drop-s{display:block;margin-top:6px;font:300 12px/1.5 var(--body);color:#8F8A80;word-break:break-all}
+.drop.busy{border-style:solid;opacity:.75;cursor:wait}
+.drop.ok{border-style:solid;border-color:var(--g)}
 .dn-go{margin-top:22px;justify-content:center;width:100%}
 [dir=rtl] .dn-sub,[dir=rtl] .dn-c,[dir=rtl] .dn-cost{direction:ltr;text-align:right;unicode-bidi:isolate}
 [dir=rtl] .dn-art{direction:ltr;text-align:right}
@@ -213,6 +218,7 @@ var TX={en:{tonight:"To<em>night</em>",today:"To<em>day</em>",morning:"This <em>
   chT:"What should change?",chPh:"Write your note…",send:"Send",cancel:"Cancel",chips:["Change the caption","Change the image","Change the time","Shorter, please"],needNote:"Write a note first",
   approved:"Approved",sent:"Sent back with your note",fail:"Not saved. Try again.",done:"Saved",
   received:"Received",propose:"I propose",choose:"Your choice",chat:"Open chat",close:"Close",
+  drop:{t:"Drop the print file here",s:"The master, jpg or tiff. Once per piece; every future order of it uses this file.",busy:"Uploading…",ok:"On file. Gelato takes it from here."},
   invoice:{k:"Invoice · ZKJ VERSE store",to:"To",price:"Price",storePrice:"store price",cur:"USD",fine:"The customer pays in the store checkout and writes the delivery address there. Gelato prints and ships with your branding. You will be told at each step.",go:"Send the invoice",ok:"Invoice sent"},
   more_t:"More",items:{followup:"Follow-up · clients & enquiries",cal:"Calendar",live:"Live now",plan:"Plan",rep:"Reports",acc:"Account",hq:"HQ · all brands",todo:"To-do",cc:"Control Center",dw:"Drawings",push:"Alerts on this phone",lang:"العربية",out:"Sign out"},
   pushOn:"Alerts are on for this phone",pushOff:"Alerts are off on this phone",pushNo:"This browser cannot receive alerts. On iPhone: Share → Add to Home Screen, then open from the Home Screen.",
@@ -229,6 +235,7 @@ var TX={en:{tonight:"To<em>night</em>",today:"To<em>day</em>",morning:"This <em>
   chT:"ما الذي يجب تعديله؟",chPh:"اكتب ملاحظتك…",send:"إرسال",cancel:"إلغاء",chips:["عدّل النص","غيّر الصورة","غيّر الموعد","اختصر رجاءً"],needNote:"اكتب الملاحظة أولًا",
   approved:"تمت الموافقة",sent:"أُعيد مع ملاحظتك",fail:"لم يُحفظ. حاول مجددًا.",done:"حُفظ",
   received:"ما وصل",propose:"أقترح",choose:"خيارك",chat:"افتح المحادثة",close:"إغلاق",
+  drop:{t:"أسقط ملف الطباعة هنا",s:"الملف الأصلي، jpg أو tiff. مرة واحدة لكل عمل؛ كل طلب قادم له يستخدم هذا الملف.",busy:"جارٍ الرفع…",ok:"محفوظ. تتولى Gelato الباقي."},
   invoice:{k:"فاتورة · متجر ZKJ VERSE",to:"إلى",price:"السعر",storePrice:"سعر المتجر",cur:"USD",fine:"يدفع العميل في صفحة الدفع بالمتجر ويكتب عنوان التسليم هناك. تطبع Gelato وتشحن بعلامتك. ستُخبر عند كل خطوة.",go:"أرسل الفاتورة",ok:"أُرسلت الفاتورة"},
   more_t:"المزيد",items:{followup:"المتابعة · العملاء والاستفسارات",cal:"التقويم",live:"المنشور الآن",plan:"الخطة",rep:"التقارير",acc:"الحساب",hq:"المقر · كل العلامات",todo:"المهام",cc:"مركز التحكم",dw:"الرسومات",push:"التنبيهات على هذا الهاتف",lang:"English",out:"تسجيل الخروج"},
   pushOn:"التنبيهات مفعّلة على هذا الهاتف",pushOff:"التنبيهات متوقفة على هذا الهاتف",pushNo:"هذا المتصفح لا يستقبل التنبيهات. على iPhone: مشاركة ← إضافة إلى الشاشة الرئيسية، ثم افتح من الشاشة الرئيسية.",
@@ -303,10 +310,14 @@ function openTask(id){var x=null;M.tasks.forEach(function(t){if(t.id===id)x=t;})
     (pick(x,"received")?'<div class="sh-row"><span>'+esc(T("received"))+'</span><p>'+esc(pick(x,"received"))+'</p></div>':'')+
     (pick(x,"proposal")?'<div class="sh-row pro"><span>'+esc(T("propose"))+'</span><p>'+esc(pick(x,"proposal"))+'</p></div>':'')+
     '<div class="sh-row"><span>'+esc(T("choose"))+'</span><div class="opts" style="margin-top:0">'+opts+'</div></div>'+
+    (x.source_table==="print_files"?'<label class="drop" id="drop"><input type="file" id="drop-in" accept=".jpg,.jpeg,.png,.tif,.tiff,image/jpeg,image/png,image/tiff" hidden><span class="drop-t">'+esc(T("drop").t)+'</span><span class="drop-s">'+esc(T("drop").s)+'</span></label>':'')+
     (x.chat_url?'<a class="chat" href="'+esc(x.chat_url)+'" target="_blank" rel="noopener">'+esc(T("chat"))+'</a>':'')+
     (x.go?'<a class="chat" data-go="'+esc(x.go)+'" style="margin-inline-start:18px">'+esc(T("open"))+'</a>':'')+
     '<button class="sh-x" data-x>'+esc(T("close"))+'</button>');
   $("sheet-in").querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("click",function(){var k=b.getAttribute("data-k");b.disabled=true;ZH.task(x.id,k).then(function(r){if(r&&r.ok){if(k==="invoice"&&x.kind==="enquiry"&&ZH.store){openInvoice(x);return;}toast(T("done"));closeSheet();reload();}else{toast(T("fail"),true);b.disabled=false;}});});});
+  var di=$("drop-in");if(di)di.addEventListener("change",function(){var f=di.files&&di.files[0];if(!f)return;var d=T("drop"),lab=$("drop");lab.classList.add("busy");lab.querySelector(".drop-t").textContent=d.busy;lab.querySelector(".drop-s").textContent=f.name;
+    ZH.print(x.source_id,(x.title||"").replace(/^.*·\s*/,""),f).then(function(r){if(r&&r.ok){lab.classList.remove("busy");lab.classList.add("ok");lab.querySelector(".drop-t").textContent=d.ok;return ZH.task(x.id,"file").then(function(){toast(d.ok);setTimeout(function(){closeSheet();reload();},900);});}
+      lab.classList.remove("busy");lab.querySelector(".drop-t").textContent=d.t;lab.querySelector(".drop-s").textContent=(r&&r.error)||T("fail");toast((r&&r.error)||T("fail"),true);});});
   var go=$("sheet-in").querySelector("[data-go]");if(go)go.addEventListener("click",function(e){e.preventDefault();closeSheet();ZH.act(go.getAttribute("data-go"));});}
 /* Control point (KJ 7 Nov 2026): "I receive the enquiry, I manage the payment with the customer, I press go ahead, you continue
    all the work from there." The tap sends the store's own invoice for that piece and size; the customer pays in the store
