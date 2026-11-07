@@ -6,8 +6,9 @@
 // (private bucket "prints", signed link for 7 days) and places the print with Gelato through its API (gelato → order_direct).
 // Then every 10 minutes it asks Gelato where the print is, writes the tracking onto the Shopify order (the customer gets the
 // store's shipping email) and tells KJ: paid · at the lab · shipped · delivered · needs attention. No Gelato app, no Gelato dashboard.
-// Needs the Supabase secret SHOPIFY_ADMIN_TOKEN (custom app: write_draft_orders, read_orders, read_products,
-// read_merchant_managed_fulfillment_orders, write_merchant_managed_fulfillment_orders, write_fulfillments). KJ saves it in Supabase, never in chat.
+// Needs the Supabase secrets SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET (Dev Dashboard app "ZKJ dashboard", scopes write_draft_orders,
+// read_orders, read_products, read_merchant_managed_fulfillment_orders, write_merchant_managed_fulfillment_orders, write_fulfillments),
+// or an old-style SHOPIFY_ADMIN_TOKEN. KJ saves them in Supabase, never in chat.
 // Actions (POST {"action": ...}):
 //   invoice {enquiry_id, amount?}  admin or service role → draft order + invoice. Nothing is sent without this tap.
 //   sync                            cron (no key) → stage changes + bell notes.
@@ -17,10 +18,28 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 const SB_URL = (Deno.env.get('SUPABASE_URL') ?? '').replace(/\/$/, '');
 const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const SHOP = (Deno.env.get('SHOPIFY_SHOP') ?? 'p3f801-9a.myshopify.com').trim();
-const TOKEN = (Deno.env.get('SHOPIFY_ADMIN_TOKEN') ?? '').trim();
 const API = `https://${SHOP}/admin/api/2026-10/graphql.json`;
-
+// Two ways in: a fixed Admin API token (old custom apps), or the Dev Dashboard app's client id + secret (KJ, 8 Nov 2026):
+// the function then mints a 24-hour access token itself (client credentials grant) and keeps it in app_settings.
+const FIXED = (Deno.env.get('SHOPIFY_ADMIN_TOKEN') ?? '').trim();
+const CID = (Deno.env.get('SHOPIFY_CLIENT_ID') ?? '').trim();
+const CSECRET = (Deno.env.get('SHOPIFY_CLIENT_SECRET') ?? '').trim();
 type J = Record<string, unknown>;
+let TOKEN = FIXED;
+async function token(): Promise<string> {
+  if (FIXED) return FIXED;
+  if (!CID || !CSECRET) return '';
+  const raw = (await sb('app_settings?select=value&key=eq.shopify_token&limit=1').catch(() => []))?.[0]?.value;
+  let saved: J | null = null; try { saved = raw ? JSON.parse(String(raw)) : null; } catch { saved = null; }
+  if (saved && saved.exp && Date.now() < Number(saved.exp) - 10 * 60e3 && saved.t) return String(saved.t);
+  const r = await fetch(`https://${SHOP}/admin/oauth/access_token`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ client_id: CID, client_secret: CSECRET, grant_type: 'client_credentials' }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.access_token) throw new Error(`Shopify token: ${r.status} ${JSON.stringify(j).slice(0, 200)}`);
+  const v = { t: j.access_token, exp: Date.now() + Number(j.expires_in ?? 86400) * 1000, scope: j.scope };
+  await sb('app_settings', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ key: 'shopify_token', value: JSON.stringify(v), updated_at: new Date().toISOString() }) }).catch(() => null);
+  return String(j.access_token);
+}
+
 async function sb(path: string, init: RequestInit = {}) {
   const r = await fetch(`${SB_URL}/rest/v1/${path}`, { ...init, headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', ...(init.headers ?? {}) } });
   const t = await r.text();
@@ -28,6 +47,7 @@ async function sb(path: string, init: RequestInit = {}) {
   return t ? JSON.parse(t) : null;
 }
 async function gql(query: string, variables: J = {}) {
+  if (!TOKEN) TOKEN = await token();
   const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': TOKEN }, body: JSON.stringify({ query, variables }) });
   const j = await r.json().catch(() => ({}));
   if (!r.ok || j.errors) throw new Error(`Shopify ${r.status}: ${JSON.stringify(j.errors ?? j).slice(0, 300)}`);
@@ -209,9 +229,9 @@ Deno.serve(async (req) => {
   const b = await req.json().catch(() => ({}));
   const action = String(b.action ?? 'sync');
   if (!(await allowed(req, action))) return json(401, { ok: false, error: 'admin only' });
-  if (!TOKEN) { await log('error', 'SHOPIFY_ADMIN_TOKEN secret is missing'); return json(500, { ok: false, error: 'SHOPIFY_ADMIN_TOKEN secret is missing' }); }
+  if (!FIXED && !(CID && CSECRET)) { await log('error', 'Shopify secrets missing (SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET, or SHOPIFY_ADMIN_TOKEN)'); return json(500, { ok: false, error: 'Shopify secrets missing: SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET (or SHOPIFY_ADMIN_TOKEN)' }); }
   try {
-    if (action === 'ping') { const d = await gql(`{ shop { name myshopifyDomain currencyCode } }`); return json(200, { ok: true, shop: d.shop }); }
+    if (action === 'ping') { const d = await gql(`{ shop { name myshopifyDomain currencyCode } }`); let sc = FIXED ? 'fixed token' : ''; try { sc = JSON.parse(String((await sb('app_settings?select=value&key=eq.shopify_token&limit=1'))?.[0]?.value ?? '{}')).scope ?? sc; } catch { /* none */ } return json(200, { ok: true, shop: d.shop, scope: sc }); }
     if (action === 'invoice') return json(200, await invoice(b));
     if (action === 'sync') return json(200, await sync());
     return json(400, { ok: false, error: 'unknown action' });
