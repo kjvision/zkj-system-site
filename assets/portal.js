@@ -1246,13 +1246,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'home.html?v=20261107a';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'home.html?v=20261107b';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'home.html?v=20261107a'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'home.html?v=20261107b'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1435,10 +1435,10 @@ var CLASSIC_OFF = true;
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261107a#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261107b#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261107a#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261107b#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
@@ -1709,8 +1709,17 @@ var CLASSIC_OFF = true;
       return q(sb.from('push_subscriptions').upsert({ endpoint: sub.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, ua: navigator.userAgent.slice(0, 200) }, { onConflict: 'endpoint' }).select('id')).then(function () { S.pushOn = true; return { ok: true, on: true }; });
     }).catch(function (e) { S.pushOn = false; return { ok: false, error: e && e.message, reason: /denied/.test(String(e && e.message)) ? 'denied' : 'failed' }; });
   }
+  // Gelato (KJ 7 Nov 2026): the dashboard asks the lab for a quote or places the order; the Edge Function checks
+  // that KJ's yes is on the job and that the enquiry has no order yet. Admin only, signed-in call.
+  function gelatoCall(body) {
+    if (!S.isAdmin) return Promise.resolve({ ok: false, error: 'admin only' });
+    return sb.functions.invoke('gelato', { body: body }).then(function (r) {
+      if (r.error) { var ctx = r.error.context; return (ctx && ctx.json ? ctx.json().catch(function () { return null; }) : Promise.resolve(null)).then(function (j) { return { ok: false, error: (j && j.error) || r.error.message }; }); }
+      return r.data || { ok: false, error: 'empty' };
+    }).catch(function (e) { return { ok: false, error: e && e.message }; });
+  }
   pushState();
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff, home: homeData, task: homeTask, push: pushToggle };
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff, home: homeData, task: homeTask, push: pushToggle, gelato: gelatoCall };
   // Esc steps back inside the new world (circuit → cube); it never drops to the old screens
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CX.on) frontAct('home'); });
 

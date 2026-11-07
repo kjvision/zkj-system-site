@@ -76,6 +76,12 @@ nav button i{position:absolute;top:-2px;inset-inline-start:calc(50% + 22px);font
 .opt{display:flex;align-items:center;justify-content:space-between;min-height:50px;padding:0 18px;border:1px solid rgba(239,234,224,.2);color:#D9D3C6;font:400 14px/1.3 var(--body)}
 .opt.pri{border-color:var(--g);color:#F2E3B4}
 .opt:disabled{opacity:.5;cursor:wait}
+.sh-p{margin:10px 0 16px;color:#9AA0A6;font:400 13px/1.5 var(--body)}
+.ofs{display:grid;gap:12px;margin-bottom:16px}
+.of{display:grid;gap:5px;font:400 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#9AA0A6}
+.of input{height:44px;padding:0 12px;background:transparent;border:1px solid rgba(239,234,224,.2);color:#F4F2EC;font:400 15px/1 var(--body);outline:0}
+.of input:focus{border-color:var(--g)}.of input[aria-invalid=true]{border-color:#F0806E}
+[dir=rtl] .of{font-family:var(--body);letter-spacing:0;text-transform:none;font-size:12px}
 .sh-x{display:block;margin:20px auto 0;font:400 11px/1 var(--body);letter-spacing:.24em;color:var(--si);text-transform:uppercase}
 [dir=rtl] .sh-x{letter-spacing:0;font-size:12px}
 .chat{display:inline-block;margin-top:14px;font:500 10px/1 var(--body);letter-spacing:.22em;color:var(--g);border-bottom:1px solid var(--g);padding-bottom:4px;text-transform:uppercase}
@@ -190,6 +196,7 @@ var TX={en:{tonight:"To<em>night</em>",today:"To<em>day</em>",morning:"This <em>
   chT:"What should change?",chPh:"Write your note…",send:"Send",cancel:"Cancel",chips:["Change the caption","Change the image","Change the time","Shorter, please"],needNote:"Write a note first",
   approved:"Approved",sent:"Sent back with your note",fail:"Not saved. Try again.",done:"Saved",
   received:"Received",propose:"I propose",choose:"Your choice",chat:"Open chat",close:"Close",
+  order:{k:"Order the print · Gelato",p:"The lab needs the delivery address and the print-ready file link. Nothing is sent until you tap Place order.",size:"Size (cm)",file_url:"Print file link",firstName:"First name",lastName:"Last name",addressLine1:"Address",addressLine2:"Address line 2",city:"City",postCode:"Post code",country:"Country (2 letters)",email:"Email",phone:"Phone",go:"Place order",miss:"Fill every field first.",ok:"Order placed"},
   more_t:"More",items:{followup:"Follow-up · clients & enquiries",cal:"Calendar",live:"Live now",plan:"Plan",rep:"Reports",acc:"Account",hq:"HQ · all brands",todo:"To-do",cc:"Control Center",dw:"Drawings",push:"Alerts on this phone",lang:"العربية",out:"Sign out"},
   pushOn:"Alerts are on for this phone",pushOff:"Alerts are off on this phone",pushNo:"This browser cannot receive alerts. On iPhone: Share → Add to Home Screen, then open from the Home Screen.",
   next:"Next",steps:function(d,n){return d+" of "+n+" steps";},
@@ -205,6 +212,7 @@ var TX={en:{tonight:"To<em>night</em>",today:"To<em>day</em>",morning:"This <em>
   chT:"ما الذي يجب تعديله؟",chPh:"اكتب ملاحظتك…",send:"إرسال",cancel:"إلغاء",chips:["عدّل النص","غيّر الصورة","غيّر الموعد","اختصر رجاءً"],needNote:"اكتب الملاحظة أولًا",
   approved:"تمت الموافقة",sent:"أُعيد مع ملاحظتك",fail:"لم يُحفظ. حاول مجددًا.",done:"حُفظ",
   received:"ما وصل",propose:"أقترح",choose:"خيارك",chat:"افتح المحادثة",close:"إغلاق",
+  order:{k:"اطلب الطباعة · Gelato",p:"يحتاج المعمل إلى عنوان التسليم ورابط ملف الطباعة. لا يُرسل شيء قبل أن تضغط «أرسل الطلب».",size:"المقاس (سم)",file_url:"رابط ملف الطباعة",firstName:"الاسم الأول",lastName:"اسم العائلة",addressLine1:"العنوان",addressLine2:"العنوان (سطر 2)",city:"المدينة",postCode:"الرمز البريدي",country:"الدولة (حرفان)",email:"البريد",phone:"الهاتف",go:"أرسل الطلب",miss:"أكمل كل الحقول أولًا.",ok:"تم إرسال الطلب"},
   more_t:"المزيد",items:{followup:"المتابعة · العملاء والاستفسارات",cal:"التقويم",live:"المنشور الآن",plan:"الخطة",rep:"التقارير",acc:"الحساب",hq:"المقر · كل العلامات",todo:"المهام",cc:"مركز التحكم",dw:"الرسومات",push:"التنبيهات على هذا الهاتف",lang:"English",out:"تسجيل الخروج"},
   pushOn:"التنبيهات مفعّلة على هذا الهاتف",pushOff:"التنبيهات متوقفة على هذا الهاتف",pushNo:"هذا المتصفح لا يستقبل التنبيهات. على iPhone: مشاركة ← إضافة إلى الشاشة الرئيسية، ثم افتح من الشاشة الرئيسية.",
   next:"التالي",steps:function(d,n){return d+" من "+n+" خطوات";},
@@ -281,8 +289,18 @@ function openTask(id){var x=null;M.tasks.forEach(function(t){if(t.id===id)x=t;})
     (x.chat_url?'<a class="chat" href="'+esc(x.chat_url)+'" target="_blank" rel="noopener">'+esc(T("chat"))+'</a>':'')+
     (x.go?'<a class="chat" data-go="'+esc(x.go)+'" style="margin-inline-start:18px">'+esc(T("open"))+'</a>':'')+
     '<button class="sh-x" data-x>'+esc(T("close"))+'</button>');
-  $("sheet-in").querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("click",function(){b.disabled=true;ZH.task(x.id,b.getAttribute("data-k")).then(function(r){if(r&&r.ok){toast(T("done"));closeSheet();reload();}else{toast(T("fail"),true);b.disabled=false;}});});});
+  $("sheet-in").querySelectorAll("[data-k]").forEach(function(b){b.addEventListener("click",function(){var k=b.getAttribute("data-k");b.disabled=true;ZH.task(x.id,k).then(function(r){if(r&&r.ok){if(k==="order"&&x.kind==="enquiry"&&ZH.gelato){openOrder(x);return;}toast(T("done"));closeSheet();reload();}else{toast(T("fail"),true);b.disabled=false;}});});});
   var go=$("sheet-in").querySelector("[data-go]");if(go)go.addEventListener("click",function(e){e.preventDefault();closeSheet();ZH.act(go.getAttribute("data-go"));});}
+/* Gelato order (KJ 7 Nov 2026): after KJ taps "Order the print" on an art enquiry, the lab needs the delivery address and
+   the print-ready file link. Nothing is sent until KJ taps "Place order"; the Edge Function checks KJ's yes again. */
+function openOrder(x){var o=T("order"),f=function(k,ph,ac){return '<label class="of"><span>'+esc(o[k])+'</span><input name="'+k+'" placeholder="'+esc(ph||"")+'" '+(ac?'autocomplete="'+ac+'"':'')+'></label>';};
+  sheet('<div class="sh-k">'+esc(o.k)+'</div><div class="sh-t">'+esc(pick(x,"title"))+'</div><p class="sh-p">'+esc(o.p)+'</p><form id="of" class="ofs" autocomplete="on">'+
+    f("size","30x40")+f("file_url","https://…/print-file.jpg")+f("firstName","","given-name")+f("lastName","","family-name")+f("addressLine1","","address-line1")+f("addressLine2","","address-line2")+f("city","","address-level2")+f("postCode","","postal-code")+f("country","AE","country")+f("email","","email")+f("phone","","tel")+
+    '<button class="opt pri" type="submit">'+esc(o.go)+'<span>›</span></button></form><button class="sh-x" data-x>'+esc(T("close"))+'</button>');
+  var fm=$("of");fm.addEventListener("input",function(e){if(e.target&&e.target.removeAttribute)e.target.removeAttribute("aria-invalid");});fm.addEventListener("submit",function(e){e.preventDefault();var d={},miss=false;Array.prototype.forEach.call(fm.elements,function(el){if(el.name){d[el.name]=el.value.trim();if(!d[el.name]&&el.name!=="addressLine2"&&el.name!=="phone"){el.setAttribute("aria-invalid","true");miss=true;}}});
+    if(miss){toast(o.miss,true);return;}var bt=fm.querySelector("button");bt.disabled=true;
+    ZH.gelato({action:"order",enquiry_id:x.source_id,size:d.size,file_url:d.file_url,currency:"USD",address:{firstName:d.firstName,lastName:d.lastName,addressLine1:d.addressLine1,addressLine2:d.addressLine2,city:d.city,postCode:d.postCode,country:d.country.toUpperCase().slice(0,2),email:d.email,phone:d.phone}}).then(function(r){
+      if(r&&r.ok){toast(o.ok+" "+(r.order_id||""));closeSheet();reload();}else{toast((r&&r.error)||T("fail"),true);bt.disabled=false;}});});}
 function openTargets(){var h='<div class="sh-k">'+esc(T("targets"))+' · '+M.targets.length+'</div><div class="tg">';
   M.targets.forEach(function(t){h+='<div class="tr"><span>'+esc(t.id)+'</span>'+esc(pick(t,"title"))+'<em>'+t.pct+'%</em><i style="--p:'+t.pct+'%"></i><small>'+esc(T("steps")(t.done,t.steps))+(pick(t,"next")?" · "+esc(T("next"))+": "+esc(pick(t,"next")):"")+'</small></div>';});
   sheet(h+'</div><button class="sh-x" data-x>'+esc(T("close"))+'</button>');}
