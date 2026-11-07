@@ -1246,13 +1246,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'front.html?v=20261105c';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'home.html?v=20261107a';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'front.html?v=20261105c'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'home.html?v=20261107a'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1269,6 +1269,7 @@
     if (tok === 'signout') { sb.auth.signOut().then(toLogin, toLogin); return; }
     if (tok === 'lang') { var lt = document.querySelector('[data-lang-toggle]'); if (lt) lt.click(); return; }
     if (tok === 'bell') { if (!FR.on) openFront(); openCircuit('notif'); return; }
+    if (tok === 'c:todo' && !S.isAdmin) { openCircuit('ap'); return; }
     if (tok === 'bell-classic') { if (!FR.on) openFront(); openCircuit('notif'); return; }
     // every screen that used to be classic now has its circuit screen (KJ, 3 Nov 2026)
     var NEWS = { 'hq:hq': 'cl', 'hq:drawings': 'dw', 'hq:todo': 'todo', 'hq:week': 'wk', 'hq:admin': 'cc', 'v:core': 'core', 'v:calendar': 'cal', 'v:ads': 'ads-ap', 'v:approvals': 'ap', 'v:inbox': 'inbox', 'v:reports': 'rep', 'v:today': 'hq' };
@@ -1434,10 +1435,10 @@ var CLASSIC_OFF = true;
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261105c#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261107a#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261105c#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261107a#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
@@ -1642,7 +1643,74 @@ var CLASSIC_OFF = true;
   }
   function circuitCoreOff() { if (CORE2.ctl) { try { CORE2.ctl.destroy(); } catch (e) { /* ignore */ } CORE2.ctl = null; } }
   function circuitItem(id) { var x = itemById(id); return Promise.resolve(x ? itemFull(x) : null); }
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff };
+  /* ---------- DASHBOARD ONE · Home (app/home.html, KJ 6 Nov 2026, DECISIONS 63): one job list (public.tasks) + the 7 targets ---------- */
+  function homeData() {
+    var c = frontClient(); if (!c) return Promise.resolve(null);
+    var get = function (pr) { return q(pr).catch(function () { return []; }); };
+    return Promise.all([
+      circuitData({ week: 0 }),
+      S.isAdmin ? get(sb.from('tasks').select('*').eq('status', 'open').order('priority', { ascending: false }).order('created_at', { ascending: true }).limit(40)) : Promise.resolve([]),
+      S.isAdmin ? get(sb.from('targets_v').select('*').order('ord')) : Promise.resolve([]),
+      S.isAdmin ? get(sb.from('site_enquiries').select('id').eq('status', 'new')) : Promise.resolve([]),
+      loadNotifs().catch(function () { return null; })
+    ]).then(function (r) {
+      var d = r[0] || {}, tasks = r[1] || [], targets = r[2] || [], enq = r[3] || [];
+      var groups = (d.pending || []).filter(function (g) { return g.canReview; });
+      var total = groups.reduce(function (n, g) { return n + g.ids.length; }, 0);
+      var brands = {}; groups.forEach(function (g) { brands[g.client || cName(c)] = 1; });
+      var first = groups.map(function (g) { return g.at; }).filter(Boolean).sort()[0];
+      var h = Number(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hour12: false, timeZone: 'Asia/Dubai' }).format(new Date()));
+      var numOf = function (x) { var m = /(\d+)\s+post/.exec(x.title || ''); return m ? m[1] : null; };
+      var goOf = function (x) { return x.kind === 'enquiry' ? 'c:inbox' : x.kind === 'comment' ? 'c:inbox' : x.kind === 'account' ? (S.isAdmin ? 'c:cc' : 'c:acc') : x.kind === 'drawing' ? 'c:dw' : x.kind === 'delivered' ? 'c:todo' : null; };
+      var pct = targets.length ? Math.round(targets.reduce(function (n, t) { return n + Number(t.pct || 0); }, 0) / targets.length) : 0;
+      return {
+        lang: L(), dir: L() === 'ar' ? 'rtl' : 'ltr', admin: !!S.isAdmin, hour: h, unread: (S.notifs || []).filter(function (n) { return !n.read; }).length,
+        push: S.pushOn === true ? 'on' : S.pushOn === false ? 'off' : 'unknown',
+        approve: { n: total, total: total, groups: groups, brands: Object.keys(brands).length, since: first ? fmtDate(first) : '', img: (groups[0] && groups[0].img && groups[0].img[0]) || null },
+        inboxN: enq.length + tasks.filter(function (x) { return x.kind === 'comment'; }).length + (d.comments || []).filter(function (x) { return x.status === 'waiting'; }).length,
+        tasks: tasks.map(function (x) { var cl = x.client_id ? clientById(x.client_id) : null; return { id: x.id, kind: x.kind, title: x.title, title_ar: x.title_ar, received: x.received, received_ar: x.received_ar, proposal: x.proposal, proposal_ar: x.proposal_ar,
+          options: x.options || [], priority: x.priority, platform: x.platform, client: cl ? cName(cl) : '', ago: x.created_at ? ago(x.created_at) : '', num: numOf(x), chat_url: safeUrl(x.chat_url) || null, go: goOf(x), img: null }; }),
+        targets: targets.map(function (t) { return { id: t.id, title: t.title, title_ar: t.title_ar, pct: Number(t.pct || 0), done: Number(t.done || 0), steps: Number(t.steps || 0), next: t.next_step, next_ar: t.next_step_ar, owner: t.owner }; }),
+        targetsAvg: pct, liveN: (d.live || []).length
+      };
+    });
+  }
+  // KJ answers a job: the answer is saved on the row; "done"-type answers close it, "later" keeps it open
+  function homeTask(id, key) {
+    if (!S.isAdmin) return Promise.resolve({ ok: false });
+    var closing = !/^(later|tomorrow|wait|retry|skip|snooze)$/.test(String(key || ''));
+    var patch = { answer: String(key || '').slice(0, 80), answered_at: new Date().toISOString(), status: closing ? 'done' : 'answered' };
+    if (closing) patch.done_at = patch.answered_at;
+    return q(sb.from('tasks').update(patch).eq('id', id).select('id')).then(function (rows) { if (!rows || !rows.length) throw new Error('not saved'); return { ok: true }; }).catch(function (e) { return { ok: false, error: e && e.message }; });
+  }
+  /* phone alerts (KJ 6 Nov 2026): the browser subscribes to push with the key push-send hands out; the row lives in push_subscriptions (own rows only) */
+  function pushState() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) { S.pushOn = false; return Promise.resolve(false); }
+    return navigator.serviceWorker.getRegistration('/app/').then(function (reg) { return reg ? reg.pushManager.getSubscription() : null; })
+      .then(function (sub) { S.pushOn = !!sub; return S.pushOn; }).catch(function () { S.pushOn = false; return false; });
+  }
+  function b64ToU8(s) { var p = '='.repeat((4 - s.length % 4) % 4), b = (s + p).replace(/-/g, '+').replace(/_/g, '/'), raw = atob(b), out = new Uint8Array(raw.length); for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; }
+  function pushToggle(on) {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return Promise.resolve({ ok: false, reason: 'unsupported' });
+    var base = ((window.ZKJ_SB && window.ZKJ_SB.url) || '') + '/functions/v1/push-send';
+    if (!on) {
+      return navigator.serviceWorker.getRegistration('/app/').then(function (reg) { return reg ? reg.pushManager.getSubscription() : null; }).then(function (sub) {
+        if (!sub) { S.pushOn = false; return { ok: true, on: false }; }
+        return q(sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)).catch(function () { return null; }).then(function () { return sub.unsubscribe(); }).then(function () { S.pushOn = false; return { ok: true, on: false }; });
+      }).catch(function (e) { return { ok: false, error: e && e.message }; });
+    }
+    return navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).then(function (reg) {
+      return Notification.requestPermission().then(function (perm) {
+        if (perm !== 'granted') throw new Error('denied');
+        return fetch(base).then(function (r) { return r.json(); }).then(function (k) { return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(k.publicKey) }); });
+      });
+    }).then(function (sub) {
+      var j = sub.toJSON();
+      return q(sb.from('push_subscriptions').upsert({ endpoint: sub.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, ua: navigator.userAgent.slice(0, 200) }, { onConflict: 'endpoint' }).select('id')).then(function () { S.pushOn = true; return { ok: true, on: true }; });
+    }).catch(function (e) { S.pushOn = false; return { ok: false, error: e && e.message, reason: /denied/.test(String(e && e.message)) ? 'denied' : 'failed' }; });
+  }
+  pushState();
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff, home: homeData, task: homeTask, push: pushToggle };
   // Esc steps back inside the new world (circuit → cube); it never drops to the old screens
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CX.on) frontAct('home'); });
 
