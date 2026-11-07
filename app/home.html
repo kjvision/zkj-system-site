@@ -326,7 +326,7 @@ function openOrder(x){var o=T("order");
       '<div class="dn-to"><em>'+esc(o.to)+'</em>'+L("firstName",first,o.first,1)+' '+L("lastName",last,o.last,1)+'<br>'+L("addressLine1","",o.street,1)+'<br>'+L("city",city,o.city,1)+', '+L("postCode","",o.post,1)+'<br>'+L("country",iso?cc:"",o.country,1)+(iso?'<i data-iso="'+iso+'"></i>':'')+'</div>'+
       '<div class="dn-c">'+L("email",e.email||"",o.email,1)+(e.phone?' · '+L("phone",e.phone,o.phone):' · '+L("phone","",o.phone))+'</div>'+
       '<div class="dn-to"><em>'+esc(o.file)+'</em>'+L("file_url","",o.fileHint,1)+'</div>'+
-      '<div class="dn-cost">'+(q?'<b>'+esc(o.print)+' '+q[1]+' '+q[2]+'</b>'+(ships.length?' · '+ships.map(function(s,i){return '<a class="dn-ship'+(i===0?" on":"")+'" data-i="'+i+'">'+esc(s.name)+' '+s.price+' <small>'+s.days+' '+esc(o.days)+'</small></a>';}).join(' <span class="dn-or">/</span> '):"")
+      '<div class="dn-cost">'+(q?'<b><bdi>'+esc(o.print)+'</bdi> '+q[1]+' '+q[2]+'</b>'+(ships.length?' · '+ships.map(function(s,i){return '<a class="dn-ship'+(i===0?" on":"")+'" data-i="'+i+'">'+esc(s.name)+' '+s.price+' <small>'+s.days+' '+esc(o.days)+'</small></a>';}).join(' <span class="dn-or">/</span> '):"")
         :'<span class="dn-noq">'+esc(o.noq)+'</span>')+'</div>'+
       '<button class="opt pri dn-go" type="button">'+esc(o.go)+'</button></div><button class="sh-x" data-x>'+esc(T("close"))+'</button>';
     sheet(h);var root=$("sheet-in");
