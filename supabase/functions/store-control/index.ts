@@ -77,6 +77,7 @@ async function allowed(req: Request, action: string, b: J) {
   }
   return false;
 }
+const ROUND: Record<string, string> = { '21x28': '27×35 cm', '24x32': '30×40 cm' }; // KJ agreed 8 Nov: rounded up to the next Gelato size
 const field = (m: string, k: string) => { const r = new RegExp(k + ': ([^·]+)', 'i').exec(m || ''); return r ? r[1].trim() : ''; };
 const sizeKey = (s: string) => { const m = s.toLowerCase().replace(/\s|cm/g, '').replace(/×/g, 'x').match(/(\d{2,3})x(\d{2,3})/); return m ? `${m[1]}x${m[2]}` : ''; };
 
@@ -106,7 +107,7 @@ async function invoice(b: J) {
   const listPrice = Number(f.variant.price);
   const amount = b.amount != null && Number(b.amount) > 0 ? Number(b.amount) : listPrice;
   const input: J = {
-    email: e.email, note: `ZKJ VERSE · enquiry ${e.id} · ${f.artwork} · ${f.size}`, tags: ['zkj-dashboard', 'art-enquiry'],
+    email: e.email, note: `ZKJ VERSE · enquiry ${e.id} · ${f.artwork} · ${f.size}${ROUND[sizeKey(f.size)] ? ' · printed at ' + ROUND[sizeKey(f.size)] + ' (the nearest print size)' : ''}`, tags: ['zkj-dashboard', 'art-enquiry'],
     customAttributes: [{ key: 'enquiry', value: String(e.id) }],
     lineItems: [{ variantId: f.variant.id, quantity: 1 }],
   };

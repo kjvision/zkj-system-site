@@ -18,8 +18,9 @@ const PRODUCT_API = 'https://product.gelatoapis.com/v3';
 const ORDER_API = 'https://order.gelatoapis.com/v4';
 const CATALOG = 'posters';
 // ZKJ VERSE ladder (3:4 upright) → Gelato PaperFormat, checked against Gelato's real list on 8 Nov 2026.
-// 24x32 cm has no Gelato equivalent (nearest are 27x35 and 30x40): it is refused with a clear message, never guessed.
-const SIZES: Record<string, string> = { '15x20': '150x200-mm', '21x28': '210x279-mm', '30x40': '300x400-mm', '45x60': '450x600-mm', '60x80': '600x800-mm', '75x100': '750x1000-mm' };
+// KJ agreed 8 Nov: store sizes with no Gelato equivalent are rounded UP to the next Gelato size, and the customer is told
+// the exact size on the invoice: 21x28 → 27x35 cm, 24x32 → 30x40 cm.
+const SIZES: Record<string, string> = { '15x20': '150x200-mm', '21x28': '270x350-mm', '24x32': '300x400-mm', '30x40': '300x400-mm', '45x60': '450x600-mm', '60x80': '600x800-mm', '75x100': '750x1000-mm' };
 // only real poster products (never flyers or cards); paper order: museum-type matte first (KJ's choice, BUILD_BOOK 06), then plain uncoated, never glossy by accident
 const PAPER_PREF = [/250-gsm-uncoated-offwhite-archival/, /100-lb-cover-uncoated-offwhite-archival/, /200-gsm-uncoated/, /170-gsm-uncoated/, /uncoated/];
 
@@ -56,7 +57,6 @@ const sizeKey = (s: string) => String(s ?? '').toLowerCase().replace(/\s|cm/g, '
 
 async function findProduct(size: string, country = '') {
   const key = sizeKey(size);
-  if (key === '24x32') throw new Error('24×32 cm is not a Gelato size (nearest 27×35 or 30×40): KJ decides');
   const fmt = SIZES[key];
   if (!fmt) throw new Error(`size ${size} is not on the ladder`);
   const res = await gl(`${PRODUCT_API}/catalogs/${CATALOG}/products:search`, { method: 'POST', body: JSON.stringify({ attributeFilters: { Orientation: ['ver'], PaperFormat: [fmt] }, limit: 100 }) });
