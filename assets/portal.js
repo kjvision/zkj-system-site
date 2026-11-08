@@ -1246,13 +1246,13 @@
   function openFront(reload) {
     if (!FR.wrap) {
       FR.wrap = document.createElement('div'); FR.wrap.className = 'front-wrap'; FR.wrap.id = 'front';
-      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'home.html?v=20261107a';
+      FR.frame = document.createElement('iframe'); FR.frame.title = 'ZKJ SYSTEM'; FR.frame.src = 'home.html?v=20261107e';
       FR.frame.addEventListener('load', function () { setTimeout(booted, 250); });
       setTimeout(booted, 8000); // never leave the cover up
       FR.frame.setAttribute('allow', 'fullscreen');
       FR.wrap.appendChild(FR.frame); document.body.appendChild(FR.wrap);
     } else if (reload) {
-      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'home.html?v=20261107a'; }
+      try { FR.frame.contentWindow.location.reload(); } catch (e) { FR.frame.src = 'home.html?v=20261107e'; }
     } else {
       try { FR.frame.contentWindow.ZFRONT_FRAME && FR.frame.contentWindow.ZFRONT_FRAME.home(); } catch (e) { /* ignore */ }
     }
@@ -1435,10 +1435,10 @@ var CLASSIC_OFF = true;
   function openCircuit(scene) {
     if (!CX.wrap) {
       CX.wrap = document.createElement('div'); CX.wrap.className = 'front-wrap circuit-wrap'; CX.wrap.id = 'circuit';
-      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261107a#' + scene;
+      CX.frame = document.createElement('iframe'); CX.frame.title = 'ZKJ SYSTEM'; CX.frame.src = 'circuit.html?v=20261107e#' + scene;
       CX.wrap.appendChild(CX.frame); document.body.appendChild(CX.wrap);
     } else {
-      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261107a#' + scene; }
+      try { CX.frame.contentWindow.ZCIRCUIT && CX.frame.contentWindow.ZCIRCUIT.go(scene); } catch (e) { CX.frame.src = 'circuit.html?v=20261107e#' + scene; }
     }
     CX.wrap.hidden = false; CX.on = true; document.documentElement.classList.add('front-on');
     requestAnimationFrame(function () { CX.wrap.classList.add('on'); });
@@ -1668,7 +1668,7 @@ var CLASSIC_OFF = true;
         push: S.pushOn === true ? 'on' : S.pushOn === false ? 'off' : 'unknown',
         approve: { n: total, total: total, groups: groups, brands: Object.keys(brands).length, since: first ? fmtDate(first) : '', img: (groups[0] && groups[0].img && groups[0].img[0]) || null },
         inboxN: enq.length + tasks.filter(function (x) { return x.kind === 'comment'; }).length + (d.comments || []).filter(function (x) { return x.status === 'waiting'; }).length,
-        tasks: tasks.map(function (x) { var cl = x.client_id ? clientById(x.client_id) : null; return { id: x.id, kind: x.kind, title: x.title, title_ar: x.title_ar, received: x.received, received_ar: x.received_ar, proposal: x.proposal, proposal_ar: x.proposal_ar,
+        tasks: tasks.map(function (x) { var cl = x.client_id ? clientById(x.client_id) : null; return { id: x.id, kind: x.kind, source_id: x.source_id, source_table: x.source_table, title: x.title, title_ar: x.title_ar, received: x.received, received_ar: x.received_ar, proposal: x.proposal, proposal_ar: x.proposal_ar,
           options: x.options || [], priority: x.priority, platform: x.platform, client: cl ? cName(cl) : '', ago: x.created_at ? ago(x.created_at) : '', num: numOf(x), chat_url: safeUrl(x.chat_url) || null, go: goOf(x), img: null }; }),
         targets: targets.map(function (t) { return { id: t.id, title: t.title, title_ar: t.title_ar, pct: Number(t.pct || 0), done: Number(t.done || 0), steps: Number(t.steps || 0), next: t.next_step, next_ar: t.next_step_ar, owner: t.owner }; }),
         targetsAvg: pct, liveN: (d.live || []).length
@@ -1709,8 +1709,35 @@ var CLASSIC_OFF = true;
       return q(sb.from('push_subscriptions').upsert({ endpoint: sub.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, ua: navigator.userAgent.slice(0, 200) }, { onConflict: 'endpoint' }).select('id')).then(function () { S.pushOn = true; return { ok: true, on: true }; });
     }).catch(function (e) { S.pushOn = false; return { ok: false, error: e && e.message, reason: /denied/.test(String(e && e.message)) ? 'denied' : 'failed' }; });
   }
+  // Edge Functions behind the control point (KJ 7 Nov 2026): gelato (quote) and store-control (invoice → paid → lab → shipped).
+  // Admin only, signed-in call; the functions check KJ's role again.
+  function fnCall(name, body) {
+    if (!S.isAdmin) return Promise.resolve({ ok: false, error: 'admin only' });
+    return sb.functions.invoke(name, { body: body }).then(function (r) {
+      if (r.error) { var ctx = r.error.context; return (ctx && ctx.json ? ctx.json().catch(function () { return null; }) : Promise.resolve(null)).then(function (j) { return { ok: false, error: (j && j.error) || r.error.message }; }); }
+      return r.data || { ok: false, error: 'empty' };
+    }).catch(function (e) { return { ok: false, error: e && e.message }; });
+  }
+  function gelatoCall(body) { return fnCall('gelato', body); }
+  function storeCall(body) { return fnCall('store-control', body); }
+  // the enquiry behind an art job (for the dispatch note: everything the client already told us is pre-written)
+  // the print file, dropped once per piece (KJ 7 Nov 2026): private bucket "prints", one row in print_files per store handle
+  function printUpload(handle, artwork, file) {
+    if (!S.isAdmin || !handle || !file) return Promise.resolve({ ok: false, error: 'nothing to upload' });
+    if (!/\.(jpe?g|png|tiff?)$/i.test(file.name)) return Promise.resolve({ ok: false, error: 'jpg, png or tiff only' });
+    var safe = file.name.replace(/[^\w.\-]+/g, '_').slice(-80), path = handle + '/' + Date.now() + '-' + safe;
+    return sb.storage.from('prints').upload(path, file, { upsert: false, contentType: file.type || undefined }).then(function (r) {
+      if (r.error) throw r.error;
+      return q(sb.from('print_files').upsert({ handle: handle, artwork: artwork || null, path: path, bytes: file.size, uploaded_by: S.user && S.user.id }, { onConflict: 'handle' }).select('id'));
+    }).then(function (rows) { return { ok: true, id: rows && rows[0] && rows[0].id, path: path }; })
+      .catch(function (e) { return { ok: false, error: e && e.message }; });
+  }
+  function homeEnquiry(id) {
+    if (!S.isAdmin || !id) return Promise.resolve(null);
+    return q(sb.from('site_enquiries').select('*').eq('id', id).limit(1)).then(function (rows) { return rows && rows[0] ? rows[0] : null; }).catch(function () { return null; });
+  }
   pushState();
-  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff, home: homeData, task: homeTask, push: pushToggle };
+  window.ZFRONT_HOST = { model: frontModel, act: frontAct, data: circuitData, review: circuitReview, reply: circuitReply, readAll: circuitReadAll, readOne: circuitReadOne, reviewMany: circuitReviewMany, hq: hqData, admin: circuitAdmin, item: circuitItem, core: circuitCore, coreOff: circuitCoreOff, home: homeData, task: homeTask, push: pushToggle, gelato: gelatoCall, store: storeCall, enquiry: homeEnquiry, print: printUpload };
   // Esc steps back inside the new world (circuit → cube); it never drops to the old screens
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && CX.on) frontAct('home'); });
 
