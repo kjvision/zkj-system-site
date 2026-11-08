@@ -17,8 +17,11 @@ const GELATO = (KEY_NAME ? Deno.env.get(KEY_NAME) ?? '' : '').trim();
 const PRODUCT_API = 'https://product.gelatoapis.com/v3';
 const ORDER_API = 'https://order.gelatoapis.com/v4';
 const CATALOG = 'posters';
-// ZKJ VERSE ladder (3:4 upright). Store sizes → Gelato PaperFormat (filled by `sizes` once; fallback = metric names).
-const SIZES: Record<string, string> = { '15x20': '150x200-mm', '21x28': '210x280-mm', '24x32': '240x320-mm', '30x40': '300x400-mm', '45x60': '450x600-mm', '60x80': '600x800-mm', '75x100': '750x1000-mm' };
+// ZKJ VERSE ladder (3:4 upright) → Gelato PaperFormat, checked against Gelato's real list on 8 Nov 2026.
+// 24x32 cm has no Gelato equivalent (nearest are 27x35 and 30x40): it is refused with a clear message, never guessed.
+const SIZES: Record<string, string> = { '15x20': '150x200-mm', '21x28': '210x279-mm', '30x40': '300x400-mm', '45x60': '450x600-mm', '60x80': '600x800-mm', '75x100': '750x1000-mm' };
+// only real poster products (never flyers or cards); paper order: museum-type matte first (KJ's choice, BUILD_BOOK 06), then plain uncoated, never glossy by accident
+const PAPER_PREF = [/250-gsm-uncoated-offwhite-archival/, /100-lb-cover-uncoated-offwhite-archival/, /200-gsm-uncoated/, /170-gsm-uncoated/, /uncoated/];
 
 async function sb(path: string, init: RequestInit = {}) {
   const r = await fetch(`${SB_URL}/rest/v1/${path}`, { ...init, headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', ...(init.headers ?? {}) } });
@@ -51,15 +54,17 @@ async function allowed(req: Request, action: string, b: Record<string, unknown>)
 }
 const sizeKey = (s: string) => String(s ?? '').toLowerCase().replace(/\s|cm/g, '').replace(/[×x]/, 'x');
 
-async function findProduct(size: string) {
-  const fmt = SIZES[sizeKey(size)];
+async function findProduct(size: string, country = '') {
+  const key = sizeKey(size);
+  if (key === '24x32') throw new Error('24×32 cm is not a Gelato size (nearest 27×35 or 30×40): KJ decides');
+  const fmt = SIZES[key];
   if (!fmt) throw new Error(`size ${size} is not on the ladder`);
-  const res = await gl(`${PRODUCT_API}/catalogs/${CATALOG}/products:search`, { method: 'POST', body: JSON.stringify({ attributeFilters: { Orientation: ['ver'], PaperFormat: [fmt] }, limit: 20 }) });
-  const list = (res.products as { productUid: string; attributes: Record<string, string> }[]) ?? [];
-  // prefer the museum-quality matte fine-art paper KJ chose (BUILD_BOOK 06), else the first active product
-  const pick = list.find((p) => /museum|fine-art|matte/i.test(JSON.stringify(p.attributes))) ?? list[0];
-  if (!pick) throw new Error(`no Gelato poster for ${fmt}`);
-  return pick;
+  const res = await gl(`${PRODUCT_API}/catalogs/${CATALOG}/products:search`, { method: 'POST', body: JSON.stringify({ attributeFilters: { Orientation: ['ver'], PaperFormat: [fmt] }, limit: 100 }) });
+  const all = (res.products as { productUid: string; attributes: Record<string, string>; supportedCountries?: string[] }[]) ?? [];
+  const ok = all.filter((p) => /^(flat_product_|posters_pf_)/.test(p.productUid) && p.attributes?.ProductStatus === 'activated' && (!country || !(p.supportedCountries ?? []).length || (p.supportedCountries ?? []).includes(country)));
+  for (const re of PAPER_PREF) { const hit = ok.find((p) => re.test(p.productUid)); if (hit) return hit; }
+  if (!ok.length) throw new Error(`no Gelato poster for ${fmt}${country ? ' to ' + country : ''}`);
+  return ok[0];
 }
 
 Deno.serve(async (req) => {
@@ -80,7 +85,7 @@ Deno.serve(async (req) => {
       const c = await gl(`${PRODUCT_API}/catalogs/${CATALOG}`);
       const attrs = (c.productAttributes as { productAttributeUid: string; values: { productAttributeValueUid: string; title: string }[] }[]) ?? [];
       const out: Record<string, string[]> = {};
-      for (const a of attrs) out[a.productAttributeUid] = a.values.map((v) => v.productAttributeValueUid);
+      for (const a of attrs) out[a.productAttributeUid] = Array.isArray(a.values) ? a.values.map((v) => v.productAttributeValueUid) : Object.keys(a.values ?? {});
       return json(200, { ok: true, attributes: out });
     }
     if (action === 'search') {
@@ -94,7 +99,7 @@ Deno.serve(async (req) => {
       const country = String(b.country ?? e?.country ?? '').trim().toUpperCase().slice(0, 2);
       const fileUrl = String(b.file_url ?? '');
       if (!size || country.length !== 2) return json(400, { ok: false, error: 'size and 2-letter country needed' });
-      const p = await findProduct(size);
+      const p = await findProduct(size, country);
       const q = await gl(`${ORDER_API}/orders:quote`, { method: 'POST', body: JSON.stringify({
         orderReferenceId: `quote-${b.enquiry_id ?? Date.now()}`, customerReferenceId: e?.email ?? 'zkj-verse', currency: String(b.currency ?? 'USD'), allowMultipleQuotes: false,
         recipient: { country, firstName: e?.name ?? 'Client', lastName: '-', addressLine1: '-', city: '-', postCode: '-', email: e?.email ?? 'hello@zkjverse.com' },
@@ -117,7 +122,7 @@ Deno.serve(async (req) => {
       const a = (b.address ?? {}) as Record<string, string>;
       for (const k of ['firstName', 'lastName', 'addressLine1', 'city', 'postCode', 'country', 'email']) if (!a[k]) return json(400, { ok: false, error: `address.${k} missing` });
       if (!b.file_url || !b.size) return json(400, { ok: false, error: 'file_url and size needed' });
-      const p = await findProduct(String(b.size));
+      const p = await findProduct(String(b.size), String(a.country));
       const o = await gl(`${ORDER_API}/orders`, { method: 'POST', body: JSON.stringify({
         orderType: 'order', orderReferenceId: String(b.ref ?? `zkj-${Date.now()}`), customerReferenceId: a.email, currency: String(b.currency ?? 'USD'),
         items: [{ itemReferenceId: 'art-1', productUid: p.productUid, quantity: Number(b.qty ?? 1), files: [{ type: 'default', url: b.file_url }] }],
@@ -144,7 +149,7 @@ Deno.serve(async (req) => {
       const a = b.address ?? {};
       for (const k of ['firstName', 'lastName', 'addressLine1', 'city', 'postCode', 'country', 'email']) if (!a[k]) return json(400, { ok: false, error: `address.${k} missing` });
       if (!b.file_url || !b.size) return json(400, { ok: false, error: 'file_url and size needed' });
-      const p = await findProduct(String(b.size));
+      const p = await findProduct(String(b.size), String(a.country));
       const o = await gl(`${ORDER_API}/orders`, { method: 'POST', body: JSON.stringify({
         orderType: 'order', orderReferenceId: `zkj-${b.enquiry_id}`, customerReferenceId: a.email, currency: String(b.currency ?? 'USD'),
         items: [{ itemReferenceId: 'art-1', productUid: p.productUid, quantity: Number(b.qty ?? 1), files: [{ type: 'default', url: b.file_url }] }],

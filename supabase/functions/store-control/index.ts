@@ -61,14 +61,21 @@ async function bell(title: string, title_ar: string, body: string, priority = 'n
   if (!cl) return;
   await sb('notifications', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ client_id: cl.id, audience: 'admin', priority, title: title.slice(0, 200), title_ar: title_ar.slice(0, 200), body: body.slice(0, 600), body_ar: null }) }).catch(() => null);
 }
-async function allowed(req: Request, action: string) {
+async function allowed(req: Request, action: string, b: J) {
   const bearer = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
   if (bearer && bearer === SB_KEY) return true;
   if (bearer && bearer !== (Deno.env.get('SUPABASE_ANON_KEY') ?? '')) {
     const r = await fetch(`${SB_URL}/auth/v1/user`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${bearer}` } });
     if (r.ok) { const u = await r.json(); const p = await sb(`profiles?select=role&id=eq.${u.id}`); if (p?.[0]?.role === 'admin') return true; }
   }
-  return ['sync', 'ping'].includes(action);
+  if (['sync', 'ping'].includes(action)) return true;
+  // the live check (KJ 8 Nov): an invoice to KJ's own address may be started from the database without a key;
+  // a customer's invoice never can.
+  if (action === 'invoice' && /^[0-9a-f-]{36}$/.test(String(b.enquiry_id ?? ''))) {
+    const e = (await sb(`site_enquiries?select=email&id=eq.${b.enquiry_id}`).catch(() => []))?.[0];
+    return !!e && /@zkjverse\.com$/i.test(String(e.email ?? ''));
+  }
+  return false;
 }
 const field = (m: string, k: string) => { const r = new RegExp(k + ': ([^·]+)', 'i').exec(m || ''); return r ? r[1].trim() : ''; };
 const sizeKey = (s: string) => { const m = s.toLowerCase().replace(/\s|cm/g, '').replace(/×/g, 'x').match(/(\d{2,3})x(\d{2,3})/); return m ? `${m[1]}x${m[2]}` : ''; };
@@ -228,7 +235,7 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return json(405, { ok: false });
   const b = await req.json().catch(() => ({}));
   const action = String(b.action ?? 'sync');
-  if (!(await allowed(req, action))) return json(401, { ok: false, error: 'admin only' });
+  if (!(await allowed(req, action, b))) return json(401, { ok: false, error: 'admin only' });
   if (!FIXED && !(CID && CSECRET)) { await log('error', 'Shopify secrets missing (SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET, or SHOPIFY_ADMIN_TOKEN)'); return json(500, { ok: false, error: 'Shopify secrets missing: SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET (or SHOPIFY_ADMIN_TOKEN)' }); }
   try {
     if (action === 'ping') { const d = await gql(`{ shop { name myshopifyDomain currencyCode } }`); let sc = FIXED ? 'fixed token' : ''; try { sc = JSON.parse(String((await sb('app_settings?select=value&key=eq.shopify_token&limit=1'))?.[0]?.value ?? '{}')).scope ?? sc; } catch { /* none */ } return json(200, { ok: true, shop: d.shop, scope: sc }); }
