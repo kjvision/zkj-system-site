@@ -99,6 +99,9 @@ async function findVariant(e: J) {
 }
 
 async function invoice(b: J) {
+  // KJ's law A77: no invoice, quote, deposit or payment link before the trade licence. Dormant until app_settings.licence_active = 'yes'.
+  const lic = (await sb('app_settings?select=value&key=eq.licence_active&limit=1').catch(() => []))?.[0]?.value;
+  if (String(lic ?? 'no').toLowerCase() !== 'yes') throw new Error('Invoices are switched off until the trade licence exists (rule A77).');
   const e = (await sb(`site_enquiries?select=*&id=eq.${b.enquiry_id}`))?.[0];
   if (!e) throw new Error('enquiry not found');
   const dup = (await sb(`art_orders?select=id,stage,draft_order_name&enquiry_id=eq.${e.id}&stage=neq.cancelled&limit=1`))?.[0];

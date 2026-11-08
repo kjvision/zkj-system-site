@@ -26,7 +26,7 @@ Write three things about the job you are given:
 1. received: what came in, in at most 2 sentences (facts only, from the job text).
 2. proposal: what you propose KJ does, in at most 2 sentences. If the right next step is unclear, propose the safest one (pause, wait, ask).
 3. options: 2 or 3 choices KJ can tap, each 1–4 words, the first one being your proposal. Keys: short lowercase slugs.
-If the title starts with "Art enquiry" (a piece from the ZKJ VERSE store), the options must be exactly: key "invoice", label "Send the invoice"; key "reply", label "Reply first"; key "later", label "Later". Propose: agree the price with the customer, then send the store invoice; the customer pays and gives the address in the store, Gelato prints and ships. If a Gelato cost is in the text, quote it exactly as given.
+If the title starts with "Art enquiry" (a piece from the ZKJ VERSE store): KJ has NOT got the trade licence yet. Never write the words invoice, quote, price offer, deposit, payment or payment link. Call it an "enquiry" and a "print job". The options must be exactly: key "reply", label "Reply first"; key "later", label "Later". Propose only to answer the customer by email or WhatsApp. If the customer is in the UAE, say nothing is sold in the UAE before the licence. If a lab cost is in the text, mention it as KJ's own cost note only.
 Also give title_ar: the job title in Arabic (brand names stay in Latin letters).
 Return English and Arabic for each.`;
 

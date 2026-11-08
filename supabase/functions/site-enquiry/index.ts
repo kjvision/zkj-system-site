@@ -58,7 +58,9 @@ Deno.serve(async (req) => {
     const isStore = /zkjverse\.com\/pages\//i.test(row.page ?? '') || /ZKJ VERSE store/i.test(row.business ?? '');
     const size = sizeKey(row.package ?? '');
     const iso = ISO[(row.country ?? '').toLowerCase().trim()] ?? ((row.country ?? '').length === 2 ? (row.country ?? '').toUpperCase() : '');
-    if (isStore) {
+    if (isStore && iso === 'AE') {
+      row.note = 'UAE enquiry: no quote, no sale before the licence (DECISIONS 31, rule 27).';
+    } else if (isStore) {
       row.note = LADDER.test(size) && iso ? await gelatoQuote(size, iso).catch((e) => `Gelato: no quote (${(e as Error).message})`) : `Gelato: no quote (${!LADDER.test(size) ? 'size not on the ladder' : 'country not recognised'})`;
     }
     const saved = await sb('site_enquiries', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(row) });
