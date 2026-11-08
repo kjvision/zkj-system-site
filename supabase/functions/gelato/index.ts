@@ -99,13 +99,18 @@ Deno.serve(async (req) => {
       const country = String(b.country ?? e?.country ?? '').trim().toUpperCase().slice(0, 2);
       const fileUrl = String(b.file_url ?? '');
       if (!size || country.length !== 2) return json(400, { ok: false, error: 'size and 2-letter country needed' });
+      if (country === 'AE') return json(200, { ok: false, error: 'UAE destination: no sale before the licence (DECISIONS 31)' });
       const p = await findProduct(size, country);
       const q = await gl(`${ORDER_API}/orders:quote`, { method: 'POST', body: JSON.stringify({
-        orderReferenceId: `quote-${b.enquiry_id ?? Date.now()}`, customerReferenceId: e?.email ?? 'zkj-verse', currency: String(b.currency ?? 'USD'), allowMultipleQuotes: false,
+        orderReferenceId: `quote-${b.enquiry_id ?? Date.now()}`, customerReferenceId: e?.email ?? 'zkj-verse', currency: String(b.currency ?? 'USD'), allowMultipleQuotes: true,
         recipient: { country, firstName: e?.name ?? 'Client', lastName: '-', addressLine1: '-', city: '-', postCode: '-', email: e?.email ?? 'hello@zkjverse.com' },
         products: [{ itemReferenceId: 'art-1', productUid: p.productUid, quantity: Number(b.qty ?? 1), files: fileUrl ? [{ type: 'default', url: fileUrl }] : [] }],
       }) });
-      const quotes = (q.quotes as Record<string, unknown>[]) ?? [];
+      // KJ's rule 27: nothing produced or shipped in the UAE for the art store. Only labs outside the UAE count; cheapest first.
+      const quotes = ((q.quotes as Record<string, unknown>[]) ?? []).filter((x) => String(x.fulfillmentCountry ?? '') !== 'AE');
+      if (!quotes.length) return json(200, { ok: false, error: 'no lab outside the UAE for this size and destination (rule 27)' });
+      const total = (x: Record<string, unknown>) => Number((((x.products as Record<string, unknown>[]) ?? [])[0] ?? {}).price ?? 0) + Math.min(...(((x.shipmentMethods as Record<string, unknown>[]) ?? []).map((m) => Number(m.price)).concat([1e9])));
+      quotes.sort((a, b2) => total(a) - total(b2));
       const q0 = quotes[0] ?? {};
       const prod = ((q0.products as Record<string, unknown>[]) ?? [])[0] ?? {};
       const ships = ((q0.shipmentMethods as Record<string, unknown>[]) ?? []).map((s) => ({ uid: s.shipmentMethodUid, name: s.name, price: s.price, currency: s.currency, days: `${s.minDeliveryDays}–${s.maxDeliveryDays}`, type: s.type }));
