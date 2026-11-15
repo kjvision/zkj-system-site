@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ZKJ ORBIT · Company demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;1,6..96,400&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one phone-width column; ZKJ VERSE shell in graphite + champagne, studio identity carried by a swappable --studio hue. */
+:root{
+  color-scheme:dark;
+  --bg:#0f0e11; --panel:#17161b; --panel-2:#1f1d24; --line:#2d2a33;
+  --fg:#eee9e2; --muted:#9a94a0; --verse:#d4bf95;
+  --studio:#5fb0aa; --studio-ink:#0f0e11;
+  --ok:#6fcf97; --busy:#e8a35a; --site:#7fa8ff;
+  --display:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--verse);outline-offset:2px}
+.app{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 96px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 14px}
+.brand{font-family:var(--display);letter-spacing:.32em;font-size:12px;text-transform:uppercase;color:var(--verse)}
+.brand small{display:block;font-family:var(--sans);letter-spacing:.14em;font-size:10px;color:var(--muted)}
+.as{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.as select{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;max-width:150px}
+.guide{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:16px}
+.guide .steps{display:flex;gap:4px}
+.guide .steps i{width:18px;height:3px;border-radius:2px;background:var(--line)}
+.guide .steps i.on{background:var(--verse)}
+.guide p{flex:1;min-width:0;margin:0;font-size:12.5px;color:var(--muted)}
+.guide p b{color:var(--fg);font-weight:600}
+.btn{border:1px solid var(--line);background:var(--panel-2);border-radius:999px;padding:10px 16px;font-weight:600;font-size:13.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.sm{padding:6px 12px;font-size:12px}
+.btn.studio{background:var(--studio);color:var(--studio-ink);border-color:transparent}
+.btn.verse{background:transparent;border-color:var(--verse);color:var(--verse)}
+.btn.ghost{background:transparent}
+.btn:active{transform:scale(.98)}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance}
+.eyebrow{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.view{display:flex;flex-direction:column;gap:16px}
+/* e-card */
+.ecard{position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(160deg,color-mix(in srgb,var(--studio) 26%,var(--panel)) 0%,var(--panel) 55%);border:1px solid color-mix(in srgb,var(--studio) 35%,var(--line));padding:22px 20px 20px}
+.ecard::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;border:1px solid color-mix(in srgb,var(--studio) 40%,transparent);pointer-events:none}
+.studio-tag{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--studio)}
+.studio-tag em{font-style:normal;color:var(--muted);letter-spacing:.08em;text-transform:none;font-size:10.5px;border:1px dashed var(--line);padding:2px 8px;border-radius:999px}
+.who{display:flex;gap:16px;align-items:center;margin-top:22px}
+.av{flex:none;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:22px;color:var(--studio-ink);background:conic-gradient(from 200deg,var(--studio),color-mix(in srgb,var(--studio) 40%,#fff),var(--studio))}
+.av.s{width:40px;height:40px;font-size:14px}
+.who h1{font-size:28px;line-height:1.1}
+.who .role{color:var(--muted);font-size:13.5px;margin-top:4px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line)}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.st-available{color:var(--ok)} .st-busy{color:var(--busy)} .st-site{color:var(--site)}
+.contact{display:grid;gap:8px;margin-top:20px;font-size:13.5px}
+.contact div{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:8px}
+.contact span{color:var(--muted)} .contact b{font-weight:500;user-select:all;text-align:right;overflow-wrap:anywhere}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>.btn{flex:1 1 140px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
+.panel h3{font-size:19px;margin-bottom:10px}
+.note{border-top:1px solid var(--line);padding-top:10px;margin-top:10px;font-size:13.5px}
+.note small{color:var(--muted);display:block;font-size:11.5px}
+textarea,input[type=text],input[type=search],select.f{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+textarea{resize:vertical;min-height:64px}
+/* verse */
+.verse-hero{padding:26px 4px 6px;border-bottom:1px solid var(--line)}
+.verse-hero .eyebrow{color:var(--verse)}
+.verse-hero h2{font-size:38px;line-height:1.05;margin-top:8px}
+.verse-hero h2 i{color:var(--verse)}
+.verse-hero p{color:var(--muted);max-width:60ch}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{aspect-ratio:4/5;max-width:100%;border-radius:14px;padding:12px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid var(--line);position:relative;overflow:hidden}
+.tile b{font-family:var(--display);font-weight:400;font-size:16px;line-height:1.2;position:relative}
+.tile small{color:color-mix(in srgb,var(--fg) 70%,transparent);font-size:11px;position:relative}
+.tile:first-child{grid-column:1/-1;aspect-ratio:16/9}
+.tl{display:grid;gap:12px}
+.tl div{display:grid;grid-template-columns:64px 1fr;gap:12px;font-size:13.5px}
+.tl span{color:var(--verse);font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stats b{display:block;font-family:var(--display);font-size:24px;font-weight:400}
+.stats small{color:var(--muted);font-size:11px}
+/* company */
+.dept h3{font-size:13px;font-family:var(--sans);font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--studio);display:flex;justify-content:space-between;margin:6px 0 8px}
+.dept h3 span{color:var(--muted);font-weight:500}
+.person{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.person .t{flex:1;min-width:0}
+.person .t b{display:block;font-weight:600;font-size:14px}
+.person .t small{color:var(--muted);font-size:12px}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:currentColor}
+.swatches{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid transparent}
+.sw.on{border-color:var(--fg)}
+/* segmented */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{border:1px solid var(--line);background:var(--panel-2);border-radius:12px;padding:12px 6px;font-weight:600;font-size:13px}
+.seg button.on{border-color:currentColor;background:color-mix(in srgb,currentColor 14%,var(--panel))}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.slots button{border:1px solid var(--line);background:var(--panel-2);border-radius:10px;padding:9px 4px;font-size:13px;font-variant-numeric:tabular-nums}
+.slots button.on{background:var(--studio);color:var(--studio-ink);border-color:transparent;font-weight:700}
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.days button{flex:none;border:1px solid var(--line);background:var(--panel-2);border-radius:12px;padding:8px 12px;font-size:12.5px;text-align:center}
+.days button.on{border-color:var(--studio);color:var(--studio)}
+.req{border-top:1px solid var(--line);padding-top:12px;margin-top:12px;display:grid;gap:8px;font-size:13.5px}
+.req .meta{color:var(--muted);font-size:12px}
+.pill{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid currentColor}
+.pill.pending{color:var(--busy)} .pill.accepted{color:var(--ok)} .pill.declined{color:var(--muted)}
+label.l{display:grid;gap:6px;font-size:12px;color:var(--muted)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+nav.tabs div{max-width:460px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+nav.tabs button{background:none;border:0;padding:8px 2px;border-radius:10px;font-size:11.5px;font-weight:600;color:var(--muted);display:grid;justify-items:center;gap:3px}
+nav.tabs button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5}
+nav.tabs button.on{color:var(--verse)}
+.badge{background:var(--verse);color:var(--bg);border-radius:999px;font-size:10px;padding:0 5px;margin-left:2px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:460px;background:var(--panel);border:1px solid var(--line);border-radius:22px 22px 0 0;padding:20px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;max-height:85vh;overflow:auto}
+.sheet h3{font-size:22px}
+pre.vcf{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:11.5px;overflow-x:auto;margin:0;color:var(--muted)}
+.muted{color:var(--muted)} .fine{font-size:11.5px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.view{animation:in .28s ease-out}@keyframes in{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">ZKJ Verse<small>Company Edition · demo</small></div>
+    <label class="as">Viewing as <select id="asSel" aria-label="Viewing as"></select></label>
+  </header>
+  <div class="guide" id="guide"></div>
+  <main id="main"></main>
+</div>
+<nav class="tabs"><div id="tabs"></div></nav>
+<div id="layer"></div>
+
+<script>
+(function(){
+const STUDIO={name:"Ardea Studio",place:"Dubai Design District",domain:"ardea.example"};
+const PALETTES=[["Lagoon","#5fb0aa"],["Sandstone","#c9a477"],["Iris","#9a8ae0"],["Coral","#e0866e"]];
+const DEPTS=["Design","Technical / CAD","Procurement","Site"];
+const raw=[
+["Layla Haddad","Design Director",0,"available"],["Omar Farouk","Senior Interior Designer",0,"available"],["Mira Castellan","Interior Designer",0,"busy"],["Yusuf Rahman","FF&E Designer",0,"available"],["Sana Qureshi","Junior Designer",0,"available"],["Daniel Okafor","Lighting Designer",0,"site"],["Hana Saleh","Materials Curator",0,"available"],["Tariq Nasser","Visualiser",0,"busy"],
+["Rami Aziz","Technical Director",1,"busy"],["Priya Menon","BIM Coordinator",1,"available"],["Karim Saeed","Senior CAD Technician",1,"available"],["Elena Varga","Detailing Lead",1,"available"],["Faisal Amin","CAD Technician",1,"busy"],["Noor Jabri","Document Controller",1,"available"],
+["Aisha Mansour","Procurement Manager",2,"available"],["Leo Brandt","Senior Buyer",2,"busy"],["Reem Khalil","Logistics Coordinator",2,"site"],["Samir Haddadin","Supplier Liaison",2,"available"],
+["Hassan Darwish","Site Director",3,"site"],["Joanna Silva","Site Manager",3,"site"],["Ali Murad","Fit-out Supervisor",3,"site"],["Zain Kabbani","Snagging Lead",3,"available"],["Fatima Obeid","Site Coordinator",3,"busy"],["Marco Ruiz","Joinery Inspector",3,"site"]];
+const STORY=[
+ "Shapes interiors from the first sketch to the final styling walk, with a soft spot for stone, timber and daylight.",
+ "Turns design intent into drawings that contractors can build from without a single phone call.",
+ "Finds the right maker for every finish, and keeps lead times honest from order to delivery.",
+ "Keeps the site calm, safe and on programme, and makes sure what is built matches what was drawn."];
+const PROJ=[["Marina Penthouse","Residential · 640 m²"],["Creek Gallery Café","Hospitality · 210 m²"],["Hillside Villa","Residential · 1,150 m²"],["Boulevard Clinic","Healthcare · 480 m²"],["Harbour Office Floor","Workplace · 1,900 m²"],["Courtyard Suites","Hospitality · 36 keys"]];
+const GRAD=["linear-gradient(150deg,#3a4a48,#1b2221)","linear-gradient(150deg,#4a3f33,#1f1a16)","linear-gradient(150deg,#3b3650,#18161f)","linear-gradient(150deg,#4b3a35,#1f1817)","linear-gradient(150deg,#333f4f,#15191f)","linear-gradient(150deg,#45453a,#1c1c17)"];
+const S={people:[],as:1,cur:0,view:"card",step:1,palette:0,notes:{},meetings:[],q:"",mt:{to:null,day:0,slot:null,topic:""},toastT:0};
+raw.forEach((r,i)=>{const [n,role,d,st]=r;const f=n.split(" ")[0].toLowerCase();
+ S.people.push({id:i,name:n,role,dept:d,status:st,ini:n.split(" ").map(w=>w[0]).join(""),
+  email:f+"@"+STUDIO.domain,phone:"+971 50 000 "+String(1100+i*7).padStart(4,"0"),ext:String(201+i),
+  years:4+((i*5)%13),projects:12+((i*7)%40),story:STORY[d],
+  proj:[PROJ[i%6],PROJ[(i+2)%6],PROJ[(i+4)%6]].map((p,k)=>({t:p[0],m:p[1],g:GRAD[(i+k*2)%6]}))});});
+S.notes[0]=[{from:9,text:"Revised joinery details for the Marina kitchen are in the shared folder.",t:"Yesterday"}];
+S.meetings.push({id:1,from:14,to:1,day:1,slot:"11:00",topic:"Stone samples for Hillside Villa",state:"pending"});
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const P=id=>S.people[id];
+const ST={available:["Available","st-available"],busy:["Busy","st-busy"],site:["On site","st-site"]};
+const statusHTML=p=>`<span class="status ${ST[p.status][1]}">${ST[p.status][0]}</span>`;
+const DAYS=(()=>{const out=[];const d=new Date();let k=0;while(out.length<5){d.setDate(d.getDate()+1);const w=d.getDay();if(w===0||w===6)continue;out.push(d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}));}return out;})();
+const SLOTS=["09:00","10:00","11:00","12:30","14:00","15:00","16:00","16:30","17:00"];
+
+const STEPS=[
+ [1,"Single e-card","One person, one tap to save to phone.",()=>{S.cur=0;go("card")}],
+ [2,"Enter the Verse","The deeper story behind the card.",()=>{S.cur=0;go("verse")}],
+ [3,"Company view","Every card, grouped by department.",()=>go("company")],
+ [4,"Availability","Set your status. It shows on your card.",()=>go("me")],
+ [5,"Meeting request","Pick a colleague and a time. They accept.",()=>go("meet")],
+ [6,"Notes","Leave a short note on a colleague's card.",()=>{S.cur=0;if(S.as===0){S.as=1;asSel();}go("card");setTimeout(()=>{const t=$("#noteTxt");t&&t.scrollIntoView({behavior:"smooth",block:"center"})},60)}]];
+function guide(){const s=STEPS[S.step-1];
+ $("#guide").innerHTML=`<div style="display:grid;gap:6px;flex:1;min-width:0"><div class="steps">${STEPS.map(x=>`<i class="${x[0]<=S.step?"on":""}"></i>`).join("")}</div><p><b>${s[0]}/6 · ${s[1]}.</b> ${s[2]}</p></div>
+ <button class="btn sm ghost" id="gPrev" ${S.step===1?"disabled":""} aria-label="Previous step">‹</button><button class="btn sm verse" id="gNext">${S.step===6?"Restart":"Next ›"}</button>`;
+ $("#gNext").onclick=()=>{S.step=S.step===6?1:S.step+1;STEPS[S.step-1][3]();};
+ $("#gPrev").onclick=()=>{if(S.step>1){S.step--;STEPS[S.step-1][3]();}};}
+
+const ICON={card:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M14 10h4M14 13h3M6 16h6"/>',verse:'<path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/>',company:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',meet:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'};
+function tabs(){const pend=S.meetings.filter(m=>m.to===S.as&&m.state==="pending").length;
+ $("#tabs").innerHTML=[["card","Card"],["verse","Verse"],["company","Studio"],["meet","Meet"],["me","Me"]].map(([k,l])=>`<button data-v="${k}" class="${S.view===k?"on":""}"><svg viewBox="0 0 24 24">${ICON[k]}</svg><span>${l}${k==="me"&&pend?`<span class="badge">${pend}</span>`:""}</span></button>`).join("");
+ $("#tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>go(b.dataset.v));}
+function asSel(){$("#asSel").innerHTML=S.people.map(p=>`<option value="${p.id}" ${p.id===S.as?"selected":""}>${esc(p.name)}</option>`).join("");}
+$("#asSel").onchange=e=>{S.as=+e.target.value;toast("Now viewing as "+P(S.as).name);render();};
+
+function go(v){S.view=v;render();window.scrollTo({top:0,behavior:"smooth"});}
+function toast(t){let el=$(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}el.textContent=t;el.hidden=false;clearTimeout(S.toastT);S.toastT=setTimeout(()=>el.hidden=true,2400);}
+
+function vCard(p){return["BEGIN:VCARD","VERSION:3.0","N:"+p.name.split(" ").slice(1).join(" ")+";"+p.name.split(" ")[0]+";;;","FN:"+p.name,"ORG:"+STUDIO.name+";"+DEPTS[p.dept],"TITLE:"+p.role,"TEL;TYPE=WORK,CELL:"+p.phone,"EMAIL;TYPE=WORK:"+p.email,"ADR;TYPE=WORK:;;"+STUDIO.place+";Dubai;;;UAE","NOTE:Demo contact · fictional","END:VCARD"].join("\r\n");}
+function saveSheet(p){const v=vCard(p);
+ sheet(`<div class="eyebrow">Save to phone</div><h3>${esc(p.name)}</h3><p class="muted" style="margin:0">A contact file with name, role, studio, phone and email. On a live card this opens straight in the phone's Contacts app.</p><pre class="vcf">${esc(v)}</pre><div class="row"><button class="btn studio" id="dl">Download contact</button><button class="btn" id="cp">Copy details</button></div><p class="fine">Open the saved file to add it to Contacts.</p>`);
+ $("#dl").onclick=async()=>{const fn=p.name.replace(/\s+/g,"_")+".vcf";let dlc=null;try{dlc=window.claude&&window.claude.use?await window.claude.use("downloads"):null;}catch(e){}if(dlc){try{await dlc.save({filename:fn,data:new Blob([v],{type:"text/vcard"})});toast("Contact saved");}catch(e){toast("Save cancelled");}return;}try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([v],{type:"text/vcard"}));a.download=p.name.replace(/\s+/g,"_")+".vcf";document.body.appendChild(a);a.click();a.remove();toast("Contact file prepared");}catch(e){toast("Download blocked here. Use Copy details.");}};
+ $("#cp").onclick=()=>{const txt=`${p.name}\n${p.role}, ${STUDIO.name}\n${p.phone}\n${p.email}`;navigator.clipboard?.writeText(txt).then(()=>toast("Details copied"),()=>{$(".vcf").textContent=txt;toast("Select the text to copy");});};}
+function sheet(html){$("#layer").innerHTML=`<div class="sheet-bg" id="sbg"><div class="sheet" role="dialog" aria-modal="true">${html}<button class="btn ghost" id="sClose">Close</button></div></div>`;$("#sClose").onclick=closeSheet;$("#sbg").onclick=e=>{if(e.target.id==="sbg")closeSheet();};}
+function closeSheet(){$("#layer").innerHTML="";}
+
+function cardView(){const p=P(S.cur),me=S.cur===S.as,ns=S.notes[p.id]||[];
+ return `<section class="view">
+ <article class="ecard">
+  <div class="studio-tag"><span>${STUDIO.name}</span><em>your studio's identity here</em></div>
+  <div class="who"><div class="av">${p.ini}</div><div style="min-width:0"><h1>${esc(p.name)}</h1><div class="role">${esc(p.role)} · ${DEPTS[p.dept]}</div><div style="margin-top:8px">${statusHTML(p)}</div></div></div>
+  <div class="contact"><div><span>Mobile</span><b>${p.phone}</b></div><div><span>Email</span><b>${p.email}</b></div><div><span>Studio</span><b>${STUDIO.place} · ext ${p.ext}</b></div></div>
+ </article>
+ <div class="row"><button class="btn studio" id="save">Save to phone</button><button class="btn verse" id="enter">Enter the Verse</button></div>
+ ${me?`<button class="btn" id="setSt">This is your card · set your status</button>`:`<button class="btn" id="reqMeet">Request a meeting with ${esc(p.name.split(" ")[0])}</button>`}
+ <div class="panel"><h3>Notes on this card</h3><p class="fine" style="margin:0">Visible to colleagues inside ${STUDIO.name} only.</p>
+  ${ns.length?ns.map(n=>`<div class="note">${esc(n.text)}<small>${esc(P(n.from).name)} · ${esc(n.t)}</small></div>`).join(""):`<p class="muted note">No notes yet. Leave the first one.</p>`}
+  ${me?"":`<form id="noteF" style="display:grid;gap:8px;margin-top:12px"><textarea id="noteTxt" maxlength="200" placeholder="Short note for ${esc(p.name.split(" ")[0])}, e.g. samples are at reception"></textarea><button class="btn studio" type="submit">Leave note as ${esc(P(S.as).name.split(" ")[0])}</button></form>`}
+ </div>
+ <button class="btn ghost" id="toCo">Browse all ${S.people.length} studio cards</button>
+ </section>`;}
+function bindCard(){const p=P(S.cur);
+ $("#save").onclick=()=>saveSheet(p);$("#enter").onclick=()=>{if(S.step===1)S.step=2;go("verse");};
+ $("#toCo").onclick=()=>go("company");
+ const r=$("#reqMeet");if(r)r.onclick=()=>{S.mt.to=p.id;go("meet");};
+ const s=$("#setSt");if(s)s.onclick=()=>go("me");
+ const f=$("#noteF");if(f)f.onsubmit=e=>{e.preventDefault();const t=$("#noteTxt").value.trim();if(!t){toast("Write a short note first");return;}(S.notes[p.id]=S.notes[p.id]||[]).unshift({from:S.as,text:t,t:"Just now"});toast("Note left on "+p.name.split(" ")[0]+"'s card");render();};}
+
+function verseView(){const p=P(S.cur);
+ return `<section class="view">
+ <div class="verse-hero"><div class="eyebrow">The Verse of ${esc(p.name)}</div><h2>${esc(p.role.split(" ").slice(0,-1).join(" ")||p.role)} <i>${esc(p.role.split(" ").slice(-1)[0])}</i></h2><p>${esc(p.story)}</p><div class="row" style="margin-top:10px;align-items:center">${statusHTML(p)}<span class="fine">${DEPTS[p.dept]} · ${STUDIO.name}</span></div></div>
+ <div class="stats panel"><div><b>${p.years}</b><small>years of practice</small></div><div><b>${p.projects}</b><small>projects delivered</small></div><div><b>${3+p.id%4}</b><small>live projects</small></div></div>
+ <div><div class="eyebrow" style="margin-bottom:10px">Portfolio</div><div class="tiles">${p.proj.map(x=>`<div class="tile" style="background:${x.g}"><b>${esc(x.t)}</b><small>${esc(x.m)}</small></div>`).join("")}</div></div>
+ <div class="panel"><h3>Story</h3><p style="margin:0" class="muted">Joined ${STUDIO.name} after years across residential and hospitality work in the Gulf. Known in the studio for clear briefs, careful detailing and calm client meetings.</p></div>
+ <div class="panel"><h3>Experience</h3><div class="tl"><div><span>Now</span><b style="font-weight:500">${esc(p.role)}, ${STUDIO.name}</b></div><div><span>Before</span>${esc(DEPTS[p.dept])} roles on ${p.projects-6}+ residential and hospitality projects</div><div><span>Base</span>Dubai, UAE</div></div></div>
+ <div class="panel"><h3>Current projects</h3>${p.proj.slice(0,2).map((x,k)=>`<div class="note" style="display:flex;justify-content:space-between;gap:8px"><span>${esc(x.t)}</span><span class="fine">${["Concept","Tender","Fit-out"][(p.id+k)%3]}</span></div>`).join("")}</div>
+ <button class="btn verse" id="consult">Request a consultation</button>
+ <button class="btn ghost" id="back">Back to card</button>
+ </section>`;}
+function bindVerse(){const p=P(S.cur);$("#back").onclick=()=>go("card");
+ $("#consult").onclick=()=>{sheet(`<div class="eyebrow">Request a consultation</div><h3>with ${esc(p.name)}</h3><form id="cf" style="display:grid;gap:10px"><label class="l" for="cName">Your name<input type="text" id="cName" value="Visitor (demo)"></label><label class="l" for="cAbout">What is it about?<textarea id="cAbout">A two-bedroom apartment refresh, looking to start next quarter.</textarea></label><button class="btn studio" type="submit">Send request</button></form>`);
+  $("#cf").onsubmit=e=>{e.preventDefault();closeSheet();toast("Request sent to "+p.name.split(" ")[0]+" (demo)");};};}
+
+function companyView(){const q=S.q.toLowerCase();
+ const list=S.people.filter(p=>!q||(p.name+" "+p.role+" "+DEPTS[p.dept]).toLowerCase().includes(q));
+ const counts={available:0,busy:0,site:0};S.people.forEach(p=>counts[p.status]++);
+ return `<section class="view">
+ <div><div class="eyebrow">${STUDIO.name} · ${S.people.length} people</div><h2 style="font-size:30px;margin-top:4px">The studio</h2></div>
+ <div class="row fine" style="gap:14px"><span class="st-available">● ${counts.available} available</span><span class="st-busy">● ${counts.busy} busy</span><span class="st-site">● ${counts.site} on site</span></div>
+ <input type="search" id="q" placeholder="Search name, role or department" value="${esc(S.q)}" aria-label="Search cards">
+ <div class="panel" style="padding:12px 14px"><div class="swatches"><span class="fine" style="margin-right:4px">Studio identity</span>${PALETTES.map((c,i)=>`<button class="sw ${i===S.palette?"on":""}" data-i="${i}" style="background:${c[1]}" aria-label="${c[0]}"></button>`).join("")}<span class="fine">${PALETTES[S.palette][0]}</span></div></div>
+ <div id="dlist">${DEPTS.map((d,di)=>{const ps=list.filter(p=>p.dept===di);if(!ps.length)return"";return `<div class="dept"><h3>${d}<span>${ps.length}</span></h3>${ps.map(p=>`<button class="person" data-id="${p.id}"><div class="av s">${p.ini}</div><div class="t"><b>${esc(p.name)}${p.id===S.as?" · you":""}</b><small>${esc(p.role)}</small></div><span class="dot ${ST[p.status][1]}" title="${ST[p.status][0]}"></span></button>`).join("")}</div>`}).join("")||`<p class="muted">No one matches “${esc(S.q)}”. Try a role such as “site” or “CAD”.</p>`}</div>
+ </section>`;}
+function bindCompany(){const q=$("#q");q.oninput=()=>{S.q=q.value;const pos=q.selectionStart;render();const n=$("#q");n.focus();n.setSelectionRange(pos,pos);};
+ document.querySelectorAll(".person").forEach(b=>b.onclick=()=>{S.cur=+b.dataset.id;go("card");});
+ document.querySelectorAll(".sw").forEach(b=>b.onclick=()=>{S.palette=+b.dataset.i;applyPalette();render();});}
+function applyPalette(){document.documentElement.style.setProperty("--studio",PALETTES[S.palette][1]);}
+
+function meetView(){const me=P(S.as),m=S.mt;const to=m.to!=null&&m.to!==S.as?P(m.to):null;
+ const mine=S.meetings.filter(x=>x.from===S.as).slice().reverse();
+ return `<section class="view">
+ <div><div class="eyebrow">Meeting request</div><h2 style="font-size:30px;margin-top:4px">Find a time</h2><p class="muted" style="margin:4px 0 0">From ${esc(me.name)} to any colleague. They accept from their own card.</p></div>
+ <div class="panel" style="display:grid;gap:14px">
+  <label class="l" for="mTo">With
+   <select class="f" id="mTo"><option value="">Choose a colleague</option>${DEPTS.map((d,di)=>`<optgroup label="${d}">${S.people.filter(p=>p.dept===di&&p.id!==S.as).map(p=>`<option value="${p.id}" ${to&&to.id===p.id?"selected":""}>${esc(p.name)} · ${ST[p.status][0]}</option>`).join("")}</optgroup>`).join("")}</select></label>
+  ${to&&to.status!=="available"?`<p class="fine" style="margin:-6px 0 0">${esc(to.name.split(" ")[0])} is <span class="${ST[to.status][1]}">${ST[to.status][0].toLowerCase()}</span> right now. Pick a later slot.</p>`:""}
+  <div class="l">Day<div class="days">${DAYS.map((d,i)=>`<button type="button" data-d="${i}" class="${m.day===i?"on":""}">${d}</button>`).join("")}</div></div>
+  <div class="l">Time<div class="slots">${SLOTS.map(s=>`<button type="button" data-s="${s}" class="${m.slot===s?"on":""}">${s}</button>`).join("")}</div></div>
+  <label class="l" for="mTopic">Topic<input type="text" id="mTopic" maxlength="80" value="${esc(m.topic)}" placeholder="e.g. Lighting layout for Marina Penthouse"></label>
+  <button class="btn studio" id="mSend">Send request</button>
+ </div>
+ <div class="panel"><h3>Sent by you</h3>${mine.length?mine.map(x=>reqHTML(x,false)).join(""):`<p class="muted" style="margin:0">Nothing sent yet.</p>`}</div>
+ </section>`;}
+function reqHTML(x,incoming){const o=P(incoming?x.from:x.to);
+ return `<div class="req"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-weight:600">${incoming?"From":"To"} ${esc(o.name)}</b><span class="pill ${x.state}">${x.state}</span></div><div>${esc(x.topic||"Quick catch-up")}</div><div class="meta">${DAYS[x.day]} · ${x.slot} · 30 min</div>
+ ${incoming&&x.state==="pending"?`<div class="row"><button class="btn sm studio" data-acc="${x.id}">Accept</button><button class="btn sm" data-dec="${x.id}">Suggest another time</button></div>`:""}
+ ${!incoming&&x.state==="pending"?`<button class="btn sm ghost" data-switch="${x.to}" style="justify-self:start">Switch to ${esc(o.name.split(" ")[0])} to accept ›</button>`:""}</div>`;}
+function bindReq(){document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=()=>{const x=S.meetings.find(m=>m.id==b.dataset.acc);x.state="accepted";toast("Accepted · added to both calendars (demo)");render();});
+ document.querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>{const x=S.meetings.find(m=>m.id==b.dataset.dec);x.state="declined";toast("Asked "+P(x.from).name.split(" ")[0]+" for another time");render();});
+ document.querySelectorAll("[data-switch]").forEach(b=>b.onclick=()=>{S.as=+b.dataset.switch;asSel();toast("Now viewing as "+P(S.as).name);go("me");});}
+function bindMeet(){const m=S.mt;
+ $("#mTo").onchange=e=>{m.to=e.target.value===""?null:+e.target.value;m.topic=$("#mTopic").value;render();};
+ $("#mTopic").oninput=e=>m.topic=e.target.value;
+ document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{m.day=+b.dataset.d;m.topic=$("#mTopic").value;render();});
+ document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{m.slot=b.dataset.s;m.topic=$("#mTopic").value;render();});
+ $("#mSend").onclick=()=>{m.topic=$("#mTopic").value.trim();if(m.to==null||m.to===S.as){toast("Choose a colleague first");return;}if(!m.slot){toast("Pick a time");return;}
+  S.meetings.push({id:Date.now(),from:S.as,to:m.to,day:m.day,slot:m.slot,topic:m.topic,state:"pending"});toast("Request sent to "+P(m.to).name.split(" ")[0]);S.mt={to:null,day:0,slot:null,topic:""};render();};
+ bindReq();}
+
+function meView(){const p=P(S.as);const inc=S.meetings.filter(x=>x.to===S.as).slice().reverse();
+ return `<section class="view">
+ <div style="display:flex;gap:14px;align-items:center"><div class="av">${p.ini}</div><div><div class="eyebrow">You</div><h2 style="font-size:26px">${esc(p.name)}</h2><div class="fine">${esc(p.role)} · ${DEPTS[p.dept]}</div></div></div>
+ <div class="panel"><h3>Your status</h3><p class="fine" style="margin:-4px 0 12px">Shown on your card and in the studio list.</p>
+  <div class="seg">${Object.entries(ST).map(([k,v])=>`<button class="${v[1]} ${p.status===k?"on":""}" data-st="${k}">${v[0]}</button>`).join("")}</div></div>
+ <div class="panel"><h3>Meeting requests for you</h3>${inc.length?inc.map(x=>reqHTML(x,true)).join(""):`<p class="muted" style="margin:0">No requests. Switch “Viewing as” to someone who has one, or send one from Meet.</p>`}</div>
+ <button class="btn" id="myCard">View my card</button>
+ <button class="btn ghost" id="reset">Reset demo</button>
+ </section>`;}
+function bindMe(){const p=P(S.as);
+ document.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{p.status=b.dataset.st;toast("Status set to "+ST[p.status][0].toLowerCase());render();});
+ $("#myCard").onclick=()=>{S.cur=S.as;go("card");};
+ $("#reset").onclick=()=>location.reload();bindReq();}
+
+const V={card:[cardView,bindCard],verse:[verseView,bindVerse],company:[companyView,bindCompany],meet:[meetView,bindMeet],me:[meView,bindMe]};
+function render(){$("#main").innerHTML=V[S.view][0]();V[S.view][1]();tabs();guide();}
+asSel();applyPalette();render();
+})();
+</script>
+
+</body>
+</html>
