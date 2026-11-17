@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/orbit/app/sw.js', { scope: '/orbit/app/' })})}
